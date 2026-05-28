@@ -1,0 +1,50 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.egg-info/
+*.egg
+dist/
+build/
+*.whl
+.env
+.venv/
+venv/
+
+# PyCharm / IntelliJ
+.idea/
+*.iml
+
+# VS Code
+.vscode/
+
+# macOS
+.DS_Store
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+*.cover
+
+# Output directories (generated wiki content)
+wiki/papers/
+wiki/implementation-decisions/
+
+# Temporary files
+*.log
+*.tmp
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Hypothesis
+.hypothesis/
+
+# KiRo specs (local task management)
+.kiro/
+
+# Runtimes
+*.egg-info/
+pip-wheel-metadata/
