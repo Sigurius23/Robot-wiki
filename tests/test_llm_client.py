@@ -12,7 +12,8 @@ Covers:
   - Empty/whitespace response handling
   - OSError in _write_output
   - Directory creation before file write
-  - PROMPT_A_TEMPLATE and PROMPT_B_TEMPLATE contain "TODO"
+  - PROMPT_A_TEMPLATE references the papers entity schema
+  - PROMPT_B_TEMPLATE references the edges.yaml cross-reference vocabulary
 """
 
 import io
@@ -333,19 +334,20 @@ def test_property15_missing_api_key_names_env_var(provider):
 # ===========================================================================
 
 
-class TestPromptTemplatesContainTODO:
-    """PROMPT_A_TEMPLATE and PROMPT_B_TEMPLATE must contain \"TODO\"."""
+class TestPromptTemplatesSchemaReferences:
+    """PROMPT_A_TEMPLATE and PROMPT_B_TEMPLATE reference the correct schemas."""
 
-    def test_prompt_a_contains_todo(self):
-        """Requirement 5.6: PROMPT_A_TEMPLATE contains \"TODO\"."""
-        assert "TODO" in PROMPT_A_TEMPLATE, (
-            f"PROMPT_A_TEMPLATE should contain 'TODO', got: {PROMPT_A_TEMPLATE!r}"
+    def test_prompt_a_references_papers_schema(self):
+        """Requirement 5.6: PROMPT_A_TEMPLATE references the papers entity schema."""
+        assert "`papers` entity schema" in PROMPT_A_TEMPLATE, (
+            f"PROMPT_A_TEMPLATE should reference the papers entity schema, "
+            f"got: {PROMPT_A_TEMPLATE!r}"
         )
 
-    def test_prompt_b_contains_todo(self):
-        """Requirement 6.6: PROMPT_B_TEMPLATE contains \"TODO\"."""
-        assert "TODO" in PROMPT_B_TEMPLATE, (
-            f"PROMPT_B_TEMPLATE should contain 'TODO', got: {PROMPT_B_TEMPLATE!r}"
+    def test_prompt_b_references_edges_schema(self):
+        """Requirement 6.6: PROMPT_B_TEMPLATE references the edges.yaml schema."""
+        assert "edges.yaml" in PROMPT_B_TEMPLATE.lower(), (
+            f"PROMPT_B_TEMPLATE should reference edges.yaml, got: {PROMPT_B_TEMPLATE!r}"
         )
 
 

@@ -8,8 +8,7 @@ Responsibilities:
   - Output file writing with UTF-8 encoding
 
 PROMPT_A_TEMPLATE and PROMPT_B_TEMPLATE are defined as module-level string
-constants. Both contain the literal token "TODO" as a placeholder for future
-replacement with the full prompt text derived from:
+constants. They contain the full prompt text derived from:
   - references/schemas/entities.yaml  (Pass 1 frontmatter structure)
   - references/schemas/edges.yaml     (Pass 2 edge-type vocabulary)
   - references/templates/paper_template.md  (Pass 1 section skeleton)
@@ -24,8 +23,25 @@ from pathlib import Path
 # Prompt templates (placeholders — see module docstring)
 # ---------------------------------------------------------------------------
 
-PROMPT_A_TEMPLATE: str = "TODO"
-PROMPT_B_TEMPLATE: str = "TODO"
+PROMPT_A_TEMPLATE: str = (
+    "You are an expert academic librarian responsible for distilling raw research papers "
+    "into highly structured Obsidian Markdown notes. Your goal is to construct a concise, "
+    "factual summary and generate YAML frontmatter that strictly adheres to the `papers` "
+    "entity schema. Quality and accuracy are paramount: ensure the summary is rigorous and "
+    "directly reflects the paper's actual contents. Use only the provided JSON metadata to "
+    "populate frontmatter fields like year, venue, and citation counts—do NOT hallucinate "
+    "or guess any data. Rely exclusively on the provided text and metadata for your output."
+)
+
+PROMPT_B_TEMPLATE: str = (
+    "You are a meticulous research assistant tasked with mapping new literature against a "
+    "set of 12 predefined thesis implementation decisions. Your goal is to analyze the "
+    "provided paper text and determine how it impacts each decision, using the exact "
+    "cross-reference edge vocabulary established in the `edges.yaml` schema. Quality "
+    "expectations are high: your analysis must be brief, precise, and logically sound. You "
+    "must select from the exact edge types provided below without inventing new relationships "
+    "or hallucinating evidence. Base your entire analysis solely on the provided paper data."
+)
 
 # ---------------------------------------------------------------------------
 # System prompts (used in _call_llm)
