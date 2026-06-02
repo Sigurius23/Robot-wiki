@@ -2,10 +2,20 @@
 llm_client.py — LLM provider abstraction and note generation.
 
 Responsibilities:
-  - Provider initialisation (Anthropic / OpenAI)
+  - Provider initialisation (Anthropic / OpenAI / NVIDIA NIM)
   - Prompt construction from PROMPT_A_TEMPLATE and PROMPT_B_TEMPLATE
   - LLM API calls (Pass 1: paper profile, Pass 2: crossref note)
   - Output file writing with UTF-8 encoding
+
+Supported providers (LLM_PROVIDER env var):
+  - "anthropic"  — Anthropic Claude via the anthropic SDK
+  - "openai"     — OpenAI GPT via the openai SDK
+  - "nim"        — NVIDIA NIM (OpenAI-compatible API at NIM_BASE_URL)
+
+Default models (overridable via LLM_MODEL env var or --model CLI flag):
+  - anthropic → claude-sonnet-4-20250514
+  - openai    → gpt-4o
+  - nim       → deepseek-ai/deepseek-v4-pro
 
 PROMPT_A_TEMPLATE and PROMPT_B_TEMPLATE are defined as module-level string
 constants. They contain the full prompt text derived from:
@@ -14,49 +24,219 @@ constants. They contain the full prompt text derived from:
   - references/templates/paper_template.md  (Pass 1 section skeleton)
 """
 
+import itertools
 import json
+import os
 import sys
+import threading
+import time
 from pathlib import Path
 
+# ---------------------------------------------------------------------------
+# Provider defaults
+# ---------------------------------------------------------------------------
+
+_DEFAULT_MODELS: dict[str, str] = {
+    "anthropic": "claude-sonnet-4-20250514",
+    "openai": "gpt-4o",
+    "nim": "deepseek-ai/deepseek-v4-pro",
+}
+
+# NVIDIA NIM exposes an OpenAI-compatible endpoint.
+# Override with NIM_BASE_URL env var if running on a different host/port.
+_NIM_BASE_URL: str = "https://integrate.api.nvidia.com/v1"
+
 
 # ---------------------------------------------------------------------------
-# Prompt templates (placeholders — see module docstring)
+# Spinner — shows activity during blocking LLM calls
 # ---------------------------------------------------------------------------
 
-PROMPT_A_TEMPLATE: str = (
-    "You are an expert academic librarian responsible for distilling raw research papers "
-    "into highly structured Obsidian Markdown notes. Your goal is to construct a concise, "
-    "factual summary and generate YAML frontmatter that strictly adheres to the `papers` "
-    "entity schema. Quality and accuracy are paramount: ensure the summary is rigorous and "
-    "directly reflects the paper's actual contents. Use only the provided JSON metadata to "
-    "populate frontmatter fields like year, venue, and citation counts—do NOT hallucinate "
-    "or guess any data. Rely exclusively on the provided text and metadata for your output."
-)
+class _Spinner:
+    """A simple terminal spinner that runs in a background thread."""
 
-PROMPT_B_TEMPLATE: str = (
-    "You are a meticulous research assistant tasked with mapping new literature against a "
-    "set of 12 predefined thesis implementation decisions. Your goal is to analyze the "
-    "provided paper text and determine how it impacts each decision, using the exact "
-    "cross-reference edge vocabulary established in the `edges.yaml` schema. Quality "
-    "expectations are high: your analysis must be brief, precise, and logically sound. You "
-    "must select from the exact edge types provided below without inventing new relationships "
-    "or hallucinating evidence. Base your entire analysis solely on the provided paper data."
-)
+    _FRAMES = ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"]
+
+    def __init__(self, message: str):
+        self._message = message
+        self._stop_event = threading.Event()
+        self._thread = threading.Thread(target=self._spin, daemon=True)
+
+    def _spin(self) -> None:
+        for frame in itertools.cycle(self._FRAMES):
+            if self._stop_event.is_set():
+                break
+            sys.stderr.write(f"\r{frame}  {self._message}  ")
+            sys.stderr.flush()
+            time.sleep(0.1)
+        # Clear the spinner line
+        sys.stderr.write(f"\r{' ' * (len(self._message) + 6)}\r")
+        sys.stderr.flush()
+
+    def __enter__(self):
+        self._thread.start()
+        return self
+
+    def __exit__(self, *_):
+        self._stop_event.set()
+        self._thread.join()
+
+
+# ---------------------------------------------------------------------------
+# Prompt templates
+# ---------------------------------------------------------------------------
+
+PROMPT_A_TEMPLATE: str = """\
+You are a research librarian processing an academic paper for an Obsidian knowledge vault.
+The vault supports a bachelor thesis on public goods games (PGG) simulated with LLM-based agents whose personalities are grounded in Schwartz Theory of Basic Human Values.
+Your output must be valid Obsidian markdown.
+
+CRITICAL: Begin your response with the exact YAML block below. Do not alter any field values.
+
+---
+title: "{title}"
+authors: "{authors}"
+year: {year}
+journal: "{journal}"
+citation-count: {citation_count}
+url: "{url}"
+tags: [literature, unprocessed]
+cite-key: "{cite_key}"
+---
+# {title}
+source: {url}
+thesis-relevance: [One sentence — why does this paper matter for the thesis?]
+
+## Summary
+2–4 sentences. Central claim or contribution. Plain academic prose, no bullets.
+
+## Methodology
+One sentence per point:
+- **Study type**: experiment / simulation / survey / meta-analysis / theoretical
+- **Participants or agents**: human / LLM (specify model) / both
+- **N**: sample size or number of simulation runs
+- **Game or task**: exact game or task used
+- **Key manipulations**: independent variables
+- **Outcome measures**: dependent variables
+- **Pre-registered**: yes / no / unclear
+
+## Key findings
+Bullet list. Every finding requires an in-text citation: ([Author], [Year], p. X)
+
+## Limitations acknowledged by the authors
+Bullet list. State the limitation type, not verbatim text.
+
+## What this paper builds on
+Most important prior works explicitly cited. Use this exact format:
+- [[cite-key]] — (Author, Year) — what this paper takes from it
+NOTE: Use the cite-key format for wikilinks (e.g., [[OBrien2023]]), not the author's display name.
+
+## What this paper leaves open
+Gaps directly relevant to the thesis.
+
+## Thesis implications
+Effect on experimental design decisions.
+
+## Contradictions with other papers
+Note contradictions, or write: "No contradictions identified yet."
+
+## APA 7th edition reference
+[Full reference here]
+
+---
+READING RULE: Read the full paper text below. The REFERENCES section at the end
+is a lookup dictionary only — do not summarise it.
+
+=== PAPER TEXT ===
+{pdf_text}"""
+
+PROMPT_B_TEMPLATE: str = """\
+Map this paper against the implementation decisions listed below.
+Answer only what this specific paper explicitly says — do not infer or generalise.
+
+## {cite_key} — implementation decision crossref
+
+### 1. Persona injection — single-value trait description
+- covered: yes / partially / no
+- finding: [one-sentence paraphrase + ([Author], [Year], p. X)]
+- alignment: aligned / contradicts / extends / not covered
+
+### 2. Bonding protocol — text summary injection
+- covered: yes / partially / no
+- finding: [one-sentence paraphrase + ([Author], [Year], p. X)]
+- alignment: aligned / contradicts / extends / not covered
+
+### 3. Stake operationalisation — explicit elimination thresholds
+- covered: yes / partially / no
+- finding: [one-sentence paraphrase + ([Author], [Year], p. X)]
+- alignment: aligned / contradicts / extends / not covered
+
+### 4. Contribution elicitation — structured JSON with motivation field
+- covered: yes / partially / no
+- finding: [one-sentence paraphrase + ([Author], [Year], p. X)]
+- alignment: aligned / contradicts / extends / not covered
+
+### 5. Memory architecture — single preceding round only
+- covered: yes / partially / no
+- finding: [one-sentence paraphrase + ([Author], [Year], p. X)]
+- alignment: aligned / contradicts / extends / not covered
+
+### 6. Gossip & ostracism mechanics
+- covered: yes / partially / no
+- finding: [one-sentence paraphrase + ([Author], [Year], p. X)]
+- alignment: aligned / contradicts / extends / not covered
+
+### 7. Agent evolution — wealth-based cloning
+- covered: yes / partially / no
+- finding: [one-sentence paraphrase + ([Author], [Year], p. X)]
+- alignment: aligned / contradicts / extends / not covered
+
+### 8. Round structure — simultaneous vs. sequential play
+- covered: yes / partially / no
+- finding: [one-sentence paraphrase + ([Author], [Year], p. X)]
+- alignment: aligned / contradicts / extends / not covered
+
+### 9. API failure handling — default to zero contribution
+- covered: yes / partially / no
+- finding: [one-sentence paraphrase + ([Author], [Year], p. X)]
+- alignment: aligned / contradicts / extends / not covered
+
+### 10. Model selection — reasoning vs. standard models
+- covered: yes / partially / no
+- finding: [one-sentence paraphrase + ([Author], [Year], p. X)]
+- alignment: aligned / contradicts / extends / not covered
+
+### 11. Measurement — LLM self-report scales (trust, IOS)
+- covered: yes / partially / no
+- finding: [one-sentence paraphrase + ([Author], [Year], p. X)]
+- alignment: aligned / contradicts / extends / not covered
+
+### 12. Temperature — fixed at 0.7
+- covered: yes / partially / no
+- finding: [one-sentence paraphrase + ([Author], [Year], p. X)]
+- alignment: aligned / contradicts / extends / not covered
+
+---
+At the end, three lines only:
+SUPPORTS: [list decision numbers this paper supports]
+CONTRADICTS: [list decision numbers + one-line tension each]
+SILENT ON: [list decision numbers]"""
+
 
 # ---------------------------------------------------------------------------
 # System prompts (used in _call_llm)
 # ---------------------------------------------------------------------------
 
 _SYSTEM_PROMPT_A: str = (
-    "You are an academic librarian formatting an Obsidian note. "
-    "You MUST use the provided JSON metadata (year, venue, citations) "
-    "for the YAML frontmatter. Do not hallucinate citation counts."
+    "You are a research librarian formatting an Obsidian note for an academic vault. "
+    "Output valid Obsidian markdown only — no code fences, no preamble, no explanation. "
+    "Start directly with the YAML frontmatter block (---). "
+    "Use only the metadata values provided — do not hallucinate citation counts, venues, or authors."
 )
 
 _SYSTEM_PROMPT_B: str = (
-    "You are a research assistant mapping a paper against a set of "
-    "predefined implementation decisions. Use only the edge type "
-    "vocabulary provided in the prompt. Do not invent relationship types."
+    "You are a research assistant mapping a paper against specific thesis implementation decisions. "
+    "Answer only what the paper explicitly states. Do not infer or generalise. "
+    "Output the crossref note directly — no preamble, no explanation."
 )
 
 
@@ -68,11 +248,11 @@ def init_llm_client(provider: str, api_key: str):
     """
     Initialise and return the appropriate SDK client.
 
-    Supports Anthropic and OpenAI (case-insensitive provider name).
+    Supports Anthropic, OpenAI, and NVIDIA NIM (case-insensitive provider name).
     Exits the process with code 1 if ``api_key`` is empty or falsy.
 
     Args:
-        provider: ``"anthropic"`` or ``"openai"`` (case-insensitive).
+        provider: ``"anthropic"``, ``"openai"``, or ``"nim"`` (case-insensitive).
         api_key:  API key string for the chosen provider.
 
     Returns:
@@ -83,10 +263,10 @@ def init_llm_client(provider: str, api_key: str):
     """
     provider_lower = provider.lower()
 
-    if provider_lower not in ("anthropic", "openai"):
+    if provider_lower not in ("anthropic", "openai", "nim"):
         print(
             f"Error: Unknown LLM provider '{provider}'. "
-            f"Must be 'anthropic' or 'openai'.",
+            f"Must be 'anthropic', 'openai', or 'nim'.",
             file=sys.stderr,
         )
         sys.exit(1)
@@ -103,9 +283,18 @@ def init_llm_client(provider: str, api_key: str):
         import anthropic
         return anthropic.Anthropic(api_key=api_key)
 
-    # provider_lower == "openai"
-    import openai
-    return openai.OpenAI(api_key=api_key)
+    if provider_lower == "openai":
+        import openai
+        return openai.OpenAI(api_key=api_key)
+
+    if provider_lower == "nim":
+        import openai
+        base_url = os.getenv("NIM_BASE_URL", _NIM_BASE_URL)
+        return openai.OpenAI(
+            api_key=api_key,
+            base_url=base_url,
+            timeout=120.0,  # NIM cloud can be slow to start streaming on large prompts
+        )
 
 
 def _env_var_for_provider(provider: str) -> str:
@@ -113,6 +302,7 @@ def _env_var_for_provider(provider: str) -> str:
     mapping = {
         "anthropic": "ANTHROPIC_API_KEY",
         "openai": "OPENAI_API_KEY",
+        "nim": "NIM_API_KEY",
     }
     return mapping.get(provider.lower(), "LLM_API_KEY")
 
@@ -126,15 +316,18 @@ def _call_llm(
     provider: str,
     system_prompt: str,
     user_prompt: str,
+    model: str | None = None,
 ) -> str:
     """
     Dispatch a prompt to the appropriate LLM SDK and return the response text.
 
     Args:
-        client:        An initialised Anthropic or OpenAI client.
-        provider:      ``"anthropic"`` or ``"openai"`` (case-insensitive).
+        client:        An initialised Anthropic, OpenAI, or NIM client.
+        provider:      ``"anthropic"``, ``"openai"``, or ``"nim"`` (case-insensitive).
         system_prompt: System-level instruction for the model.
         user_prompt:   User-level prompt text (may include the template).
+        model:         Model name override. Falls back to the provider default
+                       from ``_DEFAULT_MODELS`` if ``None``.
 
     Returns:
         The model's text response.
@@ -143,25 +336,42 @@ def _call_llm(
         Exception: on SDK / API error (caught by the caller).
     """
     provider_lower = provider.lower()
+    resolved_model = model or _DEFAULT_MODELS.get(provider_lower, "")
 
     if provider_lower == "anthropic":
         response = client.messages.create(
-            model="claude-sonnet-4-20250514",
+            model=resolved_model,
             max_tokens=4096,
             system=system_prompt,
             messages=[{"role": "user", "content": user_prompt}],
         )
         return response.content[0].text
 
-    elif provider_lower == "openai":
-        response = client.chat.completions.create(
-            model="gpt-4o",
+    elif provider_lower in ("openai", "nim"):
+        # Use streaming to avoid gateway timeouts on long generations.
+        # Chunks arrive continuously so the connection never idles out.
+        chunks = []
+        token_count = 0
+        stream = client.chat.completions.create(
+            model=resolved_model,
             messages=[
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_prompt},
             ],
+            max_tokens=4096,
+            stream=True,
         )
-        return response.choices[0].message.content
+        for chunk in stream:
+            delta = chunk.choices[0].delta.content
+            if delta:
+                chunks.append(delta)
+                token_count += 1
+                if token_count % 20 == 0:
+                    sys.stderr.write(f"\r  ✍  {token_count} tokens received ...   ")
+                    sys.stderr.flush()
+        sys.stderr.write(f"\r  ✍  {token_count} tokens received — done.   \n")
+        sys.stderr.flush()
+        return "".join(chunks)
 
     else:
         raise ValueError(f"Unsupported provider: {provider}")
@@ -212,29 +422,26 @@ def generate_paper_profile(
     cite_key: str,
     metadata: dict,
     pdf_text: str,
+    model: str | None = None,
 ) -> None:
     """
     LLM Pass 1: generate the paper profile Obsidian note.
 
-    Constructs a prompt from ``PROMPT_A_TEMPLATE`` with *metadata* and
-    *pdf_text* injected, then calls the LLM.  Writes the result to
-    ``./wiki/papers/{cite_key}.md`` via ``_write_output``.
-
-    Prints to stderr and skips the file write on API error or empty response.
-
     Args:
         client:    Initialised LLM SDK client.
-        provider:  ``"anthropic"`` or ``"openai"`` (case-insensitive).
+        provider:  ``"anthropic"``, ``"openai"``, or ``"nim"`` (case-insensitive).
         cite_key:  Obsidian cite-key for the paper (e.g. ``"smith2024"``).
         metadata:  Dict with keys ``year``, ``venue``, ``citationCount``,
                    ``authors``, ``baseline_trust_score``, ``cite_key``,
                    ``title`` (some may be ``None``).
         pdf_text:  Full cleaned PDF text.
+        model:     Model name override (uses provider default if ``None``).
     """
     user_prompt = _build_prompt_a(metadata, pdf_text)
 
     try:
-        response_text = _call_llm(client, provider, _SYSTEM_PROMPT_A, user_prompt)
+        with _Spinner(f"[1/2] Generating paper profile for '{cite_key}' ..."):
+            response_text = _call_llm(client, provider, _SYSTEM_PROMPT_A, user_prompt, model)
     except Exception as exc:
         print(
             f"Error generating paper profile for '{cite_key}': {exc}",
@@ -251,45 +458,38 @@ def generate_paper_profile(
 
     output_path = f"./wiki/papers/{cite_key}.md"
     _write_output(output_path, response_text, cite_key)
+    print(f"✓  Paper profile written → {output_path}", file=sys.stderr)
 
 
 def _build_prompt_a(metadata: dict, pdf_text: str) -> str:
-    """Construct the Pass 1 user prompt around PROMPT_A_TEMPLATE."""
+    """Construct the Pass 1 prompt by injecting metadata into PROMPT_A_TEMPLATE."""
+    title = metadata.get("title") or "Unknown Title"
+    year = metadata.get("year") or "Unknown"
+    journal = metadata.get("venue") or "Unknown"
+    citation_count = metadata.get("citationCount") if metadata.get("citationCount") is not None else "Unknown"
+    cite_key = metadata.get("cite_key") or "unknown"
 
-    # Build a JSON-safe subset of metadata for the prompt.
-    prompt_meta = {
-        "year": metadata.get("year"),
-        "venue": metadata.get("venue"),
-        "citationCount": metadata.get("citationCount"),
-        "authors": metadata.get("authors", []),
-        "baseline_trust_score": metadata.get("baseline_trust_score"),
-        "cite_key": metadata.get("cite_key"),
-        "title": metadata.get("title"),
-    }
-    meta_json = json.dumps(prompt_meta, indent=2, default=str)
+    # Format authors as "Last, F., Last, F." string
+    raw_authors = metadata.get("authors") or []
+    if raw_authors:
+        authors = ", ".join(a.get("name", "") for a in raw_authors if a.get("name"))
+    else:
+        authors = "Unknown"
 
-    return (
-        f"{PROMPT_A_TEMPLATE}\n\n"
-        f"## Paper metadata (JSON)\n\n"
-        f"```json\n{meta_json}\n```\n\n"
-        f"## Paper full text\n\n"
-        f"{pdf_text}\n\n"
-        f"---\n\n"
-        f"Using the metadata above, generate a structured Obsidian Markdown note "
-        f"for this paper. The YAML frontmatter MUST conform to the `papers` entity "
-        f"schema: include fields `title`, `venue`, `year`, `importance` (1–5), "
-        f"`contribution_type`, `tags`, `cited_by`, `datasets`, `code_url`, and any "
-        f"other relevant fields. Use the provided metadata values — do NOT "
-        f"hallucinate citation counts or venue names. Then, follow this section "
-        f"structure for the body:\n\n"
-        f"## Problem & Context\n"
-        f"## Key idea\n"
-        f"## Method\n"
-        f"## Experiment & Results\n"
-        f"## Limitations\n"
-        f"## Open questions\n"
-        f"## My take\n"
-        f"## Related"
+    # URL from externalIds if available
+    ext = metadata.get("externalIds") or {}
+    doi = ext.get("DOI", "")
+    url = f"https://doi.org/{doi}" if doi else ""
+
+    return PROMPT_A_TEMPLATE.format(
+        title=title,
+        authors=authors,
+        year=year,
+        journal=journal,
+        citation_count=citation_count,
+        url=url,
+        cite_key=cite_key,
+        pdf_text=pdf_text,
     )
 
 
@@ -303,28 +503,24 @@ def generate_crossref_note(
     cite_key: str,
     pdf_text: str,
     paper_title: str,
+    model: str | None = None,
 ) -> None:
     """
     LLM Pass 2: generate the implementation-decision cross-reference note.
 
-    Constructs a prompt from ``PROMPT_B_TEMPLATE`` with *cite_key*,
-    *paper_title*, and *pdf_text* injected, then calls the LLM.  Writes the
-    result to ``./wiki/implementation-decisions/{cite_key}-crossref.md`` via
-    ``_write_output``.
-
-    Prints to stderr and skips the file write on API error or empty response.
-
     Args:
         client:       Initialised LLM SDK client.
-        provider:     ``"anthropic"`` or ``"openai"`` (case-insensitive).
+        provider:     ``"anthropic"``, ``"openai"``, or ``"nim"`` (case-insensitive).
         cite_key:     Obsidian cite-key for the paper.
         pdf_text:     Full cleaned PDF text.
         paper_title:  Paper title (from metadata or PDF extraction).
+        model:        Model name override (uses provider default if ``None``).
     """
     user_prompt = _build_prompt_b(cite_key, paper_title, pdf_text)
 
     try:
-        response_text = _call_llm(client, provider, _SYSTEM_PROMPT_B, user_prompt)
+        with _Spinner(f"[2/2] Generating crossref note for '{cite_key}' ..."):
+            response_text = _call_llm(client, provider, _SYSTEM_PROMPT_B, user_prompt, model)
     except Exception as exc:
         print(
             f"Error generating crossref note for '{cite_key}': {exc}",
@@ -341,36 +537,10 @@ def generate_crossref_note(
 
     output_path = f"./wiki/implementation-decisions/{cite_key}-crossref.md"
     _write_output(output_path, response_text, cite_key)
+    print(f"✓  Crossref note written  → {output_path}", file=sys.stderr)
 
 
 def _build_prompt_b(cite_key: str, paper_title: str, pdf_text: str) -> str:
-    """Construct the Pass 2 user prompt around PROMPT_B_TEMPLATE."""
-    return (
-        f"{PROMPT_B_TEMPLATE}\n\n"
-        f"## Paper reference\n\n"
-        f"- **Cite key:** {cite_key}\n"
-        f"- **Title:** {paper_title}\n\n"
-        f"## Edge type vocabulary\n\n"
-        f"When tagging each implementation decision, you MUST use EXACTLY one of "
-        f"the following relationship types:\n\n"
-        f"- `supports` — the paper provides evidence or arguments in favour of "
-        f"the decision\n"
-        f"- `contradicts` — the paper provides evidence or arguments against "
-        f"the decision\n"
-        f"- `builds_on` — the paper extends, improves, or directly builds upon "
-        f"the decision\n"
-        f"- `challenges` — the paper questions the assumptions or validity of "
-        f"the decision\n"
-        f"- `addresses_gap` — the paper fills a gap that the decision identifies "
-        f"or implies\n"
-        f"- `no_coverage` — the paper does not meaningfully address the decision\n\n"
-        f"## Paper full text\n\n"
-        f"{pdf_text}\n\n"
-        f"---\n\n"
-        f"For each of the 12 thesis implementation decisions, write a short "
-        f"analysis of how the paper relates to the decision. Tag each entry "
-        f"with exactly one of the six edge types above. Format each entry as:\n\n"
-        f"### Decision N: [Decision name]\n"
-        f"- **Relationship:** `edge_type`\n"
-        f"- **Analysis:** [1–3 sentences explaining the relationship]"
-    )
+    """Construct the Pass 2 prompt by injecting cite_key into PROMPT_B_TEMPLATE."""
+    crossref = PROMPT_B_TEMPLATE.format(cite_key=cite_key)
+    return f"{crossref}\n\n=== PAPER TEXT ===\n{pdf_text}"

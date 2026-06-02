@@ -20,73 +20,176 @@ def fetch_metadata(doi: str | None, pdf_text: str) -> dict:
     """
     Fetch paper metadata from Semantic Scholar.
 
-    Returns a dict with keys: year, venue, citationCount, authors.
-    Falls back to manual entry on API failure or no results.
-
-    Args:
-        doi:      DOI string if provided by user, else None.
-        pdf_text: Extracted PDF text; first page used for title extraction
-                  when doi is None.
+    Lookup strategy:
+      1. DOI from CLI argument (if provided)
+      2. DOI extracted from PDF text (https://doi.org/... or bare 10.xxx/...)
+      3. Title-based search (full, then shortened)
+      4. Synthetic metadata from PDF text (no manual entry)
     """
+    # --- Strategy 1: CLI-provided DOI ---
     if doi is not None:
+        result = _try_doi_lookup(doi)
+        if result is not None:
+            return result
+        print("Warning: DOI lookup failed, falling back to PDF DOI extraction.", file=sys.stderr)
+
+    # --- Strategy 2: DOI extracted from PDF text ---
+    pdf_doi = _extract_doi_from_text(pdf_text)
+    if pdf_doi and pdf_doi != doi:
+        print(f"→  Found DOI in PDF text: {pdf_doi}", file=sys.stderr)
+        print(f"→  Looking up DOI on Semantic Scholar ...", file=sys.stderr)
+        result = _try_doi_lookup(pdf_doi)
+        if result is not None:
+            print(f"✓  DOI lookup succeeded", file=sys.stderr)
+            return result
+        print("Warning: PDF DOI lookup failed, falling back to title search.", file=sys.stderr)
+
+    # --- Strategy 3: Title-based search ---
+    title = _extract_title_from_text(pdf_text)
+    print(f"→  Trying title search ...", file=sys.stderr)
+    queries = _build_search_queries(title, pdf_text)
+
+    for query in queries:
+        if not query:
+            continue
         try:
-            result = _query_by_doi(doi)
+            result = _query_by_title(query)
         except requests.HTTPError as exc:
             status_code = exc.response.status_code if exc.response is not None else "unknown"
             print(
-                f"Warning: Semantic Scholar API returned HTTP {status_code} for DOI '{doi}'.",
+                f"Warning: Semantic Scholar API returned HTTP {status_code} for query '{query}'.",
                 file=sys.stderr,
             )
-            return _prompt_manual_entry()
+            continue
         except RuntimeError as exc:
-            print(
-                f"Warning: Network error while fetching metadata for DOI '{doi}': {exc}",
-                file=sys.stderr,
-            )
-            return _prompt_manual_entry()
+            print(f"Warning: Network error for query '{query}': {exc}", file=sys.stderr)
+            continue
 
-        if result is None:
-            print(
-                f"Warning: Semantic Scholar rate limit exhausted for DOI '{doi}'.",
-                file=sys.stderr,
-            )
-            return _prompt_manual_entry()
+        if result is not None:
+            return result
+        print(f"Warning: No results for query '{query}', trying next fallback...", file=sys.stderr)
 
-        return result
+    # --- Strategy 4: Extract from PDF text ---
+    print(
+        "Warning: All Semantic Scholar queries failed. Extracting metadata from PDF text.",
+        file=sys.stderr,
+    )
+    return _extract_metadata_from_pdf(pdf_text)
 
-    # No DOI — fall back to title-based search.
-    title = _extract_title_from_text(pdf_text)
-    if title is None:
-        print(
-            "Warning: Could not extract title from PDF text; falling back to manual entry.",
-            file=sys.stderr,
-        )
-        return _prompt_manual_entry()
 
+def _try_doi_lookup(doi: str) -> dict | None:
+    """Attempt a DOI lookup, returning None on any failure."""
     try:
-        result = _query_by_title(title)
+        return _query_by_doi(doi)
     except requests.HTTPError as exc:
         status_code = exc.response.status_code if exc.response is not None else "unknown"
-        print(
-            f"Warning: Semantic Scholar API returned HTTP {status_code} for title query '{title}'.",
-            file=sys.stderr,
-        )
-        return _prompt_manual_entry()
+        print(f"Warning: Semantic Scholar API returned HTTP {status_code} for DOI '{doi}'.", file=sys.stderr)
+        return None
     except RuntimeError as exc:
-        print(
-            f"Warning: Network error while fetching metadata for title '{title}': {exc}",
-            file=sys.stderr,
-        )
-        return _prompt_manual_entry()
+        print(f"Warning: Network error for DOI '{doi}': {exc}", file=sys.stderr)
+        return None
 
-    if result is None:
-        print(
-            f"Warning: No results found for title query '{title}'.",
-            file=sys.stderr,
-        )
-        return _prompt_manual_entry()
 
-    return result
+def _extract_doi_from_text(pdf_text: str) -> str | None:
+    """
+    Extract the first DOI found in the PDF text.
+
+    Looks for:
+      - https://doi.org/10.xxxxx
+      - http://doi.org/10.xxxxx
+      - doi.org/10.xxxxx
+      - bare 10.xxxxx/xxxxx pattern near common DOI context words
+    """
+    import re
+
+    # Search in first 3000 chars where DOI usually appears (header/footer)
+    search_text = pdf_text[:3000] + pdf_text[-1000:]
+
+    # Match https://doi.org/10.xxxx/xxxx or doi.org/10.xxxx/xxxx
+    url_pattern = re.search(
+        r'(?:https?://)?doi\.org/(10\.\d{4,}/\S+)',
+        search_text,
+        re.IGNORECASE,
+    )
+    if url_pattern:
+        doi = url_pattern.group(1).rstrip('.,;)')
+        return doi
+
+    # Match bare DOI: 10.xxxx/xxxx (must have a slash after the prefix)
+    bare_pattern = re.search(
+        r'\b(10\.\d{4,}/[^\s,;>]+)',
+        search_text,
+    )
+    if bare_pattern:
+        doi = bare_pattern.group(1).rstrip('.,;)')
+        return doi
+
+    return None
+
+
+def _build_search_queries(title: str | None, pdf_text: str) -> list[str]:
+    """
+    Build a list of progressively simpler search queries to try in order.
+
+    1. Full extracted title
+    2. First 6 words of title
+    3. First 4 words of title
+    4. First 8 words from the PDF body (skip headers)
+    """
+    queries = []
+
+    if title:
+        queries.append(title)
+        words = title.split()
+        if len(words) > 6:
+            queries.append(" ".join(words[:6]))
+        if len(words) > 4:
+            queries.append(" ".join(words[:4]))
+
+    # Try pulling a longer phrase from the first few lines of the PDF
+    if pdf_text:
+        lines = [l.strip() for l in pdf_text.splitlines() if len(l.strip()) > 20]
+        for line in lines[:10]:
+            words = line.split()
+            candidate = " ".join(words[:8])
+            if candidate and candidate not in queries:
+                queries.append(candidate)
+                break
+
+    return queries
+
+
+def _extract_metadata_from_pdf(pdf_text: str) -> dict:
+    """
+    Extract best-effort metadata from PDF text without any API call.
+
+    Looks for year patterns (4-digit numbers 1900-2099) and author-like
+    patterns. Returns a dict with the same keys as the API response,
+    with None/[] for fields that can't be extracted.
+    """
+    import re
+
+    # Try to find a year (4-digit number in plausible range)
+    year = None
+    year_match = re.search(r'\b(19[5-9]\d|20[0-2]\d)\b', pdf_text[:2000])
+    if year_match:
+        year = int(year_match.group(1))
+
+    # Use the best title candidate we can find
+    title = _extract_title_from_text(pdf_text)
+
+    print(
+        f"  → Using PDF-extracted metadata: year={year}, title={title!r}",
+        file=sys.stderr,
+    )
+
+    return {
+        "year": year,
+        "venue": None,
+        "citationCount": None,
+        "authors": [],
+        "title": title,
+    }
 
 
 def _query_by_doi(doi: str) -> dict | None:
@@ -117,16 +220,37 @@ def _query_by_title(title: str) -> dict | None:
 
 def _extract_title_from_text(pdf_text: str) -> str | None:
     """
-    Return the first non-empty, non-whitespace line of pdf_text,
-    treated as the paper title. Returns None if pdf_text is empty
-    or whitespace-only.
+    Return the first plausible title line from pdf_text.
+
+    A plausible title line:
+      - Is not empty or whitespace-only
+      - Is longer than 10 characters (filters out section labels like "ARTICLES")
+      - Is not all-uppercase with fewer than 4 words (filters out journal headers)
+      - Does not look like a page number or URL
+
+    Returns None if pdf_text is empty/whitespace-only or no plausible line found.
     """
     if not pdf_text or not pdf_text.strip():
         return None
 
     for line in pdf_text.splitlines():
-        if line.strip():
-            return line.strip()
+        stripped = line.strip()
+        if not stripped:
+            continue
+        # Too short to be a title
+        if len(stripped) <= 10:
+            continue
+        # All-caps single-word or short phrase (e.g. "ARTICLES", "RESEARCH")
+        words = stripped.split()
+        if stripped.isupper() and len(words) <= 4:
+            continue
+        # Looks like a URL
+        if stripped.startswith("http://") or stripped.startswith("https://"):
+            continue
+        # Looks like a page number or DOI only
+        if stripped.startswith("10.") and len(words) == 1:
+            continue
+        return stripped
 
     return None
 

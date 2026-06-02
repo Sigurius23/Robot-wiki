@@ -16,6 +16,7 @@ Retained:
   - Field extraction: year, venue, citationCount, authors
 """
 
+import os
 import time
 import requests
 
@@ -24,9 +25,23 @@ import requests
 # ---------------------------------------------------------------------------
 
 _BASE_URL = "https://api.semanticscholar.org/graph/v1"
-_FIELDS = "year,venue,citationCount,authors"
+_FIELDS = "year,venue,citationCount,authors,title,abstract,externalIds"
 _MAX_RETRIES = 3
 _RETRY_WAIT_SECONDS = 5
+
+
+def _get_headers() -> dict:
+    """Return request headers, including the API key if set in the environment."""
+    headers = {}
+    api_key = os.getenv("SEMANTIC_SCHOLAR_API_KEY", "")
+    if api_key:
+        headers["x-api-key"] = api_key
+    return headers
+
+
+def _rate_limit_delay() -> float:
+    """Return the pre-request delay: 1s with API key, 3s without."""
+    return 1.0 if os.getenv("SEMANTIC_SCHOLAR_API_KEY", "") else 3.0
 
 
 # ---------------------------------------------------------------------------
@@ -45,18 +60,19 @@ def _get_with_retry(url: str, params: dict | None = None) -> requests.Response |
     status code and emit an appropriate warning.
     """
     for attempt in range(1, _MAX_RETRIES + 1):
+        time.sleep(_rate_limit_delay())  # respect rate limit before every request
         try:
-            response = requests.get(url, params=params, timeout=15)
+            response = requests.get(url, params=params, headers=_get_headers(), timeout=15)
         except requests.RequestException as exc:
             # Network-level error — treat as a non-retryable failure.
             raise RuntimeError(f"Network error contacting Semantic Scholar: {exc}") from exc
 
         if response.status_code == 429:
+            wait = 60 * attempt  # 60s, 120s, 180s — matches AutoSci's escalating backoff
             if attempt < _MAX_RETRIES:
-                time.sleep(_RETRY_WAIT_SECONDS)
+                time.sleep(wait)
                 continue
             else:
-                # All retries exhausted on 429.
                 return None
 
         # Any other status code (success or non-429 error) — return immediately.
@@ -84,7 +100,7 @@ def query_by_doi(doi: str) -> dict | None:
     Raises:
         RuntimeError: on network-level failure.
     """
-    url = f"{_BASE_URL}/paper/{doi}"
+    url = f"{_BASE_URL}/paper/DOI:{doi}"
     params = {"fields": _FIELDS}
 
     response = _get_with_retry(url, params)
@@ -139,14 +155,16 @@ def query_by_title(title: str) -> dict | None:
 
 def _extract_fields(paper_data: dict) -> dict:
     """
-    Extract the four required fields from a Semantic Scholar paper dict.
+    Extract the required fields from a Semantic Scholar paper dict.
 
-    Returns a dict with keys: year, venue, citationCount, authors.
-    Missing fields default to None (year, venue, citationCount) or [] (authors).
+    Returns a dict with keys: year, venue, citationCount, authors, title.
+    Missing fields default to None or [] for authors.
     """
     return {
         "year": paper_data.get("year"),
         "venue": paper_data.get("venue"),
         "citationCount": paper_data.get("citationCount"),
         "authors": paper_data.get("authors", []),
+        "title": paper_data.get("title"),
+        "externalIds": paper_data.get("externalIds") or {},
     }

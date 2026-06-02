@@ -117,6 +117,15 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         default=None,
         help="Cite-key for the output notes (optional; derived from filename if omitted).",
     )
+    parser.add_argument(
+        "--model",
+        default=None,
+        help=(
+            "Model name override (optional). "
+            "Defaults: anthropic=claude-sonnet-4-20250514, "
+            "openai=gpt-4o, nim=deepseek-ai/deepseek-v4-pro."
+        ),
+    )
 
     args = parser.parse_args(argv)
 
@@ -168,6 +177,8 @@ def main(argv: list[str] | None = None) -> None:
     pdf_path: str = args.pdf
     doi: str | None = args.doi
     cite_key: str = args.cite_key if args.cite_key else derive_cite_key(pdf_path)
+    # --model flag takes precedence; fall back to LLM_MODEL env var
+    model: str | None = args.model or os.getenv("LLM_MODEL") or None
 
     # --- Step 2: Load environment & validate -------------------------------------
     load_dotenv()
@@ -188,10 +199,13 @@ def main(argv: list[str] | None = None) -> None:
     elif provider_lower == "openai":
         api_key = os.getenv("OPENAI_API_KEY")
         env_var_name = "OPENAI_API_KEY"
+    elif provider_lower == "nim":
+        api_key = os.getenv("NIM_API_KEY")
+        env_var_name = "NIM_API_KEY"
     else:
         print(
             f"Error: Unknown LLM_PROVIDER '{provider}'. "
-            f"Must be 'anthropic' or 'openai'.",
+            f"Must be 'anthropic', 'openai', or 'nim'.",
             file=sys.stderr,
         )
         sys.exit(1)
@@ -204,20 +218,30 @@ def main(argv: list[str] | None = None) -> None:
         sys.exit(1)
 
     # --- Step 3: Extract text from PDF -------------------------------------------
+    print(f"→  Extracting text from PDF ...", file=sys.stderr)
     try:
         pdf_text = extract_text(pdf_path)
     except RuntimeError as exc:
         print(f"Error: Failed to extract text from PDF: {exc}", file=sys.stderr)
         sys.exit(1)
+    print(f"✓  Extracted {len(pdf_text):,} characters", file=sys.stderr)
 
     # --- Step 4: Fetch metadata --------------------------------------------------
+    print(f"→  Fetching metadata from Semantic Scholar ...", file=sys.stderr)
     metadata = fetch_metadata(doi, pdf_text)
+    year = metadata.get("year")
+    venue = metadata.get("venue") or "unknown"
+    citations = metadata.get("citationCount")
+    citations_str = str(citations) if citations is not None else "unknown"
+    authors_count = len(metadata.get("authors") or [])
+    print(f"✓  Metadata: year={year}, venue={venue!r}, citations={citations_str}, authors={authors_count}", file=sys.stderr)
 
     # --- Step 5: Compute trust score ---------------------------------------------
     venue = metadata.get("venue")
     year = metadata.get("year")
     citation_count = metadata.get("citationCount")
     baseline_trust_score = compute_baseline_trust_score(venue, year, citation_count)
+    print(f"✓  Baseline trust score: {baseline_trust_score}/10", file=sys.stderr)
 
     # --- Step 6: Enrich metadata -------------------------------------------------
     metadata["baseline_trust_score"] = baseline_trust_score
@@ -231,11 +255,11 @@ def main(argv: list[str] | None = None) -> None:
     client = init_llm_client(provider, api_key)
 
     # --- Step 8: Generate paper profile (Pass 1) ---------------------------------
-    generate_paper_profile(client, provider, cite_key, metadata, pdf_text)
+    generate_paper_profile(client, provider, cite_key, metadata, pdf_text, model)
 
     # --- Step 9: Generate crossref note (Pass 2) ---------------------------------
     paper_title = metadata.get("title") or cite_key
-    generate_crossref_note(client, provider, cite_key, pdf_text, paper_title)
+    generate_crossref_note(client, provider, cite_key, pdf_text, paper_title, model)
 
 
 # ---------------------------------------------------------------------------
