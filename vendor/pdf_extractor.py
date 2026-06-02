@@ -107,8 +107,10 @@ def _clean_text(text: str) -> str:
     text = _RE_NEWLINES.sub("\n\n", text)
 
     # Step 3: Strip bibliography section and everything after it.
+    # To prevent early truncation of body text, only strip if the match occurs
+    # in the second half of the document character length.
     match = _RE_BIBLIOGRAPHY.search(text)
-    if match:
+    if match and match.start() > len(text) * 0.5:
         text = text[: match.start()]
 
     return text

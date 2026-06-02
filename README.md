@@ -4,16 +4,67 @@ A single-command Python CLI that transforms a local academic PDF into two struct
 
 ---
 
+## Prerequisites & Installation
+
+This pipeline requires **Python 3.10+** (utilises modern union type syntax `str | None`).
+
+```bash
+# 1. Create and activate a virtual environment
+python3 -m venv .venv
+source .venv/bin/activate
+
+# 2. Install pinned dependencies
+pip install -r requirements.txt
+```
+
+---
+
+## Configuration
+
+Before running the pipeline, configure your API keys in a local `.env` file. Copy the template and fill in the values:
+
+```bash
+cp .env.example .env
+```
+
+### `.env` File Structure
+```dotenv
+# LLM provider: "anthropic", "openai", or "nim"
+LLM_PROVIDER=nim
+
+# API keys — only the key for your chosen provider is required
+NIM_API_KEY=nvapi-...
+ANTHROPIC_API_KEY=sk-ant-...
+OPENAI_API_KEY=sk-...
+
+# Semantic Scholar API key (optional but recommended — 1 req/s vs shared pool)
+# Get one free at: https://www.semanticscholar.org/product/api
+SEMANTIC_SCHOLAR_API_KEY=...
+
+# Optional overrides
+# LLM_MODEL=deepseek-ai/deepseek-v4-pro   # overrides provider default
+# NIM_BASE_URL=http://0.0.0.0:8000/v1      # point at local NIM container
+```
+
+### Default Models
+
+If you do not specify a model via `--model` or `LLM_MODEL`, the pipeline uses these defaults:
+
+| Provider | Default model |
+|---|---|
+| `nim` | `deepseek-ai/deepseek-v4-pro` |
+| `anthropic` | `claude-sonnet-4-20250514` |
+| `openai` | `gpt-4o` |
+
+---
+
 ## Quick Start
 
 ```bash
-# 1. Copy and fill in your API keys
-cp .env.example .env
-
-# 2. Drop your PDF into raw_papers/
+# 1. Drop your PDF into raw_papers/
 cp your_paper.pdf raw_papers/
 
-# 3. Run the pipeline
+# 2. Run the pipeline
 python ingest.py --pdf "./raw_papers/your_paper.pdf"
 
 # Optional: override the cite-key (default: derived from filename)
@@ -26,13 +77,128 @@ python ingest.py --pdf "./raw_papers/your_paper.pdf" --doi 10.1234/abc
 python ingest.py --pdf "./raw_papers/your_paper.pdf" --model meta/llama-3.1-70b-instruct
 ```
 
-**Output:**
+**Output Files:**
 - `./wiki/papers/{cite-key}.md` — structured paper profile note
 - `./wiki/implementation-decisions/{cite-key}-crossref.md` — crossref against 12 thesis implementation decisions
+
+### Example Outputs
+
+Here is what the generated files look like for a sample paper:
+
+<details>
+<summary>📄 View Example Paper Profile (<code>wiki/papers/schwartz2024.md</code>)</summary>
+
+```markdown
+---
+title: "Revision and Cross-cultural Adaptation of the Human Values Scale for Self-completion Modes"
+authors: "Elena Sommer, Brita Dorer, Ulrike Efu Nkong, Tim Hanson, Sabine Zinn, Shalom H. Schwartz"
+year: 2025
+journal: "Survey Practice"
+citation-count: 0
+url: "https://doi.org/10.29115/sp-2025-0017"
+tags: [literature, unprocessed]
+cite-key: "schwartz2024"
+---
+# Revision and Cross-cultural Adaptation of the Human Values Scale for Self-completion Modes
+source: https://doi.org/10.29115/sp-2025-0017
+thesis-relevance: Details the development and cross-cultural validation of the revised 20-item Human Values Scale, providing the validated instrument and methodology essential for operationalising agents' Schwartz values in a simulated PGG.
+
+## Summary
+This paper documents the revision and adaptation of the Human Values Scale (HVS) for the European Social Survey’s transition to self-completion modes. It introduces a shortened, gender-neutral, 20-item scale designed to measure the refined theory of 19 basic human values. Through a multilingual translation process (TRAPD) and a cognitive pretest with participants of diverse migration backgrounds, the study refined the scale for cross-cultural comparability, leading to its adoption in ESS Round 12 and the German SOEP.
+
+## Methodology
+- **Study type**: Survey methodology / questionnaire development and validation
+- **Participants or agents**: Human
+- **N**: 21 participants in the cognitive interview pretest; translation teams across multiple ESS countries
+- **Game or task**: Not applicable
+- **Key manipulations**: Revision of the HVS (gender-neutral wording, single-statement items), cross-cultural cognitive pretesting, and multilingual advance translation
+- **Outcome measures**: Qualitative assessment of item comprehension and cross-cultural applicability; identification of translation and interpretation challenges
+- **Pre-registered**: No
+
+## Key findings
+- The new HVS items were generally well understood by diverse participants, including those with migration and refugee backgrounds (Sommer et al., 2025, p. 6).
+- The transition to gender-neutral language posed significant translation challenges, as grammatical gender-neutral plurals equivalent to "they" are absent in many languages (Sommer et al., 2025, p. 5).
+- Cognitive pretesting with Ukrainian refugees revealed temporal and situational ambiguity; participants were uncertain whether to refer to their pre- or post-displacement selves, leading to the addition of "now" in the scale’s introductory text (Sommer et al., 2025, p. 6).
+
+## Limitations acknowledged by the authors
+- Measurement invariance
+- Time-series comparability
+- Cross-population applicability (awaiting further data)
+- Limitations of gender-neutral translation in some languages
+
+## What this paper builds on
+- [[schwartz2012]] — (Schwartz et al., 2012) — The refined theory of 19 basic human values that the new 20-item scale is designed to measure.
+- [[schwartz2022]] — (Schwartz and Cieciuch, 2022) — Prior item formulations from which the first version of the new scale was developed.
+- [[dorertrapd2022]] — (Dorer, 2022) — The TRAPD translation methodology implemented to ensure high-quality, comparable survey translations.
+- [[harkness2010]] — (Harkness et al., 2010) — The "ask-the-same-question" approach that guides the translation process for cross-national comparability.
+
+## What this paper leaves open
+The measurement invariance of the new HVS across different linguistic and cultural groups, including whether its psychometric properties hold for populations with migration or refugee backgrounds, remains unverified until data from ESS Round 12 and SOEP are analyzed.
+
+## Thesis implications
+The validated 20-item scale and its gender-neutral, single-statement format provide a directly implementable, state-of-the-art instrument for grounding LLM agents' values in a simulated PGG. The documented translation and cross-cultural adaptation challenges indicate that value operationalisations must be carefully contextualised, with special attention to temporal framing (e.g., "now") for agent personas.
+
+## Contradictions with other papers
+No contradictions identified yet.
+
+## APA 7th edition reference
+Sommer, E., Dorer, B., Efu Nkong, U., Hanson, T., Zinn, S., & Schwartz, S. H. (2025). Revision and cross-cultural adaptation of the Human Values Scale for self-completion modes. *Survey Practice, 18*. https://doi.org/10.29115/SP-2025-0017
+```
+
+</details>
+
+<details>
+<summary>🔗 View Example Cross-Reference Analysis (<code>wiki/implementation-decisions/schwartz2024-crossref.md</code>)</summary>
+
+```markdown
+### 1. Persona injection — single-value trait description
+- covered: no
+- finding: The paper describes the Human Values Scale, which measures a comprehensive set of basic human values, not a single-value trait description (Sommer et al., 2025, pp. 1–2).
+- alignment: not covered
+
+### 2. Bonding protocol — text summary injection
+- covered: no
+- finding: The paper focuses on survey methodology for cross-cultural value measurement and does not mention any text summary injection protocol (Sommer et al., 2025).
+- alignment: not covered
+
+... [Entries 3 to 11 omitted for brevity] ...
+
+### 12. Temperature — fixed at 0.7
+- covered: no
+- finding: The paper does not mention any temperature parameter setting (Sommer et al., 2025).
+- alignment: not covered
+
+---
+SUPPORTS: []
+CONTRADICTS: []
+SILENT ON: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+```
+
+</details>
 
 ---
 
 ## Pipeline — Step by Step
+
+The diagram below outlines the flow of data and decision-making within the pipeline:
+
+```mermaid
+flowchart TD
+    PDF[Input PDF File] --> Stage2[Stage 2: Text Extraction]
+    Stage2 -->|Cleaned Text| Stage3{Stage 3: Metadata Fetch}
+    
+    Stage3 -->|Strategy 1| S1[CLI --doi]
+    Stage3 -->|Strategy 2| S2[Extract DOI from PDF]
+    Stage3 -->|Strategy 3| S3[Title-based Search]
+    Stage3 -->|Strategy 4| S4[Local Fallback: PDF text only]
+    
+    S1 & S2 & S3 -->|Semantic Scholar API| Score[Stage 4: Trust Scorer]
+    S4 -->|Minimal Metadata| Score
+    
+    Score -->|Enriched Metadata| LLM[LLM Generation]
+    LLM -->|Pass 1| P1[wiki/papers/{cite_key}.md]
+    LLM -->|Pass 2| P2[wiki/implementation-decisions/{cite_key}-crossref.md]
+```
 
 ### Stage 1: CLI Argument Parsing (`ingest.py`)
 
@@ -187,56 +353,6 @@ Print: `✓  Metadata: year={year}, venue={venue}, citations={N}, authors={N}`
 
 ---
 
-### The 12 Thesis Implementation Decisions
-
-The crossref note maps every paper against these decisions:
-
-1. **Persona injection** — single-value trait description
-2. **Bonding protocol** — text summary injection
-3. **Stake operationalisation** — explicit elimination thresholds
-4. **Contribution elicitation** — structured JSON with motivation field
-5. **Memory architecture** — single preceding round only
-6. **Gossip & ostracism mechanics**
-7. **Agent evolution** — wealth-based cloning
-8. **Round structure** — simultaneous vs. sequential play
-9. **API failure handling** — default to zero contribution
-10. **Model selection** — reasoning vs. standard models
-11. **Measurement** — LLM self-report scales (trust, IOS)
-12. **Temperature** — fixed at 0.7
-
----
-
-## Configuration
-
-All configuration lives in `.env`:
-
-```dotenv
-# LLM provider: "anthropic", "openai", or "nim"
-LLM_PROVIDER=nim
-
-# API keys — only the key for your chosen provider is required
-NIM_API_KEY=nvapi-...
-ANTHROPIC_API_KEY=sk-ant-...
-OPENAI_API_KEY=sk-...
-
-# Semantic Scholar API key (optional but recommended — 1 req/s vs shared pool)
-# Get one free at: https://www.semanticscholar.org/product/api
-SEMANTIC_SCHOLAR_API_KEY=...
-
-# Optional overrides
-# LLM_MODEL=deepseek-ai/deepseek-v4-pro   # overrides provider default
-# NIM_BASE_URL=http://0.0.0.0:8000/v1      # point at local NIM container
-```
-
-**Default models:**
-| Provider | Default model |
-|---|---|
-| `nim` | `deepseek-ai/deepseek-v4-pro` |
-| `anthropic` | `claude-sonnet-4-20250514` |
-| `openai` | `gpt-4o` |
-
----
-
 ## Project Structure
 
 ```
@@ -265,6 +381,31 @@ project_root/
 ├── .env.example               # Template
 └── requirements.txt           # Pinned dependencies
 ```
+
+### Code Architecture & Vendoring Pattern
+
+This project uses a clean architectural separation between CLI/Orchestration wrappers and standalone logical engines:
+- **Root-level scripts** (`ingest.py`, `pdf_extractor.py`, `metadata_fetcher.py`, `trust_scorer.py`, `llm_client.py`) parse CLI arguments, construct user-facing logs, manage state, and orchestrate the pipeline stages.
+- **Vendored engines** (`vendor/`) represent the underlying pure functional logic (e.g. interacting with the Semantic Scholar API, parsing document text, or scoring algorithms). This guarantees that external integration libraries are self-contained and easily testable in isolation.
+
+---
+
+## The 12 Thesis Implementation Decisions
+
+The cross-reference note maps every paper against these decisions:
+
+1. **Persona injection** — single-value trait description
+2. **Bonding protocol** — text summary injection
+3. **Stake operationalisation** — explicit elimination thresholds
+4. **Contribution elicitation** — structured JSON with motivation field
+5. **Memory architecture** — single preceding round only
+6. **Gossip & ostracism mechanics**
+7. **Agent evolution** — wealth-based cloning
+8. **Round structure** — simultaneous vs. sequential play
+9. **API failure handling** — default to zero contribution
+10. **Model selection** — reasoning vs. standard models
+11. **Measurement** — LLM self-report scales (trust, IOS)
+12. **Temperature** — fixed at 0.7
 
 ---
 

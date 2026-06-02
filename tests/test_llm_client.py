@@ -298,14 +298,14 @@ def test_property14_overwrite_warning_contains_file_path(path_stem):
 # ---------------------------------------------------------------------------
 
 # Feature: literature-review-pipeline, Property 15
-@given(st.sampled_from(["anthropic", "openai"]))
-@settings(max_examples=10)
+@given(st.sampled_from(["anthropic", "openai", "nim"]))
+@settings(max_examples=15)
 def test_property15_missing_api_key_names_env_var(provider):
     """
     **Validates: Requirements 7.6**
 
     For each provider, when the API key is empty, the error message printed
-    to stderr MUST contain ANTHROPIC_API_KEY or OPENAI_API_KEY respectively.
+    to stderr MUST contain ANTHROPIC_API_KEY, OPENAI_API_KEY, or NIM_API_KEY respectively.
     """
     stderr_capture = io.StringIO()
     with redirect_stderr(stderr_capture):
@@ -322,9 +322,13 @@ def test_property15_missing_api_key_names_env_var(provider):
         assert "ANTHROPIC_API_KEY" in stderr_output, (
             f"'ANTHROPIC_API_KEY' not found in stderr: {stderr_output!r}"
         )
-    else:
+    elif provider == "openai":
         assert "OPENAI_API_KEY" in stderr_output, (
             f"'OPENAI_API_KEY' not found in stderr: {stderr_output!r}"
+        )
+    elif provider == "nim":
+        assert "NIM_API_KEY" in stderr_output, (
+            f"'NIM_API_KEY' not found in stderr: {stderr_output!r}"
         )
 
 
@@ -427,11 +431,10 @@ class TestCallLlmOpenai:
     def test_openai_calls_chat_completions_create(self):
         """OpenAI provider dispatches to client.chat.completions.create."""
         mock_client = MagicMock()
-        mock_choice = MagicMock()
-        mock_choice.message.content = "Response from GPT"
-        mock_client.chat.completions.create.return_value = MagicMock(
-            choices=[mock_choice]
-        )
+        mock_chunk = MagicMock()
+        mock_chunk.choices = [MagicMock()]
+        mock_chunk.choices[0].delta.content = "Response from GPT"
+        mock_client.chat.completions.create.return_value = [mock_chunk]
 
         result = _call_llm(mock_client, "openai", "system prompt", "user prompt")
 
@@ -446,15 +449,53 @@ class TestCallLlmOpenai:
     def test_openai_case_insensitive(self):
         """Provider 'OpenAI' is handled the same as 'openai'."""
         mock_client = MagicMock()
-        mock_choice = MagicMock()
-        mock_choice.message.content = "OK"
-        mock_client.chat.completions.create.return_value = MagicMock(
-            choices=[mock_choice]
-        )
+        mock_chunk = MagicMock()
+        mock_chunk.choices = [MagicMock()]
+        mock_chunk.choices[0].delta.content = "OK"
+        mock_client.chat.completions.create.return_value = [mock_chunk]
 
         result = _call_llm(mock_client, "OpenAI", "sys", "user")
         mock_client.chat.completions.create.assert_called_once()
         assert result == "OK"
+
+
+class TestCallLlmRetries:
+    """Tests for retry and backoff logic in _call_llm."""
+
+    @patch("time.sleep")
+    def test_anthropic_retries_on_failure_and_succeeds(self, mock_sleep):
+        mock_client = MagicMock()
+        mock_content = MagicMock()
+        mock_content.text = "Success after retries"
+        success_response = MagicMock(content=[mock_content])
+
+        # Fail twice with exception, succeed on third attempt
+        mock_client.messages.create.side_effect = [
+            RuntimeError("API Error 1"),
+            RuntimeError("API Error 2"),
+            success_response,
+        ]
+
+        result = _call_llm(mock_client, "anthropic", "sys", "user")
+
+        assert result == "Success after retries"
+        assert mock_client.messages.create.call_count == 3
+        # Should sleep twice with escalating times (5s and 10s)
+        assert mock_sleep.call_count == 2
+        mock_sleep.assert_any_call(5)
+        mock_sleep.assert_any_call(10)
+
+    @patch("time.sleep")
+    def test_anthropic_raises_after_max_failures(self, mock_sleep):
+        mock_client = MagicMock()
+        mock_client.messages.create.side_effect = RuntimeError("Permanent failure")
+
+        with pytest.raises(RuntimeError) as exc_info:
+            _call_llm(mock_client, "anthropic", "sys", "user")
+
+        assert "Permanent failure" in str(exc_info.value)
+        assert mock_client.messages.create.call_count == 3
+        assert mock_sleep.call_count == 2
 
 
 class TestGeneratePaperProfileErrorHandling:

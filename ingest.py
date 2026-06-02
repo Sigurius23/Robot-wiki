@@ -126,6 +126,11 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
             "openai=gpt-4o, nim=deepseek-ai/deepseek-v4-pro."
         ),
     )
+    parser.add_argument(
+        "--provider",
+        default=None,
+        help="LLM provider override (optional). Must be 'anthropic', 'openai', or 'nim'.",
+    )
 
     args = parser.parse_args(argv)
 
@@ -183,11 +188,12 @@ def main(argv: list[str] | None = None) -> None:
     # --- Step 2: Load environment & validate -------------------------------------
     load_dotenv()
 
-    provider = os.getenv("LLM_PROVIDER")
+    # --provider flag takes precedence; fall back to LLM_PROVIDER env var
+    provider = args.provider or os.getenv("LLM_PROVIDER")
     if not provider:
         print(
             "Error: LLM_PROVIDER environment variable is not set. "
-            "Must be 'anthropic' or 'openai'.",
+            "Must be 'anthropic', 'openai', or 'nim'.",
             file=sys.stderr,
         )
         sys.exit(1)

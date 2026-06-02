@@ -298,6 +298,16 @@ class TestParseArgs:
         assert args.doi == "10.1234/example"
         assert args.cite_key == "custom-key"
 
+    def test_provider_argument_parsed(self, tmp_path):
+        """--provider is optional and parsed when provided."""
+        pdf_file = tmp_path / "paper.pdf"
+        pdf_file.write_text("content")
+        args = parse_args([
+            "--pdf", str(pdf_file),
+            "--provider", "nim",
+        ])
+        assert args.provider == "nim"
+
     def test_pdf_exists_stderr_message(self, tmp_path):
         """File-not-found error prints message to stderr."""
         nonexistent = str(tmp_path / "nonexistent.pdf")

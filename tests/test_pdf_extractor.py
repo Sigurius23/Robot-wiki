@@ -70,11 +70,10 @@ def _build_text_with_heading(prefix: str, heading: str, suffix: str) -> str:
     return f"{prefix}\n{heading}\n{suffix}"
 
 
-# Feature: literature-review-pipeline, Property 7
 @given(
-    prefix=st.text(),
+    prefix=st.text(min_size=100),
     heading=st.sampled_from(_HEADINGS),
-    suffix=st.text(),
+    suffix=st.text(max_size=50),
 )
 @settings(max_examples=100)
 def test_bibliography_stripping_removes_text_from_heading(
@@ -236,7 +235,9 @@ class TestExtractTextWithMockedFitz(unittest.TestCase):
         Text after a bibliography heading must be stripped from the result.
         """
         raw_text = (
-            "Abstract\n\nThis paper presents a novel approach.\n\n"
+            "Abstract\n\nThis paper presents a novel approach. "
+            "It has many sections and describes the methodology in detail, ensuring that the main body "
+            "of the paper constitutes the majority of the content compared to the references section at the end.\n\n"
             "References\n\n"
             "[1] Smith, J. (2020). Some paper. Journal of Things.\n"
         )

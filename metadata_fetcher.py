@@ -220,37 +220,16 @@ def _query_by_title(title: str) -> dict | None:
 
 def _extract_title_from_text(pdf_text: str) -> str | None:
     """
-    Return the first plausible title line from pdf_text.
-
-    A plausible title line:
-      - Is not empty or whitespace-only
-      - Is longer than 10 characters (filters out section labels like "ARTICLES")
-      - Is not all-uppercase with fewer than 4 words (filters out journal headers)
-      - Does not look like a page number or URL
-
-    Returns None if pdf_text is empty/whitespace-only or no plausible line found.
+    Return the first non-empty, non-whitespace line of pdf_text,
+    treated as the paper title. Returns None if pdf_text is empty
+    or whitespace-only.
     """
     if not pdf_text or not pdf_text.strip():
         return None
 
     for line in pdf_text.splitlines():
-        stripped = line.strip()
-        if not stripped:
-            continue
-        # Too short to be a title
-        if len(stripped) <= 10:
-            continue
-        # All-caps single-word or short phrase (e.g. "ARTICLES", "RESEARCH")
-        words = stripped.split()
-        if stripped.isupper() and len(words) <= 4:
-            continue
-        # Looks like a URL
-        if stripped.startswith("http://") or stripped.startswith("https://"):
-            continue
-        # Looks like a page number or DOI only
-        if stripped.startswith("10.") and len(words) == 1:
-            continue
-        return stripped
+        if line.strip():
+            return line.strip()
 
     return None
 
