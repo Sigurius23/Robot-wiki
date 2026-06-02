@@ -441,6 +441,7 @@ def generate_paper_profile(
     metadata: dict,
     pdf_text: str,
     model: str | None = None,
+    subfolder: str | None = None,
 ) -> None:
     """
     LLM Pass 1: generate the paper profile Obsidian note.
@@ -474,7 +475,8 @@ def generate_paper_profile(
         )
         return
 
-    output_path = f"./wiki/papers/{cite_key}.md"
+    output_dir = f"./wiki/papers/{subfolder}" if subfolder else "./wiki/papers"
+    output_path = f"{output_dir}/{cite_key}.md"
     _write_output(output_path, response_text, cite_key)
     print(f"✓  Paper profile written → {output_path}", file=sys.stderr)
 
@@ -527,6 +529,7 @@ def generate_crossref_note(
     pdf_text: str,
     paper_title: str,
     model: str | None = None,
+    subfolder: str | None = None,
 ) -> None:
     """
     LLM Pass 2: generate the implementation-decision cross-reference note.
@@ -558,7 +561,8 @@ def generate_crossref_note(
         )
         return
 
-    output_path = f"./wiki/implementation-decisions/{cite_key}-crossref.md"
+    output_dir = f"./wiki/implementation-decisions/{subfolder}" if subfolder else "./wiki/implementation-decisions"
+    output_path = f"{output_dir}/{cite_key}-crossref.md"
     _write_output(output_path, response_text, cite_key)
     print(f"✓  Crossref note written  → {output_path}", file=sys.stderr)
 

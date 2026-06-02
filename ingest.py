@@ -131,6 +131,11 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         default=None,
         help="LLM provider override (optional). Must be 'anthropic', 'openai', or 'nim'.",
     )
+    parser.add_argument(
+        "--subfolder",
+        default=None,
+        help="Subfolder relative to the wiki root under which notes should be written.",
+    )
 
     args = parser.parse_args(argv)
 
@@ -261,11 +266,11 @@ def main(argv: list[str] | None = None) -> None:
     client = init_llm_client(provider, api_key)
 
     # --- Step 8: Generate paper profile (Pass 1) ---------------------------------
-    generate_paper_profile(client, provider, cite_key, metadata, pdf_text, model)
+    generate_paper_profile(client, provider, cite_key, metadata, pdf_text, model, subfolder=args.subfolder)
 
     # --- Step 9: Generate crossref note (Pass 2) ---------------------------------
     paper_title = metadata.get("title") or cite_key
-    generate_crossref_note(client, provider, cite_key, pdf_text, paper_title, model)
+    generate_crossref_note(client, provider, cite_key, pdf_text, paper_title, model, subfolder=args.subfolder)
 
 
 # ---------------------------------------------------------------------------
