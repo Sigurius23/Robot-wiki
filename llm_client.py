@@ -337,7 +337,7 @@ def _call_llm(
     """
     provider_lower = provider.lower()
     resolved_model = model or _DEFAULT_MODELS.get(provider_lower, "")
-    max_attempts = 3
+    max_attempts = 5
 
     for attempt in range(1, max_attempts + 1):
         try:
@@ -382,7 +382,9 @@ def _call_llm(
         except Exception as exc:
             if attempt == max_attempts:
                 raise exc
-            wait = 5 * attempt
+            # If 429 or rate limit error, wait longer to let token bucket reset
+            is_rate_limit = "429" in str(exc) or "too many requests" in str(exc).lower()
+            wait = (20 * attempt) if is_rate_limit else (5 * attempt)
             if provider_lower in ("openai", "nim") and 'token_count' in locals() and token_count > 0:
                 sys.stderr.write("\n")
             print(
@@ -399,7 +401,7 @@ def _call_llm(
 # File output
 # ---------------------------------------------------------------------------
 
-def _write_output(path: str, content: str, cite_key: str) -> None:
+def _write_output(path: str, content: str, cite_key: str) -> bool:
     """
     Write *content* to *path* with UTF-8 encoding.
 
@@ -411,6 +413,9 @@ def _write_output(path: str, content: str, cite_key: str) -> None:
         path:     Destination file path (relative or absolute).
         content:  UTF-8 string to write.
         cite_key: Cite-key (currently unused but reserved for future logging).
+
+    Returns:
+        True if the write succeeded, False otherwise.
     """
     output_path = Path(path)
 
@@ -423,11 +428,13 @@ def _write_output(path: str, content: str, cite_key: str) -> None:
     try:
         output_path.parent.mkdir(parents=True, exist_ok=True)
         output_path.write_text(content, encoding="utf-8")
+        return True
     except OSError as exc:
         print(
             f"Error writing to {path}: {exc}",
             file=sys.stderr,
         )
+        return False
 
 
 # ---------------------------------------------------------------------------
@@ -442,7 +449,7 @@ def generate_paper_profile(
     pdf_text: str,
     model: str | None = None,
     subfolder: str | None = None,
-) -> None:
+) -> bool:
     """
     LLM Pass 1: generate the paper profile Obsidian note.
 
@@ -466,19 +473,21 @@ def generate_paper_profile(
             f"Error generating paper profile for '{cite_key}': {exc}",
             file=sys.stderr,
         )
-        return
+        return False
 
     if not response_text or not response_text.strip():
         print(
             f"Warning: Empty response from LLM for paper profile '{cite_key}'.",
             file=sys.stderr,
         )
-        return
+        return False
 
     output_dir = f"./wiki/papers/{subfolder}" if subfolder else "./wiki/papers"
     output_path = f"{output_dir}/{cite_key}.md"
-    _write_output(output_path, response_text, cite_key)
-    print(f"✓  Paper profile written → {output_path}", file=sys.stderr)
+    success = _write_output(output_path, response_text, cite_key)
+    if success:
+        print(f"✓  Paper profile written → {output_path}", file=sys.stderr)
+    return success
 
 
 def _build_prompt_a(metadata: dict, pdf_text: str) -> str:
@@ -530,7 +539,7 @@ def generate_crossref_note(
     paper_title: str,
     model: str | None = None,
     subfolder: str | None = None,
-) -> None:
+) -> bool:
     """
     LLM Pass 2: generate the implementation-decision cross-reference note.
 
@@ -552,19 +561,21 @@ def generate_crossref_note(
             f"Error generating crossref note for '{cite_key}': {exc}",
             file=sys.stderr,
         )
-        return
+        return False
 
     if not response_text or not response_text.strip():
         print(
             f"Warning: Empty response from LLM for crossref note '{cite_key}'.",
             file=sys.stderr,
         )
-        return
+        return False
 
     output_dir = f"./wiki/implementation-decisions/{subfolder}" if subfolder else "./wiki/implementation-decisions"
     output_path = f"{output_dir}/{cite_key}-crossref.md"
-    _write_output(output_path, response_text, cite_key)
-    print(f"✓  Crossref note written  → {output_path}", file=sys.stderr)
+    success = _write_output(output_path, response_text, cite_key)
+    if success:
+        print(f"✓  Crossref note written  → {output_path}", file=sys.stderr)
+    return success
 
 
 def _build_prompt_b(cite_key: str, paper_title: str, pdf_text: str) -> str:

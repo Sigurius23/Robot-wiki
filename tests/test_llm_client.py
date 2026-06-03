@@ -494,8 +494,32 @@ class TestCallLlmRetries:
             _call_llm(mock_client, "anthropic", "sys", "user")
 
         assert "Permanent failure" in str(exc_info.value)
-        assert mock_client.messages.create.call_count == 3
+        assert mock_client.messages.create.call_count == 5
+        assert mock_sleep.call_count == 4
+
+    @patch("time.sleep")
+    def test_nim_429_retries_with_longer_escalating_backoff(self, mock_sleep):
+        mock_client = MagicMock()
+
+        # Simulate two 429 failures, then success
+        mock_chunk = MagicMock()
+        mock_chunk.choices = [MagicMock()]
+        mock_chunk.choices[0].delta.content = "Success after 429"
+
+        mock_client.chat.completions.create.side_effect = [
+            RuntimeError("Error code: 429 - Too Many Requests"),
+            RuntimeError("Error code: 429 - Too Many Requests"),
+            [mock_chunk],
+        ]
+
+        result = _call_llm(mock_client, "nim", "sys", "user")
+
+        assert result == "Success after 429"
+        assert mock_client.chat.completions.create.call_count == 3
+        # Should sleep twice with longer 429 escalating durations (20s and 40s)
         assert mock_sleep.call_count == 2
+        mock_sleep.assert_any_call(20)
+        mock_sleep.assert_any_call(40)
 
 
 class TestGeneratePaperProfileErrorHandling:

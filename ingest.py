@@ -266,11 +266,15 @@ def main(argv: list[str] | None = None) -> None:
     client = init_llm_client(provider, api_key)
 
     # --- Step 8: Generate paper profile (Pass 1) ---------------------------------
-    generate_paper_profile(client, provider, cite_key, metadata, pdf_text, model, subfolder=args.subfolder)
+    success_p1 = generate_paper_profile(client, provider, cite_key, metadata, pdf_text, model, subfolder=args.subfolder)
+    if not success_p1:
+        sys.exit(1)
 
     # --- Step 9: Generate crossref note (Pass 2) ---------------------------------
     paper_title = metadata.get("title") or cite_key
-    generate_crossref_note(client, provider, cite_key, pdf_text, paper_title, model, subfolder=args.subfolder)
+    success_p2 = generate_crossref_note(client, provider, cite_key, pdf_text, paper_title, model, subfolder=args.subfolder)
+    if not success_p2:
+        sys.exit(1)
 
 
 # ---------------------------------------------------------------------------
