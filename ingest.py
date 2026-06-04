@@ -129,7 +129,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument(
         "--provider",
         default=None,
-        help="LLM provider override (optional). Must be 'anthropic', 'openai', 'nim', or 'codebuff'.",
+        help="LLM provider override (optional). Must be 'anthropic', 'openai', 'nim', 'codebuff', or 'freebuff'.",
     )
     parser.add_argument(
         "--subfolder",
@@ -198,7 +198,7 @@ def main(argv: list[str] | None = None) -> None:
     if not provider:
         print(
             "Error: LLM_PROVIDER environment variable is not set. "
-            "Must be 'anthropic', 'openai', 'nim', or 'codebuff'.",
+            "Must be 'anthropic', 'openai', 'nim', 'codebuff', or 'freebuff'.",
             file=sys.stderr,
         )
         sys.exit(1)
@@ -213,20 +213,20 @@ def main(argv: list[str] | None = None) -> None:
     elif provider_lower == "nim":
         api_key = os.getenv("NIM_API_KEY")
         env_var_name = "NIM_API_KEY"
-    elif provider_lower == "codebuff":
-        # codebuff provider does not require an API key — it writes task files
-        # for Codebuff to process instead of calling an external LLM.
+    elif provider_lower in ("codebuff", "freebuff"):
+        # codebuff/freebuff provider does not require an API key — it writes task files
+        # to process instead of calling an external LLM.
         api_key = ""  # not used
         env_var_name = ""
     else:
         print(
             f"Error: Unknown LLM_PROVIDER '{provider}'. "
-            f"Must be 'anthropic', 'openai', 'nim', or 'codebuff'.",
+            f"Must be 'anthropic', 'openai', 'nim', 'codebuff', or 'freebuff'.",
             file=sys.stderr,
         )
         sys.exit(1)
 
-    if provider_lower != "codebuff" and not api_key:
+    if provider_lower not in ("codebuff", "freebuff") and not api_key:
         print(
             f"Error: {env_var_name} environment variable is not set.",
             file=sys.stderr,

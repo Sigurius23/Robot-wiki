@@ -265,17 +265,17 @@ def init_llm_client(provider: str, api_key: str):
     """
     provider_lower = provider.lower()
 
-    if provider_lower not in ("anthropic", "openai", "nim", "codebuff"):
+    if provider_lower not in ("anthropic", "openai", "nim", "codebuff", "freebuff"):
         print(
             f"Error: Unknown LLM provider '{provider}'. "
-            f"Must be 'anthropic', 'openai', 'nim', or 'codebuff'.",
+            f"Must be 'anthropic', 'openai', 'nim', 'codebuff', or 'freebuff'.",
             file=sys.stderr,
         )
         sys.exit(1)
 
-    # codebuff provider does not require an API key — it writes task files
-    # for Codebuff to process instead of calling an external LLM.
-    if provider_lower == "codebuff":
+    # codebuff/freebuff provider does not require an API key — it writes task files
+    # to process instead of calling an external LLM.
+    if provider_lower in ("codebuff", "freebuff"):
         return None
 
     if not api_key:
@@ -470,8 +470,8 @@ def generate_paper_profile(
         pdf_text:  Full cleaned PDF text.
         model:     Model name override (uses provider default if ``None``).
     """
-    # --- codebuff provider: write task file for Codebuff to process ---
-    if provider.lower() == "codebuff":
+    # --- codebuff/freebuff provider: write task file to process ---
+    if provider.lower() in ("codebuff", "freebuff"):
         user_prompt = _build_prompt_a(metadata, pdf_text)
         output_dir = f"./wiki/papers/{subfolder}" if subfolder else "./wiki/papers"
         output_path = f"{output_dir}/{cite_key}.md"
@@ -656,8 +656,8 @@ def generate_crossref_note(
         paper_title:  Paper title (from metadata or PDF extraction).
         model:        Model name override (uses provider default if ``None``).
     """
-    # --- codebuff provider: write task file for Codebuff to process ---
-    if provider.lower() == "codebuff":
+    # --- codebuff/freebuff provider: write task file to process ---
+    if provider.lower() in ("codebuff", "freebuff"):
         user_prompt = _build_prompt_b(cite_key, paper_title, pdf_text)
         output_dir = f"./wiki/implementation-decisions/{subfolder}" if subfolder else "./wiki/implementation-decisions"
         output_path = f"{output_dir}/{cite_key}-crossref.md"
