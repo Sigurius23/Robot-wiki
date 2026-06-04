@@ -38,7 +38,7 @@ python ingest.py --pdf ./raw_papers/paper.pdf --provider codebuff
 python batch_ingest.py --provider codebuff
 
 # With subfolder
-python ingest.py --pdf ./raw_papers/paper.pdf --provider codebuff --subfolder pgg-simulation
+python ingest.py --pdf ./raw_papers/paper.pdf --provider codebuff --subfolder jepa
 ```
 
 ## File naming
@@ -77,7 +77,7 @@ Each task file is a JSON object with the following fields:
 {
   "cite_key": "2502.17720v4",
   "task_type": "paper_profile",
-  "output_path": "./wiki/papers/pgg-simulation/2502.17720v4.md",
+  "output_path": "./wiki/papers/jepa/2502.17720v4.md",
   "system_prompt": "You are a research librarian formatting an Obsidian note...",
   "user_prompt": "You are a research librarian processing an academic paper...\n\n---\ntitle: \"Spontaneous Giving...\"\n...\n\n=== PAPER TEXT ===\n[truncated PDF text]",
   "metadata": {
@@ -100,7 +100,7 @@ Each task file is a JSON object with the following fields:
 {
   "cite_key": "2502.17720v4",
   "task_type": "crossref_note",
-  "output_path": "./wiki/implementation-decisions/pgg-simulation/2502.17720v4-crossref.md",
+  "output_path": "./wiki/implementation-decisions/jepa/2502.17720v4-crossref.md",
   "system_prompt": "You are a research assistant mapping a paper...",
   "user_prompt": "Paper Title: Spontaneous Giving...\n\nMap this paper against the implementation decisions...\n\n=== PAPER TEXT ===\n[truncated PDF text]",
   "metadata": {

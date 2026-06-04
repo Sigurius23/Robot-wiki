@@ -269,7 +269,7 @@ def main(argv: list[str] | None = None) -> None:
     parser.add_argument(
         "--folder",
         default=None,
-        help="Audit only a single folder (e.g., 'pgg-simulation', 'bonding').",
+        help="Audit only a single folder (e.g., 'jepa', 'manipulation').",
     )
     parser.add_argument(
         "--json",

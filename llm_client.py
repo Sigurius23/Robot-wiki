@@ -113,11 +113,12 @@ project-relevance: [One sentence — why does this paper matter for the project?
 ## Methodology
 One sentence per point:
 - **Study type**: experiment / simulation / survey / meta-analysis / theoretical
-- **Participants or agents**: human / robot / LLM (specify model) / both
-- **N**: sample size, number of simulation runs, or number of agents
-- **Game or task**: exact task or environment used
-- **Key manipulations**: independent variables
-- **Outcome measures**: dependent variables
+- **Robot platform / hardware**: specific robots used (e.g., Unitree H1, Spot, Franka Emika Panda) or "none"
+- **Simulation environment**: e.g., Isaac Sim, MuJoCo, PyBullet, Gazebo, or "none"
+- **Key software tools & frameworks**: e.g., PyTorch, JAX, ROS2, Hugging Face, or "none"
+- **Compute resources**: exact hardware (e.g., 8x H100 GPUs, TPU v4), training hours, dataset size, and model parameters if explicitly stated
+- **Task or environment**: exact task or environment used (e.g., bipedal locomotion, table-top manipulation)
+- **Outcome measures**: primary evaluation metrics (e.g., success rate, tracking error, energy efficiency)
 - **Pre-registered**: yes / no / unclear
 
 ## Key findings
@@ -156,62 +157,62 @@ Answer only what this specific paper explicitly says — do not infer or general
 
 ## {cite_key} — implementation decision crossref
 
-### 1. Agent architecture — modular vs. end-to-end learning
+### 1. Deep Learning Framework — PyTorch vs. JAX vs. TensorFlow vs. custom engine
 - covered: yes / partially / no
 - finding: [one-sentence paraphrase + ([Author], [Year], p. X)]
 - alignment: aligned / contradicts / extends / not covered
 
-### 2. Coordination mechanism — centralized vs. decentralized control
+### 2. Simulation Environment — Isaac Sim vs. MuJoCo vs. Gazebo vs. none (real-world only)
 - covered: yes / partially / no
 - finding: [one-sentence paraphrase + ([Author], [Year], p. X)]
 - alignment: aligned / contradicts / extends / not covered
 
-### 3. Communication protocol — explicit messaging vs. stigmergic/implicit coordination
+### 3. Robotics Middleware & IPC — ROS vs. ROS2 vs. LCM vs. gRPC vs. ZeroMQ
 - covered: yes / partially / no
 - finding: [one-sentence paraphrase + ([Author], [Year], p. X)]
 - alignment: aligned / contradicts / extends / not covered
 
-### 4. Task allocation — auction-based vs. dynamic heuristic scheduling
+### 4. Compute Scale & Hardware — Edge compute (Jetson Orin, TPU) vs. workstation vs. multi-GPU cluster vs. TPU pods
 - covered: yes / partially / no
 - finding: [one-sentence paraphrase + ([Author], [Year], p. X)]
 - alignment: aligned / contradicts / extends / not covered
 
-### 5. Path planning & navigation — global map-based vs. local reactive obstacle avoidance
+### 5. Control Loop Frequency & Latency — High-frequency real-time (>= 100Hz) vs. low-frequency high-level planning
 - covered: yes / partially / no
 - finding: [one-sentence paraphrase + ([Author], [Year], p. X)]
 - alignment: aligned / contradicts / extends / not covered
 
-### 6. Safety & constraint handling — virtual boundary geofencing vs. active runtime monitoring
+### 6. Training Paradigm — World Models (e.g. JEPA) vs. end-to-end RL vs. Imitation Learning vs. classical control
 - covered: yes / partially / no
 - finding: [one-sentence paraphrase + ([Author], [Year], p. X)]
 - alignment: aligned / contradicts / extends / not covered
 
-### 7. Agent evolution & learning — online adaptation vs. offline training
+### 7. Sim-to-Real Transfer (S2R) — Domain randomization vs. domain adaptation vs. real-only training
 - covered: yes / partially / no
 - finding: [one-sentence paraphrase + ([Author], [Year], p. X)]
 - alignment: aligned / contradicts / extends / not covered
 
-### 8. Environmental representation — raw sensor grids vs. semantic object maps
+### 8. Robot Platform & Kinematics — Legged vs. humanoid vs. mobile base vs. manipulator arm vs. aerial
 - covered: yes / partially / no
 - finding: [one-sentence paraphrase + ([Author], [Year], p. X)]
 - alignment: aligned / contradicts / extends / not covered
 
-### 9. Failure recovery — retry-with-fallback vs. human-in-the-loop intervention
+### 9. Model Scale & Parameter Count — Edge models (< 100M) vs. foundation models (> 7B)
 - covered: yes / partially / no
 - finding: [one-sentence paraphrase + ([Author], [Year], p. X)]
 - alignment: aligned / contradicts / extends / not covered
 
-### 10. Model selection — local edge execution vs. cloud API model hosting
+### 10. Data Source & Dataset Scale — Synthetic data vs. hand-collected real-world demonstrations vs. public datasets
 - covered: yes / partially / no
 - finding: [one-sentence paraphrase + ([Author], [Year], p. X)]
 - alignment: aligned / contradicts / extends / not covered
 
-### 11. Measurement & evaluation — task completion rate vs. energy efficiency
+### 11. Code & Replication Package — Open-source repository with weights vs. closed-source/proprietary
 - covered: yes / partially / no
 - finding: [one-sentence paraphrase + ([Author], [Year], p. X)]
 - alignment: aligned / contradicts / extends / not covered
 
-### 12. Temperature & determinism — deterministic (0.0) vs. exploratory (e.g., 0.7) action selection
+### 12. Action Space & Output Representation — Joint positions vs. joint velocities vs. end-effector delta pose
 - covered: yes / partially / no
 - finding: [one-sentence paraphrase + ([Author], [Year], p. X)]
 - alignment: aligned / contradicts / extends / not covered
