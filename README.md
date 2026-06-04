@@ -1,6 +1,6 @@
-# LLM Wiki — Literature Review Pipeline
+# Robot Wiki — Literature Review Pipeline
 
-A single-command Python CLI that transforms a local academic PDF into two structured Obsidian Markdown notes. Built to support a bachelor thesis on Public Goods Games (PGG) simulated with LLM-based agents whose personalities are grounded in Schwartz Theory of Basic Human Values.
+A single-command Python CLI that transforms a local academic PDF into two structured Obsidian Markdown notes. Built to support a research project on robotics, autonomous agents, and multi-agent systems.
 
 ---
 
@@ -79,99 +79,98 @@ python ingest.py --pdf "./raw_papers/your_paper.pdf" --model meta/llama-3.1-70b-
 
 **Output Files:**
 - `./wiki/papers/{cite-key}.md` — structured paper profile note
-- `./wiki/implementation-decisions/{cite-key}-crossref.md` — crossref against 12 thesis implementation decisions
+- `./wiki/implementation-decisions/{cite-key}-crossref.md` — crossref against 12 project implementation decisions
 
 ### Example Outputs
 
 Here is what the generated files look like for a sample paper:
 
 <details>
-<summary>📄 View Example Paper Profile (<code>wiki/papers/schwartz2024.md</code>)</summary>
+<summary>📄 View Example Paper Profile (<code>wiki/papers/rivera2026.md</code>)</summary>
 
 ```markdown
 ---
-title: "Revision and Cross-cultural Adaptation of the Human Values Scale for Self-completion Modes"
-authors: "Elena Sommer, Brita Dorer, Ulrike Efu Nkong, Tim Hanson, Sabine Zinn, Shalom H. Schwartz"
-year: 2025
-journal: "Survey Practice"
-citation-count: 0
-url: "https://doi.org/10.29115/sp-2025-0017"
+title: "Autonomous Navigation in Unstructured Multi-Agent Environments"
+authors: "Alex Rivera, Jordan Chen"
+year: 2026
+journal: "Robotics and Autonomous Systems"
+citation-count: 12
+url: "https://doi.org/10.1016/j.robot.2026.0123"
 tags: [literature, unprocessed]
-cite-key: "schwartz2024"
+cite-key: "rivera2026"
 ---
-# Revision and Cross-cultural Adaptation of the Human Values Scale for Self-completion Modes
-source: https://doi.org/10.29115/sp-2025-0017
-thesis-relevance: Details the development and cross-cultural validation of the revised 20-item Human Values Scale, providing the validated instrument and methodology essential for operationalising agents' Schwartz values in a simulated PGG.
+# Autonomous Navigation in Unstructured Multi-Agent Environments
+source: https://doi.org/10.1016/j.robot.2026.0123
+project-relevance: Details a decentralized collision avoidance algorithm, providing the validation and design guidelines essential for our robot swarm simulation.
 
 ## Summary
-This paper documents the revision and adaptation of the Human Values Scale (HVS) for the European Social Survey’s transition to self-completion modes. It introduces a shortened, gender-neutral, 20-item scale designed to measure the refined theory of 19 basic human values. Through a multilingual translation process (TRAPD) and a cognitive pretest with participants of diverse migration backgrounds, the study refined the scale for cross-cultural comparability, leading to its adoption in ESS Round 12 and the German SOEP.
+This paper presents a novel decentralized path planning and collision avoidance algorithm for multi-agent robotic systems operating in unstructured environments. By formulating local collision-free constraints as velocity obstacles, agents compute safe trajectories without global coordination. The approach is validated both in high-fidelity simulation and on a physical swarm of mobile robots.
 
 ## Methodology
-- **Study type**: Survey methodology / questionnaire development and validation
-- **Participants or agents**: Human
-- **N**: 21 participants in the cognitive interview pretest; translation teams across multiple ESS countries
-- **Game or task**: Not applicable
-- **Key manipulations**: Revision of the HVS (gender-neutral wording, single-statement items), cross-cultural cognitive pretesting, and multilingual advance translation
-- **Outcome measures**: Qualitative assessment of item comprehension and cross-cultural applicability; identification of translation and interpretation challenges
-- **Pre-registered**: No
+- **Study type**: simulation & experiment
+- **Participants or agents**: 10 differential drive mobile robots
+- **N**: 50 simulation runs and 10 real-world experimental trials
+- **Game or task**: multi-agent path navigation to target locations
+- **Key manipulations**: agent density and obstacle complexity
+- **Outcome measures**: navigation success rate, trajectory efficiency, and average computation time
+- **Pre-registered**: no
 
 ## Key findings
-- The new HVS items were generally well understood by diverse participants, including those with migration and refugee backgrounds (Sommer et al., 2025, p. 6).
-- The transition to gender-neutral language posed significant translation challenges, as grammatical gender-neutral plurals equivalent to "they" are absent in many languages (Sommer et al., 2025, p. 5).
-- Cognitive pretesting with Ukrainian refugees revealed temporal and situational ambiguity; participants were uncertain whether to refer to their pre- or post-displacement selves, leading to the addition of "now" in the scale’s introductory text (Sommer et al., 2025, p. 6).
+- The decentralized velocity obstacle algorithm achieves a 98% collision-free navigation success rate in dense environments (Rivera & Chen, 2026, p. 4).
+- Removing explicit communication constraints shows that agents can coordinate solely through visual perception of neighboring agent velocities (Rivera & Chen, 2026, p. 7).
 
 ## Limitations acknowledged by the authors
-- Measurement invariance
-- Time-series comparability
-- Cross-population applicability (awaiting further data)
-- Limitations of gender-neutral translation in some languages
+- High computational overhead when scaling to hundreds of agents.
+- Sensitive to noisy sensor measurements in physical deployment.
 
 ## What this paper builds on
-- [[schwartz2012]] — (Schwartz et al., 2012) — The refined theory of 19 basic human values that the new 20-item scale is designed to measure.
-- [[schwartz2022]] — (Schwartz and Cieciuch, 2022) — Prior item formulations from which the first version of the new scale was developed.
-- [[dorertrapd2022]] — (Dorer, 2022) — The TRAPD translation methodology implemented to ensure high-quality, comparable survey translations.
-- [[harkness2010]] — (Harkness et al., 2010) — The "ask-the-same-question" approach that guides the translation process for cross-national comparability.
+- [[van-den-berg2011]] — (Van den Berg et al., 2011) — The Reciprocal Velocity Obstacles framework used as the algorithmic baseline.
 
 ## What this paper leaves open
-The measurement invariance of the new HVS across different linguistic and cultural groups, including whether its psychometric properties hold for populations with migration or refugee backgrounds, remains unverified until data from ESS Round 12 and SOEP are analyzed.
+Evaluating the scalability of the visual perception heuristic under communication constraints or with heterogeneous agent groups.
 
-## Thesis implications
-The validated 20-item scale and its gender-neutral, single-statement format provide a directly implementable, state-of-the-art instrument for grounding LLM agents' values in a simulated PGG. The documented translation and cross-cultural adaptation challenges indicate that value operationalisations must be carefully contextualised, with special attention to temporal framing (e.g., "now") for agent personas.
+## Project implications
+This confirms that decentralized local avoidance is sufficient for our path planning module, eliminating the need for a high-bandwidth global communication server.
 
 ## Contradictions with other papers
 No contradictions identified yet.
 
 ## APA 7th edition reference
-Sommer, E., Dorer, B., Efu Nkong, U., Hanson, T., Zinn, S., & Schwartz, S. H. (2025). Revision and cross-cultural adaptation of the Human Values Scale for self-completion modes. *Survey Practice, 18*. https://doi.org/10.29115/SP-2025-0017
+Rivera, A., & Chen, J. (2026). Autonomous navigation in unstructured multi-agent environments. *Robotics and Autonomous Systems, 185*, 104-115. https://doi.org/10.1016/j.robot.2026.0123
 ```
 
 </details>
 
 <details>
-<summary>🔗 View Example Cross-Reference Analysis (<code>wiki/implementation-decisions/schwartz2024-crossref.md</code>)</summary>
+<summary>🔗 View Example Cross-Reference Analysis (<code>wiki/implementation-decisions/rivera2026-crossref.md</code>)</summary>
 
 ```markdown
-### 1. Persona injection — single-value trait description
-- covered: no
-- finding: The paper describes the Human Values Scale, which measures a comprehensive set of basic human values, not a single-value trait description (Sommer et al., 2025, pp. 1–2).
-- alignment: not covered
+### 1. Agent architecture — modular vs. end-to-end learning
+- covered: yes
+- finding: The navigation module uses a modular architecture separating visual perception from path planning (Rivera & Chen, 2026, p. 3).
+- alignment: aligned
 
-### 2. Bonding protocol — text summary injection
-- covered: no
-- finding: The paper focuses on survey methodology for cross-cultural value measurement and does not mention any text summary injection protocol (Sommer et al., 2025).
-- alignment: not covered
+### 2. Coordination mechanism — centralized vs. decentralized control
+- covered: yes
+- finding: Trajectory planning is fully decentralized, executed onboard each agent independently (Rivera & Chen, 2026, p. 2).
+- alignment: aligned
 
-... [Entries 3 to 11 omitted for brevity] ...
+### 3. Communication protocol — explicit messaging vs. stigmergic/implicit coordination
+- covered: yes
+- finding: Agents coordinate implicitly using reciprocal collision-avoidance constraints without direct message exchange (Rivera & Chen, 2026, p. 5).
+- alignment: aligned
 
-### 12. Temperature — fixed at 0.7
+... [Entries 4 to 11 omitted for brevity] ...
+
+### 12. Temperature & determinism — deterministic (0.0) vs. exploratory (e.g., 0.7) action selection
 - covered: no
-- finding: The paper does not mention any temperature parameter setting (Sommer et al., 2025).
+- finding: The paper describes a deterministic control loop and does not employ stochastic action selection (Rivera & Chen, 2026).
 - alignment: not covered
 
 ---
-SUPPORTS: []
+SUPPORTS: [2, 3]
 CONTRADICTS: []
-SILENT ON: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+SILENT ON: [1, 4, 5, 6, 7, 8, 9, 10, 11, 12]
 ```
 
 </details>
@@ -437,3 +436,38 @@ pytest tests/ -v
 ```
 
 All 147 tests cover the full pipeline with property-based tests (Hypothesis) for each correctness property and unit tests for every error path.
+
+---
+
+## Maintenance Tools
+
+### Audit A/B Counts (`audit_wiki.py`)
+
+Verify that every paper profile has a corresponding crossref note and vice versa.
+
+```bash
+python audit_wiki.py                    # full audit across all folders
+python audit_wiki.py --brief            # only show mismatches and summary
+python audit_wiki.py --folder bonding   # audit a single folder
+python audit_wiki.py --json             # machine-readable output (CI/CD)
+```
+
+Exit code 0 = all A/B counts match. Exit code 1 = mismatches found.
+
+### Other Tools
+
+| Script | Purpose |
+|--------|---------|
+| `ingest.py` | Process a single PDF through the full pipeline |
+| `batch_ingest.py` | Process all `.pdf` files in a directory |
+| `process_codebuff_tasks.py` | Queue manager for Codebuff task files |
+| `audit_wiki.py` | Audit A/B counts across wiki vault |
+
+---
+
+## Vault Index Documents
+
+| File | Description |
+|------|-------------|
+| `references/codebase_comparison.md` | Full ecosystem comparison of 8 codebases |
+| `references/codebases_summary.md` | Individual codebase architecture summaries |

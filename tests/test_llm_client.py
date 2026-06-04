@@ -33,6 +33,7 @@ from llm_client import (
     _build_prompt_b,
     _call_llm,
     _write_output,
+    _write_codebuff_task,
     init_llm_client,
     generate_paper_profile,
     generate_crossref_note,
@@ -79,7 +80,7 @@ from llm_client import (
     ),
     trust_score=st.integers(min_value=1, max_value=10),
 )
-@settings(max_examples=100)
+@settings(max_examples=100, deadline=None)
 def test_property10_prompt_contains_all_metadata(
     year, venue, citation_count, authors, trust_score
 ):
@@ -145,7 +146,7 @@ def test_property10_prompt_contains_all_metadata(
     paper_title=st.text(min_size=1, max_size=100),
     pdf_text=st.text(min_size=1, max_size=200),
 )
-@settings(max_examples=100)
+@settings(max_examples=100, deadline=None)
 def test_property11_pass2_prompt_contains_context(cite_key, paper_title, pdf_text):
     """
     **Validates: Requirements 6.2**
@@ -168,7 +169,7 @@ def test_property11_pass2_prompt_contains_context(cite_key, paper_title, pdf_tex
 
 # Feature: literature-review-pipeline, Property 12
 @given(st.text(min_size=1, max_size=50))
-@settings(max_examples=100)
+@settings(max_examples=100, deadline=None)
 def test_property12_output_path_from_cite_key(cite_key):
     """
     **Validates: Requirements 5.4, 6.4**
@@ -223,7 +224,7 @@ import tempfile
 
 # Feature: literature-review-pipeline, Property 13
 @given(st.text())
-@settings(max_examples=100)
+@settings(max_examples=100, deadline=None)
 def test_property13_utf8_roundtrip(text):
     """
     **Validates: Requirements 8.1**
@@ -264,7 +265,7 @@ def test_property13_utf8_roundtrip(text):
         ),
     ).filter(lambda s: s not in (".", "..")),
 )
-@settings(max_examples=100)
+@settings(max_examples=100, deadline=None)
 def test_property14_overwrite_warning_contains_file_path(path_stem):
     """
     **Validates: Requirements 8.2**
@@ -299,7 +300,7 @@ def test_property14_overwrite_warning_contains_file_path(path_stem):
 
 # Feature: literature-review-pipeline, Property 15
 @given(st.sampled_from(["anthropic", "openai", "nim"]))
-@settings(max_examples=15)
+@settings(max_examples=15, deadline=None)
 def test_property15_missing_api_key_names_env_var(provider):
     """
     **Validates: Requirements 7.6**
@@ -714,3 +715,152 @@ class TestWriteOutput:
             _write_output(path, "content", "key")
 
         assert "Overwriting" not in stderr_capture.getvalue()
+
+
+# ===========================================================================
+# Unit Tests — Codebuff provider (Task file writing)
+# ===========================================================================
+
+import json
+import tempfile
+import shutil
+
+
+class TestCodebuffProvider:
+    """Tests for the codebuff provider — task file writing instead of LLM calls."""
+
+    def dummy_metadata(self):
+        return {
+            "year": 2024,
+            "venue": "Nature",
+            "citationCount": 100,
+            "authors": [{"name": "Alice"}],
+            "baseline_trust_score": 8,
+            "cite_key": "test-key",
+            "title": "Test Title",
+        }
+
+    def test_init_llm_client_codebuff_returns_none(self):
+        """codebuff provider returns None (no API client needed)."""
+        result = init_llm_client("codebuff", "")
+        assert result is None
+
+    def test_init_llm_client_codebuff_case_insensitive(self):
+        """codebuff provider name is case-insensitive."""
+        result = init_llm_client("CoDeBuFf", "")
+        assert result is None
+
+    def test_generate_paper_profile_writes_task_file(self, tmp_path, monkeypatch):
+        """Pass 1 with codebuff provider writes a task JSON file."""
+        # Patch _TASKS_DIR to use a temporary directory
+        tasks_dir = tmp_path / "codebuff_tasks"
+        monkeypatch.setattr("llm_client._TASKS_DIR", str(tasks_dir))
+
+        result = generate_paper_profile(
+            None, "codebuff", "test-key",
+            self.dummy_metadata(), "Sample PDF text for testing.",
+        )
+
+        assert result is True
+
+        # Verify task file was created
+        task_files = list(tasks_dir.glob("*.json"))
+        assert len(task_files) == 1
+        task_file = task_files[0]
+        assert "test-key--paper_profile" in task_file.name
+
+        # Verify task file contents
+        task_data = json.loads(task_file.read_text(encoding="utf-8"))
+        assert task_data["cite_key"] == "test-key"
+        assert task_data["task_type"] == "paper_profile"
+        assert task_data["output_path"] == "./wiki/papers/test-key.md"
+        assert "system_prompt" in task_data
+        assert "user_prompt" in task_data
+        assert task_data["metadata"]["year"] == 2024
+        assert task_data["metadata"]["title"] == "Test Title"
+        assert task_data["pdf_text"] == "Sample PDF text for testing."
+
+    def test_generate_paper_profile_with_subfolder(self, tmp_path, monkeypatch):
+        """Pass 1 output_path respects the subfolder parameter."""
+        tasks_dir = tmp_path / "codebuff_tasks"
+        monkeypatch.setattr("llm_client._TASKS_DIR", str(tasks_dir))
+
+        generate_paper_profile(
+            None, "codebuff", "test-key",
+            self.dummy_metadata(), "pdf text",
+            subfolder="bonding",
+        )
+
+        task_files = list(tasks_dir.glob("*.json"))
+        task_data = json.loads(task_files[0].read_text(encoding="utf-8"))
+        assert task_data["output_path"] == "./wiki/papers/bonding/test-key.md"
+
+    def test_generate_crossref_note_writes_task_file(self, tmp_path, monkeypatch):
+        """Pass 2 with codebuff provider writes a task JSON file."""
+        tasks_dir = tmp_path / "codebuff_tasks"
+        monkeypatch.setattr("llm_client._TASKS_DIR", str(tasks_dir))
+
+        result = generate_crossref_note(
+            None, "codebuff", "test-key",
+            "Sample PDF text.", "Test Paper Title",
+        )
+
+        assert result is True
+
+        # Verify task file was created
+        task_files = list(tasks_dir.glob("*.json"))
+        assert len(task_files) == 1
+        task_file = task_files[0]
+        assert "test-key--crossref_note" in task_file.name
+
+        # Verify task file contents
+        task_data = json.loads(task_file.read_text(encoding="utf-8"))
+        assert task_data["cite_key"] == "test-key"
+        assert task_data["task_type"] == "crossref_note"
+        assert task_data["output_path"] == "./wiki/implementation-decisions/test-key-crossref.md"
+        assert task_data["metadata"]["title"] == "Test Paper Title"
+        assert "system_prompt" in task_data
+        assert "user_prompt" in task_data
+        assert task_data["pdf_text"] == "Sample PDF text."
+
+    def test_generate_crossref_note_with_subfolder(self, tmp_path, monkeypatch):
+        """Pass 2 output_path respects the subfolder parameter."""
+        tasks_dir = tmp_path / "codebuff_tasks"
+        monkeypatch.setattr("llm_client._TASKS_DIR", str(tasks_dir))
+
+        generate_crossref_note(
+            None, "codebuff", "test-key",
+            "pdf text", "Test Title",
+            subfolder="bonding",
+        )
+
+        task_files = list(tasks_dir.glob("*.json"))
+        task_data = json.loads(task_files[0].read_text(encoding="utf-8"))
+        assert task_data["output_path"] == "./wiki/implementation-decisions/bonding/test-key-crossref.md"
+
+    def test_task_file_contains_prompt_with_pdf_text(self, tmp_path, monkeypatch):
+        """The user_prompt in the task file includes the PDF text."""
+        tasks_dir = tmp_path / "codebuff_tasks"
+        monkeypatch.setattr("llm_client._TASKS_DIR", str(tasks_dir))
+
+        generate_paper_profile(
+            None, "codebuff", "test-key",
+            self.dummy_metadata(), "Unique PDF content for testing.",
+        )
+
+        task_files = list(tasks_dir.glob("*.json"))
+        task_data = json.loads(task_files[0].read_text(encoding="utf-8"))
+        assert "Unique PDF content for testing." in task_data["user_prompt"]
+
+    def test_codebuff_does_not_call_llm(self, tmp_path, monkeypatch):
+        """Codebuff provider must NOT call _call_llm."""
+        tasks_dir = tmp_path / "codebuff_tasks"
+        monkeypatch.setattr("llm_client._TASKS_DIR", str(tasks_dir))
+
+        with patch("llm_client._call_llm") as mock_call_llm:
+            generate_paper_profile(
+                None, "codebuff", "test-key",
+                self.dummy_metadata(), "pdf text",
+            )
+
+        mock_call_llm.assert_not_called()

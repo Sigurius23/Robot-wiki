@@ -1,0 +1,555 @@
+"""
+Wiki maintenance — self-initiated health operations.
+
+Used by `synto maintain` to:
+  - Create stub drafts for broken wikilinks
+  - Suggest orphan link fixes
+  - Suggest concept merges for near-duplicates
+  - Report source quality distribution
+"""
+
+from __future__ import annotations
+
+import logging
+import re
+from dataclasses import dataclass, field
+from datetime import datetime
+from pathlib import Path
+
+import frontmatter as fm_lib
+
+from ..config import Config
+from ..models import LintIssue
+from ..state import StateDB
+from ..vault import (
+    _mask_code_blocks,
+    _restore_code_blocks,
+    atomic_write,
+    list_wiki_articles,
+    normalize_wikilinks,
+    parse_note,
+    rename_wikilink_targets,
+    sanitize_filename,
+    write_note,
+)
+
+log = logging.getLogger(__name__)
+
+_STUB_BODY = """\
+> [!info] This is a stub article — referenced by other pages but no source material yet.
+
+Add raw notes about this topic to `raw/` and run `synto compile` to generate a full article.
+"""
+
+_CONCEPT_MERGE_THRESHOLD = 0.7
+
+_WIKILINK_REPAIR_RE = re.compile(r"\[\[([^\]|#]+?)(?:#([^\]|]*))?(?:\|([^\]]*))?\]\]")
+
+
+@dataclass
+class FixReport:
+    repaired: int = 0
+    repaired_links: list[tuple[str, str, str]] = field(default_factory=list)
+    still_broken: list[LintIssue] = field(default_factory=list)
+    skipped_files: list[Path] = field(default_factory=list)
+
+
+def fix_broken_links(
+    config: Config,
+    db: StateDB,
+    broken_link_issues: list[LintIssue],
+    dry_run: bool = False,
+) -> FixReport:
+    """Rewrite broken [[Alias]] links to [[Canonical|Alias]] using the alias map.
+
+    Only unambiguous matches are rewritten. Ambiguous or unknown links fall through
+    to still_broken for stub creation.
+    """
+    report = FixReport()
+
+    if not broken_link_issues:
+        return report
+
+    alias_map = db.list_alias_map()
+    if not alias_map:
+        report.still_broken = list(broken_link_issues)
+        return report
+
+    # Build set of known published article titles (lowercase) so we don't rewrite good links
+    known_lower = {t.lower() for t, _ in list_wiki_articles(config.wiki_dir)}
+
+    # Group issues by source file for one write per file
+    issues_by_file: dict[str, list[LintIssue]] = {}
+    for issue in broken_link_issues:
+        issues_by_file.setdefault(issue.path, []).append(issue)
+
+    for rel_path, file_issues in issues_by_file.items():
+        page = config.vault / rel_path
+        try:
+            meta, body = parse_note(page)
+        except Exception as exc:
+            log.warning("fix_broken_links: skipping %s — parse error: %s", rel_path, exc)
+            report.skipped_files.append(page)
+            report.still_broken.extend(file_issues)
+            continue
+
+        original_body = body
+        # Mask code fences so repair doesn't rewrite [[...]] inside ```code``` or `inline`.
+        masked_body, spans = _mask_code_blocks(body)
+        repaired_in_file: list[tuple[str, str]] = []
+        still_broken_in_file: list[LintIssue] = []
+
+        for issue in file_issues:
+            target = _extract_link_target(issue.description)
+            if target is None:
+                still_broken_in_file.append(issue)
+                continue
+
+            # Skip if target is already a known title (shouldn't be in broken list, but guard)
+            if target.lower() in known_lower:
+                still_broken_in_file.append(issue)
+                continue
+
+            canonical = alias_map.get(target.lower())
+            if canonical is None or canonical.lower() not in known_lower:
+                still_broken_in_file.append(issue)
+                continue
+
+            # Rewrite all occurrences of [[target ...]] → [[canonical|target]]
+            def _make_rewriter(t: str, canon: str):
+                def _rewrite(m: re.Match) -> str:
+                    if m.group(1).strip().lower() != t.lower():
+                        return m.group(0)
+                    fragment = m.group(2)
+                    display = m.group(3) if m.group(3) is not None else m.group(1).strip()
+                    frag_part = f"#{fragment}" if fragment else ""
+                    return f"[[{canon}{frag_part}|{display}]]"
+
+                return _rewrite
+
+            new_masked = _WIKILINK_REPAIR_RE.sub(_make_rewriter(target, canonical), masked_body)
+            if new_masked != masked_body:
+                repaired_in_file.append((f"[[{target}]]", f"[[{canonical}|{target}]]"))
+                masked_body = new_masked
+            else:
+                still_broken_in_file.append(issue)
+
+        body = _restore_code_blocks(masked_body, spans)
+
+        if body != original_body:
+            if dry_run:
+                for old, new in repaired_in_file:
+                    log.info("dry-run: would rewrite %s → %s in %s", old, new, rel_path)
+            else:
+                write_note(page, meta, body)
+            for old, new in repaired_in_file:
+                report.repaired += 1
+                report.repaired_links.append((rel_path, old, new))
+
+        report.still_broken.extend(still_broken_in_file)
+
+    return report
+
+
+def normalize_published_alias_links(
+    config: Config,
+    db: StateDB,
+    dry_run: bool = False,
+) -> int:
+    """Rewrite alias-form [[Alias]] links in published articles to [[Canonical|Alias]].
+
+    Complements compile's normalize_wikilinks pass: articles published before an alias
+    was registered never got that normalization. This pass runs on all published articles.
+
+    Only unambiguous alias rewrites are applied. Returns number of files modified.
+    """
+    alias_map = db.list_alias_map()
+    if not alias_map:
+        return 0
+
+    known_titles = {t.lower() for t, _ in list_wiki_articles(config.wiki_dir)}
+    modified = 0
+
+    for _title, path in list_wiki_articles(config.wiki_dir):
+        try:
+            meta, body = parse_note(path)
+        except Exception as exc:
+            log.warning("normalize_published_alias_links: skipping %s — %s", path.name, exc)
+            continue
+
+        new_body = normalize_wikilinks(body, alias_map, known_titles)
+        if new_body == body:
+            continue
+
+        if dry_run:
+            log.info("dry-run: would normalize alias links in %s", path.name)
+        else:
+            write_note(path, meta, new_body)
+            log.info("Normalized alias links in %s", path.name)
+        modified += 1
+
+    return modified
+
+
+class ConceptRenameError(Exception):
+    """Raised when a concept rename cannot proceed (not found, name taken, etc.)."""
+
+
+@dataclass
+class RenameReport:
+    old_name: str = ""
+    new_name: str = ""
+    files_moved: list[tuple[str, str]] = field(default_factory=list)
+    links_rewritten: int = 0  # files in which inbound links were rewritten
+    alias_kept: bool = False
+    dry_run: bool = False
+
+
+def _move_file(old: Path, new: Path) -> None:
+    """Rename a file, handling case-only renames on case-insensitive filesystems."""
+    if old == new:
+        return
+    case_only = old.parent == new.parent and old.name.casefold() == new.name.casefold()
+    if case_only:
+        tmp = old.with_name(f"{old.stem}.__synto_rename__{old.suffix}")
+        old.rename(tmp)
+        tmp.rename(new)
+    else:
+        # Defense in depth: preflight already rejects target collisions, but never let a
+        # rename silently overwrite an unrelated file if that guarantee ever regresses.
+        if new.exists():
+            raise ConceptRenameError(f"Refusing to overwrite existing file: {new}")
+        old.rename(new)
+
+
+def rename_concept(
+    config: Config,
+    db: StateDB,
+    old_name: str,
+    new_name: str,
+    *,
+    keep_alias: bool = True,
+    dry_run: bool = False,
+) -> RenameReport:
+    """Rename a concept: migrate DB identity, move its article, rewrite all inbound links.
+
+    See plan/issue #29. The optional alias (old → new) is the durability mechanism:
+    ingest's _normalize_concepts canonicalizes re-extracted old names back to the new
+    one, so the rename survives future re-ingest. Dropping it can resurrect the old
+    concept if a raw note still yields the old surface form.
+    """
+    old_name = old_name.strip()
+    new_name = new_name.strip()
+    report = RenameReport(
+        old_name=old_name, new_name=new_name, alias_kept=keep_alias, dry_run=dry_run
+    )
+
+    # ── Preflight (no writes) ───────────────────────────────────────────────
+    if not new_name or sanitize_filename(new_name) == "untitled":
+        raise ConceptRenameError(f"Invalid new name: {new_name!r}")
+
+    # Exact resolution only: a fuzzy substring match (e.g. "Net" -> "Network") would
+    # silently rename the wrong concept. On a miss, reuse the fuzzy helper for a
+    # suggestion only — never to act.
+    resolved = db.find_concept_exact(old_name)
+    if resolved is None:
+        fuzzy = db.find_concept_by_name_or_alias(old_name)
+        hint = f" Did you mean {fuzzy[0]!r}?" if fuzzy else ""
+        raise ConceptRenameError(f"Concept not found: {old_name!r}.{hint}")
+    canonical_old = resolved[0]
+
+    case_only = canonical_old.casefold() == new_name.casefold()
+    if canonical_old == new_name:
+        raise ConceptRenameError(f"{old_name!r} is already named {new_name!r}")
+    if not case_only and db.concept_name_exists_exact(new_name, exclude_concept=canonical_old):
+        raise ConceptRenameError(
+            f"Cannot rename to {new_name!r}: a concept/alias with that name already exists"
+        )
+
+    old_stem = sanitize_filename(canonical_old)
+    new_stem = sanitize_filename(new_name)
+
+    # The concept's own article(s): the deterministic file <dir>/<old_stem>.md, plus any
+    # row whose title is exactly the canonical name. Matching on alias titles/stems (as
+    # find_article_candidates does) is unsafe here — it could pull in an unrelated
+    # article that merely shares one of this concept's aliases and clobber it.
+    old_key = canonical_old.casefold()
+    candidates = [
+        art
+        for art in db.list_articles()
+        if art.kind != "synthesis"
+        and (
+            Path(art.path).stem.casefold() == old_stem.casefold() or art.title.casefold() == old_key
+        )
+    ]
+    # Validate everything before any write so a rename can't fail partway through.
+    moves: list[tuple[Path, Path, str, str]] = []  # (old_path, new_path, new_rel, old_rel)
+    seen_targets: set[str] = set()
+    for art in candidates:
+        old_rel = art.path
+        old_path = config.vault / old_rel
+        new_path = old_path.parent / f"{new_stem}.md"
+        new_rel = str(new_path.relative_to(config.vault))
+        if not old_path.exists():
+            raise ConceptRenameError(
+                f"Tracked article {old_rel} is missing on disk; "
+                "reconcile with `synto lint` before renaming."
+            )
+        if not case_only and new_path.exists():
+            raise ConceptRenameError(f"Target file already exists: {new_rel}")
+        existing = db.get_article(new_rel)
+        if existing is not None and new_rel != old_rel:
+            raise ConceptRenameError(f"A tracked article already exists at {new_rel}")
+        if new_rel in seen_targets:
+            raise ConceptRenameError(f"Multiple articles would collide at {new_rel}")
+        seen_targets.add(new_rel)
+        moves.append((old_path, new_path, new_rel, old_rel))
+
+    if dry_run:
+        log.info("dry-run: would rename concept %r → %r", canonical_old, new_name)
+        for _old_path, _new_path, new_rel, old_rel in moves:
+            log.info("dry-run: would move %s → %s", old_rel, new_rel)
+        report.files_moved = [(old_rel, new_rel) for _o, _n, new_rel, old_rel in moves]
+        # Count pages whose inbound links would change, without writing.
+        report.links_rewritten = _rewrite_inbound_links(
+            config, db, old_stem, new_stem, new_name, dry_run=True
+        )
+        return report
+
+    # ── Mutations ───────────────────────────────────────────────────────────
+    for old_path, new_path, new_rel, old_rel in moves:
+        _move_file(old_path, new_path)
+        meta, body = parse_note(new_path)
+        meta["title"] = new_name
+        meta["updated"] = datetime.now().strftime("%Y-%m-%d")
+        if keep_alias:
+            existing = list(meta.get("aliases") or [])
+            if not any(a.casefold() == canonical_old.casefold() for a in existing):
+                meta["aliases"] = [*existing, canonical_old]
+        # Body is unchanged (frontmatter-only edit), so content_hash is preserved by
+        # update_article_identity — this keeps manual-edit protection on a hand-fixed page.
+        write_note(new_path, meta, body)
+        db.update_article_identity(old_rel, new_rel, new_name)
+        report.files_moved.append((old_rel, new_rel))
+
+    db.rename_concept(canonical_old, new_name)
+    if keep_alias:
+        db.upsert_aliases(new_name, [canonical_old])
+
+    report.links_rewritten = _rewrite_inbound_links(
+        config, db, old_stem, new_stem, new_name, dry_run=False
+    )
+    return report
+
+
+def _rewrite_inbound_links(
+    config: Config,
+    db: StateDB,
+    old_stem: str,
+    new_stem: str,
+    new_name: str,
+    *,
+    dry_run: bool,
+) -> int:
+    """Repoint every wikilink resolving to old_stem across the wiki tree.
+
+    Covers concept articles, drafts, sources/, queries/, synthesis/ so no broken
+    links are left anywhere. raw/ is immutable and untouched. content_hash is
+    refreshed only for tracked rows — _write_fixed_note no-ops the DB update for
+    untracked pages, so the broad rewrite scope stays cheap.
+    """
+    from .lint import _write_fixed_note
+
+    changed = 0
+    for page in sorted(config.wiki_dir.rglob("*.md")):
+        try:
+            meta, body = parse_note(page)
+        except Exception as exc:
+            log.warning("rename: skipping %s — parse error: %s", page.name, exc)
+            continue
+        new_body = rename_wikilink_targets(body, old_stem, new_stem, new_name)
+        if new_body == body:
+            continue
+        changed += 1
+        if dry_run:
+            log.info("dry-run: would rewrite links in %s", page.name)
+            continue
+        rel_path = str(page.relative_to(config.vault))
+        _write_fixed_note(page, rel_path, meta, new_body, db)
+    return changed
+
+
+def create_stubs(
+    config: Config,
+    db: StateDB,
+    broken_link_issues: list[LintIssue] | None = None,
+    max_stubs: int = 5,
+) -> list[Path]:
+    """
+    Create stub drafts for broken wikilinks.
+
+    Finds [[Target]] references that have no matching article, creates placeholder
+    drafts and registers them in the stubs table so compile can pick them up.
+
+    Pass broken_link_issues to avoid re-running lint. If None, lint runs internally.
+    """
+    if broken_link_issues is None:
+        from .lint import run_lint
+
+        result = run_lint(config, db)
+        broken_link_issues = [i for i in result.issues if i.issue_type == "broken_link"]
+
+    # Extract target concept names from broken link descriptions
+    # LintIssue description format: "[[Target]] not found" or similar
+    created: list[Path] = []
+    seen: set[str] = set()
+
+    for issue in broken_link_issues:
+        if len(created) >= max_stubs:
+            log.info("Stub cap (%d) reached — stopping", max_stubs)
+            break
+
+        # Extract target from description (e.g. "[[Quantum Computing]] not found")
+        target = _extract_link_target(issue.description)
+        if not target:
+            # Fall back to path stem
+            target = Path(issue.path).stem
+        # Strip trailing .md — model sometimes generates [[raw-note.md]] wikilinks
+        if target.lower().endswith(".md"):
+            target = target[:-3]
+        if not target:
+            continue
+
+        # Path-prefixed targets like sources/SomePaper are pipeline-managed pages,
+        # not concept stubs. sanitize_filename would strip the slash and produce a
+        # wrong name (sourcesSomePaper). Skip them — the fix is to run synto run.
+        if "/" in target:
+            log.debug("Skipping path-fragment broken link target: %s", target)
+            continue
+
+        if target in seen:
+            continue
+        seen.add(target)
+
+        # Skip if already has a stub, draft, or published article
+        if db.has_stub(target):
+            continue
+        safe_name = sanitize_filename(target)
+        draft_path = config.drafts_dir / f"{safe_name}.md"
+        wiki_path = config.wiki_dir / f"{safe_name}.md"
+        if draft_path.exists() or wiki_path.exists():
+            continue
+
+        # Register in stubs table
+        db.add_stub(target, source="auto")
+
+        # Write placeholder draft
+        config.drafts_dir.mkdir(parents=True, exist_ok=True)
+        meta = {
+            "title": target,
+            "status": "stub",
+            "tags": ["stub"],
+            "sources": [],
+            "confidence": 0.0,
+            "created": datetime.now().strftime("%Y-%m-%d"),
+            "updated": datetime.now().strftime("%Y-%m-%d"),
+        }
+        post = fm_lib.Post(_STUB_BODY, **meta)
+        atomic_write(draft_path, fm_lib.dumps(post))
+        created.append(draft_path)
+        log.info("Stub created: %s", draft_path.name)
+
+    return created
+
+
+def _extract_link_target(description: str) -> str | None:
+    """Extract [[Target]] from a lint issue description string."""
+    match = re.search(r"\[\[([^\]]+)\]\]", description)
+    return match.group(1) if match else None
+
+
+def suggest_orphan_links(config: Config, db: StateDB) -> list[tuple[str, list[str]]]:
+    """
+    For each orphan article, find other articles that mention its title unlinked.
+
+    Returns list of (orphan_title, [paths_that_mention_it]).
+    """
+    from .lint import run_lint
+
+    result = run_lint(config, db)
+    orphan_issues = [i for i in result.issues if i.issue_type == "orphan"]
+    if not orphan_issues:
+        return []
+
+    # Load all published article bodies
+    wiki_pages: dict[str, str] = {}
+    if config.wiki_dir.exists():
+        for p in config.wiki_dir.rglob("*.md"):
+            if ".drafts" in p.parts:
+                continue
+            try:
+                meta, body = parse_note(p)
+                wiki_pages[str(p.relative_to(config.vault))] = body
+            except Exception:
+                pass
+
+    suggestions = []
+    for issue in orphan_issues:
+        orphan_path = config.vault / issue.path
+        try:
+            meta, _ = parse_note(orphan_path)
+            orphan_title = meta.get("title", orphan_path.stem)
+        except Exception:
+            orphan_title = orphan_path.stem
+
+        # Find pages that mention the orphan title in plain text (not as wikilink)
+        mentions = []
+        title_pattern = re.compile(
+            r"(?<!\[\[)\b" + re.escape(orphan_title) + r"\b(?!\]\])",
+            re.IGNORECASE,
+        )
+        for page_path, body in wiki_pages.items():
+            if page_path == issue.path:
+                continue
+            if title_pattern.search(body):
+                mentions.append(page_path)
+
+        if mentions:
+            suggestions.append((orphan_title, mentions))
+
+    return suggestions
+
+
+def suggest_concept_merges(config: Config, db: StateDB) -> list[tuple[str, str, float]]:
+    """
+    Find near-duplicate concept pairs using Jaccard similarity on title tokens.
+
+    Returns list of (concept_a, concept_b, similarity_score) for pairs > threshold.
+    No LLM required — purely token-overlap based.
+    """
+    concepts = db.list_all_concept_names()
+    if len(concepts) < 2:
+        return []
+
+    def tokenize(name: str) -> frozenset[str]:
+        # Lowercase, split on spaces/hyphens/underscores, filter short tokens
+        tokens = re.split(r"[\s\-_]+", name.lower())
+        return frozenset(t for t in tokens if len(t) > 1)
+
+    tokenized = [(c, tokenize(c)) for c in concepts]
+    suggestions = []
+
+    for i, (a, tokens_a) in enumerate(tokenized):
+        for b, tokens_b in tokenized[i + 1 :]:
+            if not tokens_a or not tokens_b:
+                continue
+            intersection = len(tokens_a & tokens_b)
+            union = len(tokens_a | tokens_b)
+            if union == 0:
+                continue
+            score = intersection / union
+            if score >= _CONCEPT_MERGE_THRESHOLD:
+                suggestions.append((a, b, round(score, 2)))
+
+    suggestions.sort(key=lambda x: -x[2])
+    return suggestions

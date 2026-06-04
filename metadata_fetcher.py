@@ -9,6 +9,7 @@ Vendor source: adapted from
   (Semantic Scholar provider)
 """
 
+import re
 import sys
 
 import requests
@@ -99,10 +100,12 @@ def _extract_doi_from_text(pdf_text: str) -> str | None:
       - http://doi.org/10.xxxxx
       - doi.org/10.xxxxx
       - bare 10.xxxxx/xxxxx pattern near common DOI context words
-    """
-    import re
+      - arXiv ID (converted to DOI format: 10.48550/arXiv.XXXX.XXXXX)
 
-    # Search in first 3000 chars where DOI usually appears (header/footer)
+    Searches in the first 3000 and last 1000 characters of the PDF text
+    where DOIs and arXiv IDs typically appear.
+    """
+    # Search in first 3000 chars where DOI/arXiv usually appears (header/footer)
     search_text = pdf_text[:3000] + pdf_text[-1000:]
 
     # Match https://doi.org/10.xxxx/xxxx or doi.org/10.xxxx/xxxx
@@ -124,6 +127,18 @@ def _extract_doi_from_text(pdf_text: str) -> str | None:
         doi = bare_pattern.group(1).rstrip('.,;)')
         return doi
 
+    # Match arXiv ID and convert to DOI format for Semantic Scholar lookup.
+    # arXiv IDs on Semantic Scholar are resolvable via DOI:10.48550/arXiv.{id}
+    # Matches: arXiv:2401.01735v1, arXiv:2401.01735, arxiv.org/abs/2401.01735
+    arxiv_pattern = re.search(
+        r'(?:arXiv:|arxiv\.org/abs/)(\d{4}\.\d{4,})(?:v\d+)?',
+        search_text,
+        re.IGNORECASE,
+    )
+    if arxiv_pattern:
+        arxiv_id = arxiv_pattern.group(1)
+        return f"10.48550/arXiv.{arxiv_id}"
+
     return None
 
 
@@ -134,7 +149,8 @@ def _build_search_queries(title: str | None, pdf_text: str) -> list[str]:
     1. Full extracted title
     2. First 6 words of title
     3. First 4 words of title
-    4. First 8 words from the PDF body (skip headers)
+    4. First substantial sentence from the abstract (after "ABSTRACT" heading)
+    5. First 8 words from a non-header PDF body line
     """
     queries = []
 
@@ -146,10 +162,30 @@ def _build_search_queries(title: str | None, pdf_text: str) -> list[str]:
         if len(words) > 4:
             queries.append(" ".join(words[:4]))
 
-    # Try pulling a longer phrase from the first few lines of the PDF
+    # Try extracting text from after the ABSTRACT heading for a better fallback.
+    # This avoids picking up author/affiliation lines as search queries.
     if pdf_text:
-        lines = [l.strip() for l in pdf_text.splitlines() if len(l.strip()) > 20]
-        for line in lines[:10]:
+        abstract_match = re.search(
+            r'\bABSTRACT\b[\s:—–-]*\n*((?:.{20,}\n)+)',
+            pdf_text[:5000],
+            re.IGNORECASE,
+        )
+        if abstract_match:
+            abstract_text = abstract_match.group(1).strip()
+            # Take first meaningful sentence (up to 12 words)
+            first_sentence = abstract_text.split(".")[0].strip()
+            words = first_sentence.split()
+            if len(words) >= 4:
+                candidate = " ".join(words[:12])
+                if candidate and candidate not in queries:
+                    queries.append(candidate)
+
+        # Generic fallback: first substantial non-header line from PDF body
+        lines = [l.strip() for l in pdf_text.splitlines() if len(l.strip()) > 30]
+        for line in lines[:15]:
+            # Skip lines that look like metadata (contain @, arXiv, DOI, URLs)
+            if re.search(r'[@]|arXiv:|doi\.org|https?://|^\d+\s', line, re.IGNORECASE):
+                continue
             words = line.split()
             candidate = " ".join(words[:8])
             if candidate and candidate not in queries:
@@ -167,8 +203,6 @@ def _extract_metadata_from_pdf(pdf_text: str) -> dict:
     patterns. Returns a dict with the same keys as the API response,
     with None/[] for fields that can't be extracted.
     """
-    import re
-
     # Try to find a year (4-digit number in plausible range)
     year = None
     year_match = re.search(r'\b(19[5-9]\d|20[0-2]\d)\b', pdf_text[:2000])
@@ -220,16 +254,66 @@ def _query_by_title(title: str) -> dict | None:
 
 def _extract_title_from_text(pdf_text: str) -> str | None:
     """
-    Return the first non-empty, non-whitespace line of pdf_text,
-    treated as the paper title. Returns None if pdf_text is empty
-    or whitespace-only.
+    Return the paper title extracted from the PDF text.
+
+    Skips known non-title lines commonly found at the top of academic PDFs:
+      - arXiv watermarks ("Preview")
+      - Conference labels ("Published as a conference paper at...")
+      - arXiv ID lines ("arXiv:2401.01735v1  [cs.GT]  ...")
+      - Section headers ("ABSTRACT", "Introduction")
+      - Author / affiliation lines
+      - Very short lines likely to be metadata labels (< 8 chars)
+
+    Returns None if pdf_text is empty or no title-like line is found.
     """
     if not pdf_text or not pdf_text.strip():
         return None
 
-    for line in pdf_text.splitlines():
-        if line.strip():
-            return line.strip()
+    # Combined pattern for known non-title lines
+    _NON_TITLE = re.compile(
+        r'^Preview$|'                          # arXiv watermark
+        r'^Published as a conference paper at|' # conference label
+        r'^arXiv:\d{4}\.\d{4,}|'               # arXiv ID line
+        r'^ABSTRACT$|'                          # section header
+        r'^arxiv\.org/abs/|'                    # arXiv URL
+        r'^https?://|'                           # URL line
+        r'^doi\.org/',                           # DOI URL
+        re.IGNORECASE,
+    )
+
+    # Author lines typically contain email addresses
+    _AUTHOR = re.compile(r'.+@.+\.\w+')
+    # Affiliation lines: start with a digit followed by institution indicators
+    _AFFILIATION = re.compile(
+        r'^\d+\s*'
+        r'(University|Institute|College|Laboratory|School|Department|'
+        r'Centre|Center|Inc\.|Ltd\.|Lab|Corp\.|'
+        r'Tencent|Google|Microsoft|OpenAI|DeepMind|Meta|Amazon|IBM|'
+        r'Chinese|Beijing|Shanghai|Shenzhen|'
+        r'ETH|NUS|MIT|CMU|Stanford)',
+        re.IGNORECASE,
+    )
+
+    lines = [l.strip() for l in pdf_text.splitlines()]
+
+    for line in lines:
+        if not line:
+            continue
+
+        # Skip very short lines (likely labels, page numbers, etc.)
+        if len(line) < 8:
+            continue
+
+        # Skip known non-title patterns
+        if _NON_TITLE.match(line):
+            continue
+
+        # Skip author/affiliation lines
+        if _AUTHOR.search(line) or _AFFILIATION.match(line):
+            continue
+
+        # First plausible title line found
+        return line
 
     return None
 

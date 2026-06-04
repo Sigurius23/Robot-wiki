@@ -19,24 +19,17 @@ from ingest import derive_cite_key
 
 def map_to_topic(pdf_path: Path) -> str:
     """
-    Map a PDF path to a simplified set of topics based on folder or filename keywords.
+    Map a PDF path to a topic based on its parent folder structure within raw_papers.
     """
-    path_str = str(pdf_path).lower()
-
-    if "bonding" in path_str:
-        return "bonding"
-    elif "persona" in path_str or "adherence" in path_str:
-        return "persona-adherence"
-    elif "shutdown" in path_str or "avoidance" in path_str:
-        return "shutdown-avoidance"
-    elif "reasoning" in path_str or "chain of thought" in path_str or "cot" in path_str:
-        return "reasoning"
-    elif "humans" in path_str:
-        return "pgg-humans"
-    elif "pgg" in path_str or "simulation" in path_str:
-        return "pgg-simulation"
-    else:
-        return "general"
+    try:
+        raw_papers_dir = Path("./raw_papers").resolve()
+        resolved_pdf = pdf_path.resolve()
+        rel = resolved_pdf.relative_to(raw_papers_dir)
+        if len(rel.parts) > 1:
+            return rel.parts[0]
+    except (ValueError, RuntimeError):
+        pass
+    return "general"
 
 
 def main():

@@ -40,6 +40,7 @@ _DEFAULT_MODELS: dict[str, str] = {
     "anthropic": "claude-sonnet-4-20250514",
     "openai": "gpt-4o",
     "nim": "deepseek-ai/deepseek-v4-pro",
+    "codebuff": "codebuff",
 }
 
 # NVIDIA NIM exposes an OpenAI-compatible endpoint.
@@ -87,7 +88,7 @@ class _Spinner:
 
 PROMPT_A_TEMPLATE: str = """\
 You are a research librarian processing an academic paper for an Obsidian knowledge vault.
-The vault supports a bachelor thesis on public goods games (PGG) simulated with LLM-based agents whose personalities are grounded in Schwartz Theory of Basic Human Values.
+The vault supports a research project on robotics, autonomous agents, and multi-agent systems.
 Your output must be valid Obsidian markdown and conform to the `papers` entity schema.
 
 CRITICAL: Begin your response with the exact YAML block below. Do not alter any field values.
@@ -104,7 +105,7 @@ cite-key: "{cite_key}"
 ---
 # {title}
 source: {url}
-thesis-relevance: [One sentence — why does this paper matter for the thesis?]
+project-relevance: [One sentence — why does this paper matter for the project?]
 
 ## Summary
 2–4 sentences. Central claim or contribution. Plain academic prose, no bullets.
@@ -112,9 +113,9 @@ thesis-relevance: [One sentence — why does this paper matter for the thesis?]
 ## Methodology
 One sentence per point:
 - **Study type**: experiment / simulation / survey / meta-analysis / theoretical
-- **Participants or agents**: human / LLM (specify model) / both
-- **N**: sample size or number of simulation runs
-- **Game or task**: exact game or task used
+- **Participants or agents**: human / robot / LLM (specify model) / both
+- **N**: sample size, number of simulation runs, or number of agents
+- **Game or task**: exact task or environment used
 - **Key manipulations**: independent variables
 - **Outcome measures**: dependent variables
 - **Pre-registered**: yes / no / unclear
@@ -131,10 +132,10 @@ Most important prior works explicitly cited. Use this exact format:
 NOTE: Use the cite-key format for wikilinks (e.g., [[OBrien2023]]), not the author's display name.
 
 ## What this paper leaves open
-Gaps directly relevant to the thesis.
+Gaps directly relevant to the project.
 
-## Thesis implications
-Effect on experimental design decisions.
+## Project implications
+Effect on agent design and implementation decisions.
 
 ## Contradictions with other papers
 Note contradictions, or write: "No contradictions identified yet."
@@ -155,62 +156,62 @@ Answer only what this specific paper explicitly says — do not infer or general
 
 ## {cite_key} — implementation decision crossref
 
-### 1. Persona injection — single-value trait description
+### 1. Agent architecture — modular vs. end-to-end learning
 - covered: yes / partially / no
 - finding: [one-sentence paraphrase + ([Author], [Year], p. X)]
 - alignment: aligned / contradicts / extends / not covered
 
-### 2. Bonding protocol — text summary injection
+### 2. Coordination mechanism — centralized vs. decentralized control
 - covered: yes / partially / no
 - finding: [one-sentence paraphrase + ([Author], [Year], p. X)]
 - alignment: aligned / contradicts / extends / not covered
 
-### 3. Stake operationalisation — explicit elimination thresholds
+### 3. Communication protocol — explicit messaging vs. stigmergic/implicit coordination
 - covered: yes / partially / no
 - finding: [one-sentence paraphrase + ([Author], [Year], p. X)]
 - alignment: aligned / contradicts / extends / not covered
 
-### 4. Contribution elicitation — structured JSON with motivation field
+### 4. Task allocation — auction-based vs. dynamic heuristic scheduling
 - covered: yes / partially / no
 - finding: [one-sentence paraphrase + ([Author], [Year], p. X)]
 - alignment: aligned / contradicts / extends / not covered
 
-### 5. Memory architecture — single preceding round only
+### 5. Path planning & navigation — global map-based vs. local reactive obstacle avoidance
 - covered: yes / partially / no
 - finding: [one-sentence paraphrase + ([Author], [Year], p. X)]
 - alignment: aligned / contradicts / extends / not covered
 
-### 6. Gossip & ostracism mechanics
+### 6. Safety & constraint handling — virtual boundary geofencing vs. active runtime monitoring
 - covered: yes / partially / no
 - finding: [one-sentence paraphrase + ([Author], [Year], p. X)]
 - alignment: aligned / contradicts / extends / not covered
 
-### 7. Agent evolution — wealth-based cloning
+### 7. Agent evolution & learning — online adaptation vs. offline training
 - covered: yes / partially / no
 - finding: [one-sentence paraphrase + ([Author], [Year], p. X)]
 - alignment: aligned / contradicts / extends / not covered
 
-### 8. Round structure — simultaneous vs. sequential play
+### 8. Environmental representation — raw sensor grids vs. semantic object maps
 - covered: yes / partially / no
 - finding: [one-sentence paraphrase + ([Author], [Year], p. X)]
 - alignment: aligned / contradicts / extends / not covered
 
-### 9. API failure handling — default to zero contribution
+### 9. Failure recovery — retry-with-fallback vs. human-in-the-loop intervention
 - covered: yes / partially / no
 - finding: [one-sentence paraphrase + ([Author], [Year], p. X)]
 - alignment: aligned / contradicts / extends / not covered
 
-### 10. Model selection — reasoning vs. standard models
+### 10. Model selection — local edge execution vs. cloud API model hosting
 - covered: yes / partially / no
 - finding: [one-sentence paraphrase + ([Author], [Year], p. X)]
 - alignment: aligned / contradicts / extends / not covered
 
-### 11. Measurement — LLM self-report scales (trust, IOS)
+### 11. Measurement & evaluation — task completion rate vs. energy efficiency
 - covered: yes / partially / no
 - finding: [one-sentence paraphrase + ([Author], [Year], p. X)]
 - alignment: aligned / contradicts / extends / not covered
 
-### 12. Temperature — fixed at 0.7
+### 12. Temperature & determinism — deterministic (0.0) vs. exploratory (e.g., 0.7) action selection
 - covered: yes / partially / no
 - finding: [one-sentence paraphrase + ([Author], [Year], p. X)]
 - alignment: aligned / contradicts / extends / not covered
@@ -234,7 +235,7 @@ _SYSTEM_PROMPT_A: str = (
 )
 
 _SYSTEM_PROMPT_B: str = (
-    "You are a research assistant mapping a paper against specific thesis implementation decisions. "
+    "You are a research assistant mapping a paper against specific project implementation decisions. "
     "Answer only what the paper explicitly states. Do not infer or generalise. "
     "Output the crossref note directly — no preamble, no explanation."
 )
@@ -263,13 +264,18 @@ def init_llm_client(provider: str, api_key: str):
     """
     provider_lower = provider.lower()
 
-    if provider_lower not in ("anthropic", "openai", "nim"):
+    if provider_lower not in ("anthropic", "openai", "nim", "codebuff"):
         print(
             f"Error: Unknown LLM provider '{provider}'. "
-            f"Must be 'anthropic', 'openai', or 'nim'.",
+            f"Must be 'anthropic', 'openai', 'nim', or 'codebuff'.",
             file=sys.stderr,
         )
         sys.exit(1)
+
+    # codebuff provider does not require an API key — it writes task files
+    # for Codebuff to process instead of calling an external LLM.
+    if provider_lower == "codebuff":
+        return None
 
     if not api_key:
         env_var = _env_var_for_provider(provider)
@@ -454,8 +460,8 @@ def generate_paper_profile(
     LLM Pass 1: generate the paper profile Obsidian note.
 
     Args:
-        client:    Initialised LLM SDK client.
-        provider:  ``"anthropic"``, ``"openai"``, or ``"nim"`` (case-insensitive).
+        client:    Initialised LLM SDK client, or ``None`` for the codebuff provider.
+        provider:  ``"anthropic"``, ``"openai"``, ``"nim"``, or ``"codebuff"`` (case-insensitive).
         cite_key:  Obsidian cite-key for the paper (e.g. ``"smith2024"``).
         metadata:  Dict with keys ``year``, ``venue``, ``citationCount``,
                    ``authors``, ``baseline_trust_score``, ``cite_key``,
@@ -463,6 +469,22 @@ def generate_paper_profile(
         pdf_text:  Full cleaned PDF text.
         model:     Model name override (uses provider default if ``None``).
     """
+    # --- codebuff provider: write task file for Codebuff to process ---
+    if provider.lower() == "codebuff":
+        user_prompt = _build_prompt_a(metadata, pdf_text)
+        output_dir = f"./wiki/papers/{subfolder}" if subfolder else "./wiki/papers"
+        output_path = f"{output_dir}/{cite_key}.md"
+        return _write_codebuff_task(
+            cite_key=cite_key,
+            task_type="paper_profile",
+            system_prompt=_SYSTEM_PROMPT_A,
+            user_prompt=user_prompt,
+            output_path=output_path,
+            metadata=metadata,
+            pdf_text=pdf_text,
+        )
+
+    # --- API-based providers ---
     user_prompt = _build_prompt_a(metadata, pdf_text)
 
     try:
@@ -490,6 +512,87 @@ def generate_paper_profile(
     return success
 
 
+def _truncate_pdf_text(text: str, max_chars: int = 30000) -> str:
+    """
+    Truncate the PDF text if it exceeds max_chars.
+    To preserve both the Intro/Methodology (at the start) and the Findings/Conclusion/Reference
+    section (at the end), we keep the first 22,000 characters and the last 8,000 characters.
+    """
+    if len(text) <= max_chars:
+        return text
+    part1 = text[:22000]
+    part2 = text[-8000:]
+    return f"{part1}\n\n[... PDF text truncated to fit LLM rate limits ...]\n\n{part2}"
+
+
+# ---------------------------------------------------------------------------
+# Codebuff task file writer
+# ---------------------------------------------------------------------------
+
+_TASKS_DIR = "./codebuff_tasks"
+
+
+def _write_codebuff_task(
+    cite_key: str,
+    task_type: str,
+    system_prompt: str,
+    user_prompt: str,
+    output_path: str,
+    metadata: dict | None = None,
+    pdf_text: str | None = None,
+) -> bool:
+    """
+    Write a task file for Codebuff to process.
+
+    Saves a JSON file to ``./codebuff_tasks/{cite_key}--{task_type}.json``
+    containing the full analysis context so that Codebuff can generate the
+    output markdown without needing external API calls.
+
+    Args:
+        cite_key:      Obsidian cite-key for the paper.
+        task_type:     ``"paper_profile"`` or ``"crossref_note"``.
+        system_prompt: System-level instruction for the model.
+        user_prompt:   Fully constructed user prompt (template + PDF text).
+        output_path:   Target path where Codebuff should write the result.
+        metadata:      Paper metadata dict (Pass 1) or ``{"title": ...}`` (Pass 2).
+        pdf_text:      Full cleaned PDF text (untruncated, for Codebuff context).
+
+    Returns:
+        True if the task file was written successfully, False otherwise.
+    """
+    tasks_dir = Path(_TASKS_DIR)
+    tasks_dir.mkdir(parents=True, exist_ok=True)
+
+    task_filename = f"{cite_key}--{task_type}.json"
+    task_path = tasks_dir / task_filename
+
+    task_data = {
+        "cite_key": cite_key,
+        "task_type": task_type,
+        "output_path": output_path,
+        "system_prompt": system_prompt,
+        "user_prompt": user_prompt,
+        "metadata": metadata or {},
+        "pdf_text": pdf_text or "",
+    }
+
+    try:
+        task_path.write_text(
+            json.dumps(task_data, indent=2, ensure_ascii=False, default=str),
+            encoding="utf-8",
+        )
+    except OSError as exc:
+        print(
+            f"Error writing codebuff task file {task_path}: {exc}",
+            file=sys.stderr,
+        )
+        return False
+
+    print(f"✓  Codebuff task written  → {task_path}", file=sys.stderr)
+    print(f"   Run Codebuff to generate → {output_path}", file=sys.stderr)
+    return True
+
+
 def _build_prompt_a(metadata: dict, pdf_text: str) -> str:
     """Construct the Pass 1 prompt by injecting metadata into PROMPT_A_TEMPLATE."""
     title = metadata.get("title") or "Unknown Title"
@@ -510,6 +613,7 @@ def _build_prompt_a(metadata: dict, pdf_text: str) -> str:
     doi = ext.get("DOI", "")
     url = f"https://doi.org/{doi}" if doi else ""
 
+    truncated_text = _truncate_pdf_text(pdf_text)
     prompt = PROMPT_A_TEMPLATE.format(
         title=title,
         authors=authors,
@@ -518,7 +622,7 @@ def _build_prompt_a(metadata: dict, pdf_text: str) -> str:
         citation_count=citation_count,
         url=url,
         cite_key=cite_key,
-        pdf_text=pdf_text,
+        pdf_text=truncated_text,
     )
 
     # Append a JSON block of metadata to satisfy the test assertions (e.g. baseline_trust_score, null values)
@@ -544,13 +648,29 @@ def generate_crossref_note(
     LLM Pass 2: generate the implementation-decision cross-reference note.
 
     Args:
-        client:       Initialised LLM SDK client.
-        provider:     ``"anthropic"``, ``"openai"``, or ``"nim"`` (case-insensitive).
+        client:       Initialised LLM SDK client, or ``None`` for the codebuff provider.
+        provider:     ``"anthropic"``, ``"openai"``, ``"nim"``, or ``"codebuff"`` (case-insensitive).
         cite_key:     Obsidian cite-key for the paper.
         pdf_text:     Full cleaned PDF text.
         paper_title:  Paper title (from metadata or PDF extraction).
         model:        Model name override (uses provider default if ``None``).
     """
+    # --- codebuff provider: write task file for Codebuff to process ---
+    if provider.lower() == "codebuff":
+        user_prompt = _build_prompt_b(cite_key, paper_title, pdf_text)
+        output_dir = f"./wiki/implementation-decisions/{subfolder}" if subfolder else "./wiki/implementation-decisions"
+        output_path = f"{output_dir}/{cite_key}-crossref.md"
+        return _write_codebuff_task(
+            cite_key=cite_key,
+            task_type="crossref_note",
+            system_prompt=_SYSTEM_PROMPT_B,
+            user_prompt=user_prompt,
+            output_path=output_path,
+            metadata={"title": paper_title},
+            pdf_text=pdf_text,
+        )
+
+    # --- API-based providers ---
     user_prompt = _build_prompt_b(cite_key, paper_title, pdf_text)
 
     try:
@@ -580,5 +700,7 @@ def generate_crossref_note(
 
 def _build_prompt_b(cite_key: str, paper_title: str, pdf_text: str) -> str:
     """Construct the Pass 2 prompt by injecting cite_key into PROMPT_B_TEMPLATE."""
+    truncated_text = _truncate_pdf_text(pdf_text)
     crossref = PROMPT_B_TEMPLATE.format(cite_key=cite_key)
-    return f"Paper Title: {paper_title}\n\n{crossref}\n\n=== PAPER TEXT ===\n{pdf_text}"
+    return f"Paper Title: {paper_title}\n\n{crossref}\n\n=== PAPER TEXT ===\n{truncated_text}"
+
