@@ -335,7 +335,7 @@ Print: `✓  Metadata: year={year}, venue={venue}, citations={N}, authors={N}`
 
 ### Stage 7: LLM Pass 2 — Implementation Decision Crossref (`llm_client.py`)
 
-24. Construct the Pass 2 prompt by injecting `cite_key` into `PROMPT_B_TEMPLATE`, which contains all 12 thesis implementation decisions with the exact format:
+24. Construct the Pass 2 prompt by injecting `cite_key` into `PROMPT_B_TEMPLATE`, which contains all 12 project implementation decisions with the exact format:
     ```
     ### N. {Decision name}
     - covered: yes / partially / no
@@ -348,7 +348,7 @@ Print: `✓  Metadata: year={year}, venue={venue}, citations={N}, authors={N}`
 28. Print: `✓  Crossref note written  → ./wiki/implementation-decisions/{cite_key}-crossref.md`
 
 **System prompt (Pass 2):**
-> "You are a research assistant mapping a paper against specific thesis implementation decisions. Answer only what the paper explicitly states. Do not infer or generalise. Output the crossref note directly — no preamble, no explanation."
+> "You are a research assistant mapping a paper against specific project implementation decisions. Answer only what the paper explicitly states. Do not infer or generalise. Output the crossref note directly — no preamble, no explanation."
 
 ---
 
@@ -389,22 +389,22 @@ This project uses a clean architectural separation between CLI/Orchestration wra
 
 ---
 
-## The 12 Thesis Implementation Decisions
+## The 12 Robotics Implementation Decisions
 
 The cross-reference note maps every paper against these decisions:
 
-1. **Persona injection** — single-value trait description
-2. **Bonding protocol** — text summary injection
-3. **Stake operationalisation** — explicit elimination thresholds
-4. **Contribution elicitation** — structured JSON with motivation field
-5. **Memory architecture** — single preceding round only
-6. **Gossip & ostracism mechanics**
-7. **Agent evolution** — wealth-based cloning
-8. **Round structure** — simultaneous vs. sequential play
-9. **API failure handling** — default to zero contribution
-10. **Model selection** — reasoning vs. standard models
-11. **Measurement** — LLM self-report scales (trust, IOS)
-12. **Temperature** — fixed at 0.7
+1. **Agent architecture** — modular vs. end-to-end learning
+2. **Coordination mechanism** — centralized vs. decentralized control
+3. **Communication protocol** — explicit messaging vs. stigmergic/implicit coordination
+4. **Task allocation** — auction-based vs. dynamic heuristic scheduling
+5. **Path planning & navigation** — global map-based vs. local reactive obstacle avoidance
+6. **Safety & constraint handling** — virtual boundary geofencing vs. active runtime monitoring
+7. **Agent evolution & learning** — online adaptation vs. offline training
+8. **Environmental representation** — raw sensor grids vs. semantic object maps
+9. **Failure recovery** — retry-with-fallback vs. human-in-the-loop intervention
+10. **Model selection** — local edge execution vs. cloud API model hosting
+11. **Measurement & evaluation** — task completion rate vs. energy efficiency
+12. **Temperature & determinism** — deterministic (0.0) vs. exploratory (e.g., 0.7) action selection
 
 ---
 
