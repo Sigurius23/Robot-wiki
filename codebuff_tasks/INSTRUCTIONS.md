@@ -52,8 +52,8 @@ Load the JSON file and extract the following properties:
 * Write the generated text (UTF-8 encoded) to `output_path`.
 * If a file already exists at `output_path`, overwrite it.
 
-### 5. Cleanup
-* Once the markdown file is successfully written, delete the task JSON file from `./codebuff_tasks/` (or move it to a `./codebuff_tasks/completed/` directory) to avoid reprocessing it on subsequent runs.
+### 5. Cleanup & Archiving
+* Once the markdown file is successfully written, move the completed task JSON file to the `./codebuff_tasks/archive/` directory to avoid reprocessing it on subsequent runs, while preserving the raw input for future reference.
 
 ---
 
@@ -64,10 +64,14 @@ If you want to automate this process in Python, you can use the following patter
 ```python
 import os
 import json
+import shutil
 from pathlib import Path
 
 # Iterate through tasks
 task_dir = Path("./codebuff_tasks")
+archive_dir = task_dir / "archive"
+archive_dir.mkdir(exist_ok=True)
+
 for task_file in sorted(task_dir.glob("*.json")):
     with open(task_file, "r", encoding="utf-8") as f:
         task = json.load(f)
@@ -79,5 +83,7 @@ for task_file in sorted(task_dir.glob("*.json")):
     # 3. Create target directory
     Path(task['output_path']).parent.mkdir(parents=True, exist_ok=True)
     # 4. Write output file
-    # 5. Delete or move task_file
+    # ...
+    # 5. Archive completed task file
+    shutil.move(str(task_file), str(archive_dir / task_file.name))
 ```
