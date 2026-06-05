@@ -1,0 +1,8 @@
+# G1 Kinematics Configuration
+robot_name: "Unitree G1"
+dof: 43
+mass: 35.0
+com_height_nominal: 0.85
+joint_limits:
+  knee: [-0.5, 2.7]
+  ...

@@ -12,10 +12,18 @@ This document outlines the hardware specifications and compute infrastructure av
 
 ## 1. Robotic Platform
 
-### Unitree G1 Humanoid Robot (Education Edition)
-* **Hands**: 5-finger dexterous hands (Education Edition).
+### Unitree G1 Humanoid Robot (Education/EDU Edition)
+* **Dexterous Hands**: 5-finger dexterous hands with up to 33 optional tactile sensors per hand.
 * **Degrees of Freedom (DoF)**: Full-body joint articulation.
-* **Onboard Compute**: Low-power onboard PC (primarily used for running the low-level motor controller, joint communication, and basic sensor streaming).
+* **Onboard Compute System**: Dual-computing architecture delivering 100 TOPS of AI processing power:
+  * **Arm® Cortex®-A78AE (8-Core CPU)**: Acting as primary processor for low-level real-time motion control, joint stability, and motor feedback loop.
+  * **NVIDIA Jetson Orin NX (16GB)**: Processing perception algorithms, machine learning models, visual tracking, and sensor fusion directly on the robot.
+* **Connected Sensor Suite**:
+  * **3D LiDAR**: Livox Mid-360 mounted on the head (360-degree spatial mapping).
+  * **Depth Camera**: Intel RealSense D435i (point-cloud and visual recognition).
+  * **Audio Array**: Built-in 4-microphone array for directional voice capture.
+  * **Motion Sensors**: High-frequency Inertial Measurement Units (IMUs) tracking equilibrium.
+  * **Motor Feedback**: Dual high-frequency encoders on each joint tracking position and force.
 
 ---
 

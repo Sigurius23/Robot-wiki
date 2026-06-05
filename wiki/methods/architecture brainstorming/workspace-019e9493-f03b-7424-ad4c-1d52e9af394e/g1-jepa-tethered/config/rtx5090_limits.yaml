@@ -1,0 +1,8 @@
+# RTX 5090 Constraints
+vram_limit_gb: 24.0
+target_frequency_hz: 40
+quantization: "INT8"
+mppi:
+  max_samples: 1024
+  min_samples: 512
+  throttle_threshold_gb: 22.5
