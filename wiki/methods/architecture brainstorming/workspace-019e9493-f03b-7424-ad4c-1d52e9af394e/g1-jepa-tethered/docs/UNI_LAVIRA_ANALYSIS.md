@@ -59,6 +59,39 @@ graph TD
     StairMode --> Native
 ```
 
+### The Step-by-Step Navigation Loop
+
+This flowchart details exactly how the agent decides what to do at each individual step (the navigation cycle):
+
+```mermaid
+flowchart TD
+    Start["Start Episode"] --> InitTDM["Initialize TDM<br/>(Parse Instruction into Sub-Goals)"]
+    InitTDM --> Obs["Observe 360° Panorama"]
+    
+    Obs --> LA["Language Action MLLM"]
+    LA -->|"Update Checklist"| TDMState["TDM: Mark completed / pending"]
+    
+    LA --> Choice{"Action Choice?"}
+    
+    %% Path 1: Normal Navigation
+    Choice -->|"turn(Direction)"| VA["Vision Action MLLM<br/>(Analyze chosen camera view)"]
+    VA -->|"Draw Bounding Box"| Geom["Read Laser Depth Map"]
+    Geom -->|"Calculate 3D Point"| NavDP["NavDP Local Planner"]
+    NavDP -->|"Set v_x, v_y, omega_z"| Native["G1 Locomotion Firmware"]
+    Native -->|Robot walks to waypoint| Obs
+    
+    %% Path 2: Backtracking
+    Choice -->|"backtrack(waypoint)"| SCB["Second Chance Backtrack"]
+    SCB -->|"Rewind Robot to Prior Waypoint"| Rewind["Package Failed Trajectory as Evidence"]
+    Rewind -->|Re-Prompt Language Model| LA
+    
+    %% Path 3: Stopping
+    Choice -->|"double_check(STOP)"| StopCheck{"Goal Reached?"}
+    StopCheck -->|Yes| End(["Success!"])
+    StopCheck -->|No| Resume["Penalize & Resume"]
+    Resume --> Obs
+```
+
 ---
 
 ## 3. The 3-Level "LaViRA" Decomposition
