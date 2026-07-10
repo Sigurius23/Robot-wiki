@@ -161,3 +161,27 @@ Revised:   ████████████████░░░░░░░
 | World model complexity | ViT-g + teacher-student | ViT-L, single forward pass |
 | Deployability (6 months) | ❌ Not feasible | ⚠️ Ambitious but plausible |
 | Deployability (12 months) | ❌ Not feasible | ✅ Feasible with focused team |
+
+---
+
+## 4D Voxel Grid Analysis and Debugging
+
+Because the revised architecture drops 4D-NVS (Gaussian Splatting), it trades human-readable "photorealism" for machine-readable "semantics and occupancy." This is vastly superior for real-time control, but requires different debugging techniques:
+
+1. **PCA Color-Mapping for Semantics (Predator Vision):**
+   - Each voxel holds a high-dimensional semantic vector (from DINOv3). By using **PCA (Principal Component Analysis)**, these 1024-dimension vectors can be compressed down to 3 dimensions (RGB).
+   - **Result:** Objects with similar semantics automatically glow in the same colors in 3D space, proving instantly whether the robot successfully segmented the scene (e.g., floor is green, chairs are red).
+
+2. **Standard ROS 3D Visualizers:**
+   - The sparse voxel grid can be exported as a standard point cloud (`.pcd` or `.ply`) and streamed directly into tools like **Foxglove Studio** or **RViz**.
+   - The robot's kinematic skeleton (URDF) can be overlaid inside the grid in real-time to see precisely where the robot thinks it is relative to semantic boundaries.
+
+3. **Uncertainty Heatmaps (Debugging Safety):**
+   - The grid utilizes "temporal feature decay." Visualizing the grid as a heatmap based on voxel age/uncertainty provides critical safety insights.
+   - **Green** = Freshly seen, high confidence.
+   - **Red** = Decayed, high uncertainty (like the blind spot behind the robot).
+   - This visually demonstrates exactly *why* and *when* the FIRM fall-safety policy gets triggered by an unknown area.
+
+4. **Raw Occupancy Overlays for A* Planner:**
+   - For A* to work, the voxel grid collapses into a simple binary state (walkable vs. obstacle).
+   - Visualizing this as a raw 3D block-map perfectly overlays with the A* planner's trajectory. If the trajectory intersects a block, the collision math failure is instantly identifiable.
