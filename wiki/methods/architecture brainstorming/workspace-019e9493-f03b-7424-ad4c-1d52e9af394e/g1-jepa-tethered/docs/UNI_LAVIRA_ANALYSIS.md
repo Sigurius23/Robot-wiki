@@ -72,7 +72,19 @@ Uni-LaViRA solves the classic problems of MLLM hallucinations and forgetfulness 
 
 ---
 
-## 5. Uni-LaViRA vs. GR00T N1.7 (Which to choose?)
+## 5. Real-World G1 Deployment Proof
+
+The authors explicitly validated Uni-LaViRA on the **Unitree G1 humanoid**.
+
+- **Hardware Setup:** 4x Orbbec Gemini 336L RGB-D cameras for panoramic vision.
+- **Compute:** Jetson Orin NX running onboard.
+- **Models:** `Qwen3.5-9B-Q4` (quantized) acting locally as both the Language Action and Vision Action models.
+- **Execution:** Vision Action output (3D waypoints) was fed directly into the G1's native locomotion controller at 1 Hz ($v_x, v_y, \omega_z$).
+- **Key Result:** They achieved successful outdoor Vision-and-Language Navigation (VLN) **without any gait re-training**. The G1's native balance controller handled the stepping while the zero-shot MLLM handled the spatial reasoning.
+
+---
+
+## 6. Uni-LaViRA vs. GR00T N1.7 (Which to choose?)
 
 Does this mean we should abandon GR00T? It depends entirely on the task type.
 
