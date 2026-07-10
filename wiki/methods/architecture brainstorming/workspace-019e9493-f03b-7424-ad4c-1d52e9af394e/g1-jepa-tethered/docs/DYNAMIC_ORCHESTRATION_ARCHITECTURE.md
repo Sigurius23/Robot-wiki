@@ -63,6 +63,12 @@ Instead of treating the system as a monolithic swap, memory is managed across th
 
 *(Note: GR00T N1.7 utilizes the Cosmos-Reason2-2B backbone and a Diffusion head, consuming ~10-12GB at FP16. For Mode 4, Cosmos-Reason2-2B **must** be W4A16 quantized via vLLM to safely fit the 24GB budget).*
 
+### Architectural Decision: Why Cosmos-Reason2-2B instead of Cosmos 3?
+While NVIDIA released Cosmos 3 (including the Nano 16B/8B variant) in mid-2026, we explicitly retain Cosmos-Reason2-2B for Mode 4 on this hardware constraint for three reasons:
+1. **GR00T Integration:** GR00T N1.7 natively uses the Cosmos-Reason2-2B backbone. Using the same backbone for Mode 4 ensures system compatibility and eliminates the need to host two entirely different VLM foundations.
+2. **VRAM Ceiling:** Cosmos 3 Nano requires **48GB+ VRAM (FP8)** for comfortable single-GPU inference. Even with extreme NVFP4 quantization, it leaves dangerously little headroom on a 24GB laptop.
+3. **Task Scope:** Cosmos 3 unifies physical reasoning and action generation. Since Mode 4 is strictly an assistive "search/query" sidecar (and not driving motion authority), paying the VRAM tax for the broader Cosmos 3 stack is inefficient on mobile hardware.
+
 ### Example State Transition: Mode 2 (Approach) → Mode 3 (Manipulation)
 **Mode 2 Entry Criteria:**
 - Target object identified.
