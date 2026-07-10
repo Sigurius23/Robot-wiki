@@ -38,12 +38,13 @@ graph TD
     %% Level 3: Robot Action
     subgraph L3 ["Level 3: Robot Action (Low-Level)"]
         Geom["Geometric Back-projection<br/>(Reads Depth Channel)"]
-        Controller["Deterministic Controller<br/>(NavDP / FAST-LIO2 / PX4)"]
-        RA_Out["Native Motor Commands<br/>(v_x, v_y, omega_z)"]
+        Controller["NavDP (Navigation Diffusion Policy)<br/>Turns RGB-D + Waypoint into Trajectory"]
+        Native["Native Locomotion Firmware<br/>Executes v_x, v_y, omega_z"]
     end
     VA_Out --> Geom
     Geom -->|3D World Coordinate| Controller
-    Controller --> RA_Out
+    Controller --> Native
+    Native --> RA_Out["Physical Movement"]
 
     %% Feedback Loop (SCB)
     SCB["Second Chance Backtrack (SCB)<br/>Re-evaluates failed sub-trajectories"]
@@ -59,7 +60,9 @@ The core philosophy is that navigation is largely "contact-free" and thus falls 
 
 1. **Language Action (High-Level Planning):** Consumes the user instruction, a 4-view panoramic image, and history. It outputs a semantic direction (front, left, right, back, up, down) rather than exact coordinates. 
 2. **Vision Action (Mid-Level Visual Grounding):** Takes the direction chosen by the Language Model, looks at the specific camera view for that direction, and draws a 2D bounding box around the semantic target (e.g., "doorway to the bedroom").
-3. **Robot Action (Low-Level Control):** A purely deterministic, geometric script. It takes the center pixel of the bounding box, reads the depth map at that exact pixel to get a 3D coordinate, and passes that 3D waypoint to a standard local planner (like NavDP or A*).
+3. **Robot Action (Low-Level Control):** This is where the physical execution happens. First, the system takes the center pixel of the bounding box and reads the laser depth map to calculate a raw 3D coordinate. In the real-world ground robots, this 3D coordinate is passed to **NavDP** (Navigation Diffusion Policy). 
+   - **How NavDP works:** NavDP is a specialized local planner that takes the current RGB-D camera view and the target 3D coordinate, and generates a smooth, short-horizon physical trajectory in the robot's local frame. 
+   - **The Final Handoff:** NavDP converts this trajectory into basic velocity commands ($v_x$, $v_y$, $\omega_z$), which are fed directly into the robot's *native factory firmware*. The AI does not control the joints—it simply sets the velocity, and the robot's built-in reflexes handle the balancing and stepping.
 
 ---
 
