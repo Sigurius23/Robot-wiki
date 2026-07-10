@@ -44,8 +44,8 @@ graph TD
 
     %% Level 3: Robot Action
     subgraph L3 ["Level 3: Robot Action (Low-Level Control)"]
-        Geom["Geometric Back-projection<br/>(Reads Depth Channel at Pixel)"]
-        Controller["NavDP (Navigation Diffusion Policy)<br/>Generates short-horizon trajectory"]
+        Geom["Geometric Back-projection<br/>(Reads Laser Depth at Box Center)"]
+        Controller["NavDP Local Planner<br/>(Plots physical path avoiding obstacles)"]
         Native["Native Locomotion Firmware<br/>(Executes v_x, v_y, omega_z)"]
     end
     VA_Out --> Geom
@@ -75,9 +75,9 @@ flowchart TD
     
     %% Path 1: Normal Navigation
     Choice -->|"turn(Direction)"| VA["Vision Action MLLM<br/>(Analyze chosen camera view)"]
-    VA -->|"Draw Bounding Box"| Geom["Read Laser Depth Map"]
-    Geom -->|"Calculate 3D Point"| NavDP["NavDP Local Planner"]
-    NavDP -->|"Set v_x, v_y, omega_z"| Native["G1 Locomotion Firmware"]
+    VA -->|"Draw 2D Bounding Box"| Geom["Geometric Projection<br/>(Find depth at box center)"]
+    Geom -->|"Output 3D World Coordinate"| NavDP["NavDP Local Planner<br/>(Plot path to 3D point)"]
+    NavDP -->|"Set v_x, v_y, omega_z"| Native["G1 Locomotion Firmware<br/>(Balance and Step)"]
     Native -->|Robot walks to waypoint| Obs
     
     %% Path 2: Backtracking
