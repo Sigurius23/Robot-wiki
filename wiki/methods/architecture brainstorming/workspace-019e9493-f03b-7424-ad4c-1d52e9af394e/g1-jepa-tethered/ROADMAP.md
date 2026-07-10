@@ -8,6 +8,8 @@
 ## Phase 2: Simulation (Unitree G1 Sim)
 - [ ] Implement a lightweight **V-JEPA encoder** (Distilled DINOv2 or SigLIP).
 - [ ] Integrate latent planning in Isaac Gym or Gazebo.
+  - **Training enhancement:** Add **fractal noise terrain** (Perlin-like multi-octave) to the Isaac Lab terrain generator. From the "Humanoid Parkour Learning" paper (CoRL 2024, [arXiv:2406.10759](https://arxiv.org/abs/2406.10759)) — forces natural foot-raising without hand-designed "feet air time" rewards. Drop-in change, no reward function modification needed. See [docs/papers/humanoid_parkour.md](./docs/papers/humanoid_parkour.md).
+  - **D435i sensor noise model:** Reuse the paper's published domain randomization parameters for the Intel RealSense D435i (same camera as our G1) to improve zero-shot sim-to-real transfer.
 - [ ] Benchmark "Trajectory Pruning" success rates against virtual "No-Go" zones.
 
 ## Phase 3: Hardware Optimization (Jetson Orin NX)

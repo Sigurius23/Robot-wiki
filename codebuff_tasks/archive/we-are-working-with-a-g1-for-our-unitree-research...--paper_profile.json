@@ -1,0 +1,2023 @@
+{
+  "cite_key": "we-are-working-with-a-g1-for-our-unitree-research...",
+  "task_type": "paper_profile",
+  "output_path": "./wiki/papers/unitree-safety/we-are-working-with-a-g1-for-our-unitree-research....md",
+  "system_prompt": "You are a research librarian formatting an Obsidian note for an academic vault. Output valid Obsidian markdown only — no code fences, no preamble, no explanation. Start directly with the YAML frontmatter block (---). Use only the metadata values provided — do not hallucinate citation counts, venues, or authors.",
+  "user_prompt": "You are a research librarian processing an academic paper for an Obsidian knowledge vault.\nThe vault supports a research project on robotics, autonomous agents, and multi-agent systems.\nYour output must be valid Obsidian markdown and conform to the `papers` entity schema.\n\nCRITICAL: Begin your response with the exact YAML block below. Do not alter any field values.\n\n---\ntitle: \"Search for chargino-neutralino production using recursive jigsaw reconstruction in final states with two or three charged leptons in proton-proton collisions at $\\sqrt{s}$=13 TeV with the ATLAS detector\"\nauthors: \"M. Aaboud, A. Kupco, S. Webb, T. Dreyer, Yufeng Wang, K. Jakobs, M. Spousta, M. Cobal, Peilong Wang, S. Schmitt, J. Schovancová, A. Bassalat, M. Melo, M. Shapiro, G. Tarna, S. Zimmermann, T. Eifert, N. Ozturk, S. Kuday, F. Legger, M. Sioli, L. Cerrito, S. P. Lopez, N. Bruscino, F. Giorgi, J. Huston, S. Robertson, R. Gonçalo, A. Snesarev, L. Rotonda, D. Duschinger, E. Carquin, A. R. Morales, I. Yusuff, S. Crépé-Renaudin, J. Parsons, W. Balunas, Y. Tikhonov, M. K. Ayoub, C. Mwewa, David Miller, A. Ivina, Yanlin Liu, P. Mastrandrea, Jan-Ulf Mjoernmark, S. J. Batista, W. Leight, A. Colijn, M. G. Ratti, Liaoshan Shi, M. E. Nelson, H. Krueger, J. Ocariz, M. Nordberg, J. Maneira, J. Cúth, Daniela Bortoletto, A. Lankford, N. Sinev, S. Tapprogge, F. Parodi, T. Masubuchi, D. E. F. Lima, T. LeCompte, Shenjian Chen, S. Batlamous, T. Martin, J. Poveda, E. Mountricha, T. N. Manh, M. Ouchrif, K. Korcyl, C. Grefe, K. Toms, P. Tipton, F. Klitzner, A. Valero, F. Mueller, T. Kishimoto, A. Vartapetian, K. Kawagoe, A. Barton, A. Policicchio, E. Yigitbasi, F. Speiser, S. Zambito, S. Karpov, P. Strizenec, N. Bernard, C. Lester, D. Casper, J. Navarro, B. Micco, S. Koperny, B. A. Long, C. Bertella, P. Schwemling, M. Vos, E. Meoni, T. Holmes, C. Doglioni, L. Vigani, A. Boldyrev, J. Searcy, J. Stark, E. Yatsenko, M. Kuze, B. Hooberman, A. Ferrari, K. Pachal, D. Costanzo, M. Fenton, Jesse Liu, A. Klimentov, S. P. Griso, I. Panagoulias, R. Blair, Hongbin Liu, T. Kuhl, G. Gustavino, M. Dyndał, M. Antonelli, B. Malaescu, D. K. Abhayasinghe, K. Grimm, D. Zanzi, L. P. Rodriguez, A. Horton, A. Ezhilov, M. Arratia, D. Yallup, A. Bellerive, J. Masik, A. Loesle, M. Janus, L. Barak, S. Kama, G. Iacobucci, E. Shulga, B. Gorini, J. Heilman, M. Hagihara, J. Butler, H. Fox, S. Grancagnolo, E. Koffeman, M. Beattie, S. Pino, N. Madysa, K. Black, G. Hallewell, L. Franconi, L. Horyn, D. Fassouliotis, J. Smith, A. Tricoli, M. Dumancic, H. Iwasaki, M. Kuna, M. Giannelli, B. Stapf, T. Cao, Michela Paganini, V. Ellajosyula, I. Pogrebnyak, E. Petit, J. Faltova, Y. Chiu, Wenzhong Guo, S. Swift, E. Lipeles, M. Venturi, M. Nedden, A. Ducourthial, S. Artz, M. Oreglia, H. Neal, E. Drechsler, K. Einsweiler, F. Monticelli, F. Lorenzi, S. Fressard-Batraneanu, E. Kneringer, O. Arslan, B. Freund, H. Yildiz, D. Whiteson, A. Dewhurst, K. Shaw, Yingchun Zhu, S. Maeland, C. Young, N. Biesuz, J. Terron, M. G. Bostanabad, S. P. Yuen, V. C. Gimenez, A. Stabile, T. Barillari, T. Neep, F. Peri, P. Clark, S. Schier, K. Vorobev, J. Hrivnac, M. Barisits, T. Kunigo, A. Grillo, S. Camarda, I. Ueda, R. Kopeliansky, M. Swiatlowski, N. Konstantinidis, O. Jinnouchi, H. Sadrozinski, V. Kazanin, E. Barberio, J. Pacalt, K. Tackmann, B. Tannenwald, R. Kass, Y. Kano, M. Sutton, M. Hoeferkamp, L. Živković, L. Dell’asta, V. Wallangen, Fangzhou Zhang, M. Vincter, G. Herten, V. Nikolaenko, D. Kirchmeier, C. Chau, A. Girolamo, A. O'Rourke, N. Abraham, M. Nomachi, M. Elsing, C. Geng, K. Mochizuki, A. Ciaccio, B. Burghgrave, A. S. Mete, S. Sivoklokov, L. Rossini, S. Bahrasemani, C. J. Mcnicol, F. Corriveau, I. Bloch, K. Smolek, R. Brenner, P. Tas, A. Gomez, G. Marceca, B. Petersen, V. Solovyev, B. Haney, S. Gonzalez-Sevilla, C. Shimmin, P. Werner, P. Schacht, N. Whallon, A. Negri, S. Farrington, M. Villa, V. Cindro, A. Minaenko, S. Honda, X. Ruan, P. F. Salvatore, M. Franklin, B. Mansoulie, Yang Qin, G. Galster, C. Leggett, N. M. Koehler, P. Buchholz, K. Zoch, Zuzana Blenessy, C. Ferretti, D. Biedermann, J. Kroll, A. Behera, H. Torre, Maosen Zhou, S. Shimizu, S. Fracchia, F. Tresoldi, D. Corral, S. Che, S. Oda, C. Gutschow, M. Saito, F. L. Sterzo, J. Vossebeld, J. Moss, M. Dunford, R. Middleton, A. Kowalewska, Kyungeon Choi, S. Harkusha, P. Saha, J. Hrdinka, R. Roehrig, S. Wahrmund, E. Hansen, Matt Zhang, A. Bailey, M. Biglietti, S. Jones, T. Jakoubek, S. Connell, A. Doria, Hoang Dai Nghia Nguyen, M. Danninger, L. McClymont, C. Blocker, S. Istin, E. Varnes, J. Hansen, M. Ghneimat, G. Iakovidis, A. Picazio, C. J. Treado, G. Jarlskog, K. Nagai, Ye Chen, M. Ishitsuka, W. Vandelli, A. Salvo, A. Kourkoumeli-Charalampidi, F. Spettel, Y. Heng, P. Shatalov, Y. Smirnov, S. Majewski, K. Sliwa, B. Wynne, P. Bechtle, M. Fiolhais, F. H. Phillips, F. Ito, F. Ukegawa, A. Alonso, Qing Wang, T. Guillemin, E. Winkels, J. J. Kempster, C. Sbarra, Shuo Han, I. Maznas, M. Wobisch, K. Augsten, J. Ochoa, E. Guirriec, K. Parker, N. Belyaev, A. Ryzhov, D. Moreno, G. Usai, P. Deviveiros, F. Loebinger, M. Stanitzki, L. Wilkins, B. King, K. Onogi, A. P. Pages, M. Begel, G. Forcolin, A. Mincer, Young-Kee Kim, L. Morvaj, G. Cabras, M. Weber, T. Heim, K. Belotskiy, A. Soukharev, J. Jeong, P. Gemmeren, C. Agheorghiesei, H. Pacey, R. Carney, A. Chuinard, R. Jansky, C. Roda, J. M. I. Ponce, D. Boscherini, L. Kashif, N. Semprini-Cesari, U. Bratzler, P. Fassnacht, K. Finelli, B. Brickwedde, C. David, L. Zwalinski, M. A. Verzini, R. Kukla, T. Stevenson, Jie Yu, D. Boerner, C. Galea, L. Heinrich, A. Zibell, C. Troncon, F. Guescini, D. Denysiuk, J. Pascual, M. Kacimi, Chunhui Chen, A. Perez, S. Menke, Chao Wang, E. Shabalina, G. Unal, R. Gardner, A. Forti, Yu Zhang, N. Norjoharuddeen, M. Morii, A. Sciandra, T. Kosek, Zhiqin Zhang, T. Brooks, K. Sekhon, R. Iguchi, Tai-hua Lin, L. Flores, G. Chiodini, Jun Guo, L. Simić, J. Gonski, A. Gabrielli, E. Akilli, T. Klapdor-Kleingrothaus, O. Kind, R. Schamberger, A. Schwartzman, L. A. Bella, T. Honda, F. Ruehr, A. Weidberg, L. Mijović, H. Potti, S. Snyder, U. Blumenschein, R. Konoplich, P. Maettig, M. Javurkova, E. Celebi, F. Hoenig, M. Tasevsky, S. Turchikhin, C. Solans, J. Kvita, S. Heim, V. Boisvert, B. Allen, G. Lerner, R. Hunter, S. Veneziano, Y. Hasegawa, Y. Takubo, M. Huhtinen, A. Kiryunin, A. Beddall, N. Kimura, S. Amoroso, L. Serkin, Dengfeng Zhang, P. Gris, I. Gkialas, S. Smirnov, M. Haleem, D. Froidevaux, R. Pezoa, B. Ali, F. Lyu, D. Emeliyanov, A. Filipčič, S. Kuehn, M. Lassnig, T. Pauly, A. Redelbach, H. Hakobyan, B. Wosiek, Yang Liu, S. Strandberg, A. Karyukhin, A. Mizukami, L. Pontecorvo, Liang Li, T. Lenz, J. Butterworth, S. Stark, A. Korn, N. Barlow, K. Todome, G. Mullier, F. Dallaire, E. Rossi\"\nyear: 2018\njournal: \"Unknown\"\ncitation-count: 89\nurl: \"https://doi.org/10.1103/PhysRevD.98.092012\"\ntags: [literature, unprocessed]\ncite-key: \"we-are-working-with-a-g1-for-our-unitree-research...\"\n---\n# Search for chargino-neutralino production using recursive jigsaw reconstruction in final states with two or three charged leptons in proton-proton collisions at $\\sqrt{s}$=13 TeV with the ATLAS detector\nsource: https://doi.org/10.1103/PhysRevD.98.092012\nproject-relevance: [One sentence — why does this paper matter for the project?]\n\n## Summary\n2–4 sentences. Central claim or contribution. Plain academic prose, no bullets.\n\n## Methodology\nOne sentence per point:\n- **Study type**: experiment / simulation / survey / meta-analysis / theoretical\n- **Robot platform / hardware**: specific robots used (e.g., Unitree H1, Spot, Franka Emika Panda) or \"none\"\n- **Simulation environment**: e.g., Isaac Sim, MuJoCo, PyBullet, Gazebo, or \"none\"\n- **Key software tools & frameworks**: e.g., PyTorch, JAX, ROS2, Hugging Face, or \"none\"\n- **Compute resources**: exact hardware (e.g., 8x H100 GPUs, TPU v4), training hours, dataset size, and model parameters if explicitly stated\n- **Task or environment**: exact task or environment used (e.g., bipedal locomotion, table-top manipulation)\n- **Outcome measures**: primary evaluation metrics (e.g., success rate, tracking error, energy efficiency)\n- **Pre-registered**: yes / no / unclear\n\n## Key findings\nBullet list. Every finding requires an in-text citation: ([Author], [Year], p. X)\n\n## Limitations acknowledged by the authors\nBullet list. State the limitation type, not verbatim text.\n\n## What this paper builds on\nMost important prior works explicitly cited. Use this exact format:\n- [[cite-key]] — (Author, Year) — what this paper takes from it\nNOTE: Use the cite-key format for wikilinks (e.g., [[OBrien2023]]), not the author's display name.\n\n## What this paper leaves open\nGaps directly relevant to the project.\n\n## Project implications\nEffect on agent design and implementation decisions.\n\n## Contradictions with other papers\nNote contradictions, or write: \"No contradictions identified yet.\"\n\n## APA 7th edition reference\n[Full reference here]\n\n---\nREADING RULE: Read the full paper text below. The REFERENCES section at the end\nis a lookup dictionary only — do not summarise it.\n\n=== PAPER TEXT ===\nSince you are deploying the G1 in a university setting, the stakes are a bit higher due to \ninstitutional IT policies. Recent independent cybersecurity audits on the Unitree G1 (specifically \nreports from Alias Robotics in late 2025 and a major presentation at the 39C3 hacker congress) \nhave confirmed exactly what Benn Jordan suspected. \nHere is what the latest research has found specifically regarding the G1: \n●​ The 300-Second Ping: The G1 is hardcoded to transmit multimodal telemetry (battery, \njoint torque, motion state, and raw camera/microphone data) to servers in China every \n300 seconds. \n●​ Hardcoded Encryption Keys: Every G1 unit shares the exact same 128-bit AES \nencryption key for its Bluetooth Low Energy (BLE) interface. \n●​ CloudSail Backdoor: Vulnerabilities in Unitree's \"CloudSail\" remote management system \nallow for remote code execution and prompt-injections into the on-board embodied AI. \nTo safely operate the G1 in your university lab without running afoul of your IT security \ndepartment, you must treat the robot as a \"hostile\" node. Here is the best-practice framework \nfor securing it: \n1. The \"Host-Routed\" Network Architecture (Recommended) \nDo not connect the G1 directly to your university's Wi-Fi (like eduroam or a lab subnet). Instead, \ntether it to a trusted intermediary machine. \n●​ Wired LAN Only: Connect the G1’s internal development PC directly to a host \nworkstation via Ethernet (using Port 4 or 5 on the G1’s electrical interface). \n●​ NAT Routing: If the G1 strictly needs internet access (e.g., to download ROS packages or \nconnect to a specific HuggingFace repo for inference), configure your Host PC to share \nits internet connection via NAT/IP Tables. \n●​ Default-Deny Firewall: On the Host PC, set up a firewall that drops all outbound traffic \nfrom the G1 by default. You should only \"whitelist\" the specific IP addresses or domains \nyour research requires (e.g., GitHub, your local ROS master URI, or specific API \nendpoints). \n2. Disable or Mitigate Wireless Interfaces \nBecause the BLE password setup uses a universal, hardcoded key, anyone in the hallway \noutside your lab with a smartphone could potentially inject commands into the robot if its \nBluetooth is active. \n●​ If your research does not require the Unitree mobile app or wireless controllers, log into \nthe G1's internal Linux environment via SSH and completely disable the Bluetooth daemon \n(sudo systemctl disable bluetooth). \n●​ Ensure the onboard Wi-Fi interface (wlan0) is disabled at the OS level so the robot cannot \nautonomously attempt to connect to open university guest networks to \"phone home.\" \n3. Internal OS Hardening (Killing the Telemetry) \nIf your G1 must have general internet access, you need to manually block its telemetry services. \n●​ Modify the Hosts File: SSH into the G1 (the default IP is usually 192.168.123.164) and edit \nthe /etc/hosts file. Route known Unitree telemetry domains (and any \nbaidu/tencent/alibaba domains you spot in network sniffers) to 127.0.0.1. \n●​ Kill the Cloud Services: Identify the specific background processes handling the \n\"CloudSail\" or \"image_server\" telemetry and disable them. \nBy using a wired, strictly routed connection through a host PC, you strip the robot of its ability \nto secretly exfiltrate data, ensuring your lab's proprietary research—and your university's \nnetwork—remains secure. \nAre you primarily running control loops locally (like ROS2/Z1 controller stacks), or does your \nproject require the G1 to reach out to external cloud APIs for vision-language models? \n\n\n<!-- METADATA JSON:\n{\n  \"year\": 2018,\n  \"venue\": \"\",\n  \"citationCount\": 89,\n  \"authors\": [\n    {\n      \"authorId\": \"103732793\",\n      \"name\": \"M. Aaboud\"\n    },\n    {\n      \"authorId\": \"104212839\",\n      \"name\": \"A. Kupco\"\n    },\n    {\n      \"authorId\": \"151225015\",\n      \"name\": \"S. Webb\"\n    },\n    {\n      \"authorId\": \"1410970652\",\n      \"name\": \"T. Dreyer\"\n    },\n    {\n      \"authorId\": \"2108110977\",\n      \"name\": \"Yufeng Wang\"\n    },\n    {\n      \"authorId\": \"51517832\",\n      \"name\": \"K. Jakobs\"\n    },\n    {\n      \"authorId\": \"70624406\",\n      \"name\": \"M. Spousta\"\n    },\n    {\n      \"authorId\": \"145428351\",\n      \"name\": \"M. Cobal\"\n    },\n    {\n      \"authorId\": \"2118950732\",\n      \"name\": \"Peilong Wang\"\n    },\n    {\n      \"authorId\": \"93437488\",\n      \"name\": \"S. Schmitt\"\n    },\n    {\n      \"authorId\": \"2250465\",\n      \"name\": \"J. Schovancov\\u00e1\"\n    },\n    {\n      \"authorId\": \"3762852\",\n      \"name\": \"A. Bassalat\"\n    },\n    {\n      \"authorId\": \"152283387\",\n      \"name\": \"M. Melo\"\n    },\n    {\n      \"authorId\": \"48362085\",\n      \"name\": \"M. Shapiro\"\n    },\n    {\n      \"authorId\": \"152146263\",\n      \"name\": \"G. Tarna\"\n    },\n    {\n      \"authorId\": \"2400222\",\n      \"name\": \"S. Zimmermann\"\n    },\n    {\n      \"authorId\": \"93407077\",\n      \"name\": \"T. Eifert\"\n    },\n    {\n      \"authorId\": \"152495978\",\n      \"name\": \"N. Ozturk\"\n    },\n    {\n      \"authorId\": \"152498714\",\n      \"name\": \"S. Kuday\"\n    },\n    {\n      \"authorId\": \"144863987\",\n      \"name\": \"F. Legger\"\n    },\n    {\n      \"authorId\": \"102272210\",\n      \"name\": \"M. Sioli\"\n    },\n    {\n      \"authorId\": \"5844495\",\n      \"name\": \"L. Cerrito\"\n    },\n    {\n      \"authorId\": \"144696699\",\n      \"name\": \"S. P. Lopez\"\n    },\n    {\n      \"authorId\": \"5071328\",\n      \"name\": \"N. Bruscino\"\n    },\n    {\n      \"authorId\": \"104279228\",\n      \"name\": \"F. Giorgi\"\n    },\n    {\n      \"authorId\": \"144875493\",\n      \"name\": \"J. Huston\"\n    },\n    {\n      \"authorId\": \"95311429\",\n      \"name\": \"S. Robertson\"\n    },\n    {\n      \"authorId\": \"107781677\",\n      \"name\": \"R. Gon\\u00e7alo\"\n    },\n    {\n      \"authorId\": \"4887935\",\n      \"name\": \"A. Snesarev\"\n    },\n    {\n      \"authorId\": \"152561900\",\n      \"name\": \"L. Rotonda\"\n    },\n    {\n      \"authorId\": \"152460694\",\n      \"name\": \"D. Duschinger\"\n    },\n    {\n      \"authorId\": \"83004566\",\n      \"name\": \"E. Carquin\"\n    },\n    {\n      \"authorId\": \"103661234\",\n      \"name\": \"A. R. Morales\"\n    },\n    {\n      \"authorId\": \"52146151\",\n      \"name\": \"I. Yusuff\"\n    },\n    {\n      \"authorId\": \"1383080013\",\n      \"name\": \"S. Cr\\u00e9p\\u00e9-Renaudin\"\n    },\n    {\n      \"authorId\": \"92442946\",\n      \"name\": \"J. Parsons\"\n    },\n    {\n      \"authorId\": \"7961334\",\n      \"name\": \"W. Balunas\"\n    },\n    {\n      \"authorId\": \"103201868\",\n      \"name\": \"Y. Tikhonov\"\n    },\n    {\n      \"authorId\": \"4465252\",\n      \"name\": \"M. K. Ayoub\"\n    },\n    {\n      \"authorId\": \"152518009\",\n      \"name\": \"C. Mwewa\"\n    },\n    {\n      \"authorId\": \"103905776\",\n      \"name\": \"David Miller\"\n    },\n    {\n      \"authorId\": \"152350424\",\n      \"name\": \"A. Ivina\"\n    },\n    {\n      \"authorId\": \"49420545\",\n      \"name\": \"Yanlin Liu\"\n    },\n    {\n      \"authorId\": \"84650873\",\n      \"name\": \"P. Mastrandrea\"\n    },\n    {\n      \"authorId\": \"152491587\",\n      \"name\": \"Jan-Ulf Mjoernmark\"\n    },\n    {\n      \"authorId\": \"145274722\",\n      \"name\": \"S. J. Batista\"\n    },\n    {\n      \"authorId\": \"145365747\",\n      \"name\": \"W. Leight\"\n    },\n    {\n      \"authorId\": \"2664867\",\n      \"name\": \"A. Colijn\"\n    },\n    {\n      \"authorId\": \"103104236\",\n      \"name\": \"M. G. Ratti\"\n    },\n    {\n      \"authorId\": \"120600314\",\n      \"name\": \"Liaoshan Shi\"\n    },\n    {\n      \"authorId\": \"33389370\",\n      \"name\": \"M. E. Nelson\"\n    },\n    {\n      \"authorId\": \"152827431\",\n      \"name\": \"H. Krueger\"\n    },\n    {\n      \"authorId\": \"104444641\",\n      \"name\": \"J. Ocariz\"\n    },\n    {\n      \"authorId\": \"47106250\",\n      \"name\": \"M. Nordberg\"\n    },\n    {\n      \"authorId\": \"4337420\",\n      \"name\": \"J. Maneira\"\n    },\n    {\n      \"authorId\": \"152118606\",\n      \"name\": \"J. C\\u00fath\"\n    },\n    {\n      \"authorId\": \"143975557\",\n      \"name\": \"Daniela Bortoletto\"\n    },\n    {\n      \"authorId\": \"144769254\",\n      \"name\": \"A. Lankford\"\n    },\n    {\n      \"authorId\": \"152487739\",\n      \"name\": \"N. Sinev\"\n    },\n    {\n      \"authorId\": \"15758724\",\n      \"name\": \"S. Tapprogge\"\n    },\n    {\n      \"authorId\": \"145322505\",\n      \"name\": \"F. Parodi\"\n    },\n    {\n      \"authorId\": \"143982544\",\n      \"name\": \"T. Masubuchi\"\n    },\n    {\n      \"authorId\": \"152494170\",\n      \"name\": \"D. E. F. Lima\"\n    },\n    {\n      \"authorId\": \"3141375\",\n      \"name\": \"T. LeCompte\"\n    },\n    {\n      \"authorId\": \"2145396194\",\n      \"name\": \"Shenjian Chen\"\n    },\n    {\n      \"authorId\": \"51256194\",\n      \"name\": \"S. Batlamous\"\n    },\n    {\n      \"authorId\": \"79570246\",\n      \"name\": \"T. Martin\"\n    },\n    {\n      \"authorId\": \"145440424\",\n      \"name\": \"J. Poveda\"\n    },\n    {\n      \"authorId\": \"152307218\",\n      \"name\": \"E. Mountricha\"\n    },\n    {\n      \"authorId\": \"152289657\",\n      \"name\": \"T. N. Manh\"\n    },\n    {\n      \"authorId\": \"145666935\",\n      \"name\": \"M. Ouchrif\"\n    },\n    {\n      \"authorId\": \"145977156\",\n      \"name\": \"K. Korcyl\"\n    },\n    {\n      \"authorId\": \"152154211\",\n      \"name\": \"C. Grefe\"\n    },\n    {\n      \"authorId\": \"71194039\",\n      \"name\": \"K. Toms\"\n    },\n    {\n      \"authorId\": \"47146555\",\n      \"name\": \"P. Tipton\"\n    },\n    {\n      \"authorId\": \"101268380\",\n      \"name\": \"F. Klitzner\"\n    },\n    {\n      \"authorId\": \"145217795\",\n      \"name\": \"A. Valero\"\n    },\n    {\n      \"authorId\": \"50430570\",\n      \"name\": \"F. Mueller\"\n    },\n    {\n      \"authorId\": \"113243100\",\n      \"name\": \"T. Kishimoto\"\n    },\n    {\n      \"authorId\": \"152169922\",\n      \"name\": \"A. Vartapetian\"\n    },\n    {\n      \"authorId\": \"153586836\",\n      \"name\": \"K. Kawagoe\"\n    },\n    {\n      \"authorId\": \"6983671\",\n      \"name\": \"A. Barton\"\n    },\n    {\n      \"authorId\": \"95614607\",\n      \"name\": \"A. Policicchio\"\n    },\n    {\n      \"authorId\": \"152604589\",\n      \"name\": \"E. Yigitbasi\"\n    },\n    {\n      \"authorId\": \"103700485\",\n      \"name\": \"F. Speiser\"\n    },\n    {\n      \"authorId\": \"152381672\",\n      \"name\": \"S. Zambito\"\n    },\n    {\n      \"authorId\": \"46177722\",\n      \"name\": \"S. Karpov\"\n    },\n    {\n      \"authorId\": \"152306438\",\n      \"name\": \"P. Strizenec\"\n    },\n    {\n      \"authorId\": \"145499742\",\n      \"name\": \"N. Bernard\"\n    },\n    {\n      \"authorId\": \"47614700\",\n      \"name\": \"C. Lester\"\n    },\n    {\n      \"authorId\": \"7599729\",\n      \"name\": \"D. Casper\"\n    },\n    {\n      \"authorId\": \"143766327\",\n      \"name\": \"J. Navarro\"\n    },\n    {\n      \"authorId\": \"119931252\",\n      \"name\": \"B. Micco\"\n    },\n    {\n      \"authorId\": \"152232734\",\n      \"name\": \"S. Koperny\"\n    },\n    {\n      \"authorId\": \"2064501747\",\n      \"name\": \"B. A. Long\"\n    },\n    {\n      \"authorId\": \"152242705\",\n      \"name\": \"C. Bertella\"\n    },\n    {\n      \"authorId\": \"97961029\",\n      \"name\": \"P. Schwemling\"\n    },\n    {\n      \"authorId\": \"144243989\",\n      \"name\": \"M. Vos\"\n    },\n    {\n      \"authorId\": \"152169880\",\n      \"name\": \"E. Meoni\"\n    },\n    {\n      \"authorId\": \"152468429\",\n      \"name\": \"T. Holmes\"\n    },\n    {\n      \"authorId\": \"30556043\",\n      \"name\": \"C. Doglioni\"\n    },\n    {\n      \"authorId\": \"152207827\",\n      \"name\": \"L. Vigani\"\n    },\n    {\n      \"authorId\": \"145417239\",\n      \"name\": \"A. Boldyrev\"\n    },\n    {\n      \"authorId\": \"81295156\",\n      \"name\": \"J. Searcy\"\n    },\n    {\n      \"authorId\": \"49293742\",\n      \"name\": \"J. Stark\"\n    },\n    {\n      \"authorId\": \"102578223\",\n      \"name\": \"E. Yatsenko\"\n    },\n    {\n      \"authorId\": \"102158496\",\n      \"name\": \"M. Kuze\"\n    },\n    {\n      \"authorId\": \"5043628\",\n      \"name\": \"B. Hooberman\"\n    },\n    {\n      \"authorId\": \"33277150\",\n      \"name\": \"A. Ferrari\"\n    },\n    {\n      \"authorId\": \"69939594\",\n      \"name\": \"K. Pachal\"\n    },\n    {\n      \"authorId\": \"2262980\",\n      \"name\": \"D. Costanzo\"\n    },\n    {\n      \"authorId\": \"77595799\",\n      \"name\": \"M. Fenton\"\n    },\n    {\n      \"authorId\": \"49722820\",\n      \"name\": \"Jesse Liu\"\n    },\n    {\n      \"authorId\": \"144021890\",\n      \"name\": \"A. Klimentov\"\n    },\n    {\n      \"authorId\": \"100564615\",\n      \"name\": \"S. P. Griso\"\n    },\n    {\n      \"authorId\": \"101901347\",\n      \"name\": \"I. Panagoulias\"\n    },\n    {\n      \"authorId\": \"152886927\",\n      \"name\": \"R. Blair\"\n    },\n    {\n      \"authorId\": \"2110278860\",\n      \"name\": \"Hongbin Liu\"\n    },\n    {\n      \"authorId\": \"152110597\",\n      \"name\": \"T. Kuhl\"\n    },\n    {\n      \"authorId\": \"102264185\",\n      \"name\": \"G. Gustavino\"\n    },\n    {\n      \"authorId\": \"152324625\",\n      \"name\": \"M. Dynda\\u0142\"\n    },\n    {\n      \"authorId\": \"153879103\",\n      \"name\": \"M. Antonelli\"\n    },\n    {\n      \"authorId\": \"152408012\",\n      \"name\": \"B. Malaescu\"\n    },\n    {\n      \"authorId\": \"144971486\",\n      \"name\": \"D. K. Abhayasinghe\"\n    },\n    {\n      \"authorId\": \"2329914554\",\n      \"name\": \"K. Grimm\"\n    },\n    {\n      \"authorId\": \"152561561\",\n      \"name\": \"D. Zanzi\"\n    },\n    {\n      \"authorId\": \"104336468\",\n      \"name\": \"L. P. Rodriguez\"\n    },\n    {\n      \"authorId\": \"152122627\",\n      \"name\": \"A. Horton\"\n    },\n    {\n      \"authorId\": \"103649658\",\n      \"name\": \"A. Ezhilov\"\n    },\n    {\n      \"authorId\": \"102871518\",\n      \"name\": \"M. Arratia\"\n    },\n    {\n      \"authorId\": \"72304000\",\n      \"name\": \"D. Yallup\"\n    },\n    {\n      \"authorId\": \"152157437\",\n      \"name\": \"A. Bellerive\"\n    },\n    {\n      \"authorId\": \"69575086\",\n      \"name\": \"J. Masik\"\n    },\n    {\n      \"authorId\": \"152254573\",\n      \"name\": \"A. Loesle\"\n    },\n    {\n      \"authorId\": \"104178783\",\n      \"name\": \"M. Janus\"\n    },\n    {\n      \"authorId\": \"145791776\",\n      \"name\": \"L. Barak\"\n    },\n    {\n      \"authorId\": \"121079944\",\n      \"name\": \"S. Kama\"\n    },\n    {\n      \"authorId\": \"102734033\",\n      \"name\": \"G. Iacobucci\"\n    },\n    {\n      \"authorId\": \"28287777\",\n      \"name\": \"E. Shulga\"\n    },\n    {\n      \"authorId\": \"69910679\",\n      \"name\": \"B. Gorini\"\n    },\n    {\n      \"authorId\": \"152188353\",\n      \"name\": \"J. Heilman\"\n    },\n    {\n      \"authorId\": \"152397495\",\n      \"name\": \"M. Hagihara\"\n    },\n    {\n      \"authorId\": \"88759867\",\n      \"name\": \"J. Butler\"\n    },\n    {\n      \"authorId\": \"145246389\",\n      \"name\": \"H. Fox\"\n    },\n    {\n      \"authorId\": \"144591897\",\n      \"name\": \"S. Grancagnolo\"\n    },\n    {\n      \"authorId\": \"3372744\",\n      \"name\": \"E. Koffeman\"\n    },\n    {\n      \"authorId\": \"2731509\",\n      \"name\": \"M. Beattie\"\n    },\n    {\n      \"authorId\": \"103798444\",\n      \"name\": \"S. Pino\"\n    },\n    {\n      \"authorId\": \"152510341\",\n      \"name\": \"N. Madysa\"\n    },\n    {\n      \"authorId\": \"104361108\",\n      \"name\": \"K. Black\"\n    },\n    {\n      \"authorId\": \"48542692\",\n      \"name\": \"G. Hallewell\"\n    },\n    {\n      \"authorId\": \"152520544\",\n      \"name\": \"L. Franconi\"\n    },\n    {\n      \"authorId\": \"152245496\",\n      \"name\": \"L. Horyn\"\n    },\n    {\n      \"authorId\": \"2333617346\",\n      \"name\": \"D. Fassouliotis\"\n    },\n    {\n      \"authorId\": \"2118965381\",\n      \"name\": \"J. Smith\"\n    },\n    {\n      \"authorId\": \"25833671\",\n      \"name\": \"A. Tricoli\"\n    },\n    {\n      \"authorId\": \"152290981\",\n      \"name\": \"M. Dumancic\"\n    },\n    {\n      \"authorId\": \"69346219\",\n      \"name\": \"H. Iwasaki\"\n    },\n    {\n      \"authorId\": \"38966045\",\n      \"name\": \"M. Kuna\"\n    },\n    {\n      \"authorId\": \"102860705\",\n      \"name\": \"M. Giannelli\"\n    },\n    {\n      \"authorId\": \"145783757\",\n      \"name\": \"B. Stapf\"\n    },\n    {\n      \"authorId\": \"2432481811\",\n      \"name\": \"T. Cao\"\n    },\n    {\n      \"authorId\": \"35550664\",\n      \"name\": \"Michela Paganini\"\n    },\n    {\n      \"authorId\": \"102915469\",\n      \"name\": \"V. Ellajosyula\"\n    },\n    {\n      \"authorId\": \"25570246\",\n      \"name\": \"I. Pogrebnyak\"\n    },\n    {\n      \"authorId\": \"92120987\",\n      \"name\": \"E. Petit\"\n    },\n    {\n      \"authorId\": \"152108255\",\n      \"name\": \"J. Faltova\"\n    },\n    {\n      \"authorId\": \"20854671\",\n      \"name\": \"Y. Chiu\"\n    },\n    {\n      \"authorId\": \"93964912\",\n      \"name\": \"Wenzhong Guo\"\n    },\n    {\n      \"authorId\": \"49102135\",\n      \"name\": \"S. Swift\"\n    },\n    {\n      \"authorId\": \"152327543\",\n      \"name\": \"E. Lipeles\"\n    },\n    {\n      \"authorId\": \"46862852\",\n      \"name\": \"M. Venturi\"\n    },\n    {\n      \"authorId\": \"1390689260\",\n      \"name\": \"M. Nedden\"\n    },\n    {\n      \"authorId\": \"144391894\",\n      \"name\": \"A. Ducourthial\"\n    },\n    {\n      \"authorId\": \"145520390\",\n      \"name\": \"S. Artz\"\n    },\n    {\n      \"authorId\": \"2405142600\",\n      \"name\": \"M. Oreglia\"\n    },\n    {\n      \"authorId\": \"94630571\",\n      \"name\": \"H. Neal\"\n    },\n    {\n      \"authorId\": \"50473371\",\n      \"name\": \"E. Drechsler\"\n    },\n    {\n      \"authorId\": \"104484197\",\n      \"name\": \"K. Einsweiler\"\n    },\n    {\n      \"authorId\": \"103913988\",\n      \"name\": \"F. Monticelli\"\n    },\n    {\n      \"authorId\": \"101360011\",\n      \"name\": \"F. Lorenzi\"\n    },\n    {\n      \"authorId\": \"1397147806\",\n      \"name\": \"S. Fressard-Batraneanu\"\n    },\n    {\n      \"authorId\": \"21032201\",\n      \"name\": \"E. Kneringer\"\n    },\n    {\n      \"authorId\": \"144034488\",\n      \"name\": \"O. Arslan\"\n    },\n    {\n      \"authorId\": \"50632997\",\n      \"name\": \"B. Freund\"\n    },\n    {\n      \"authorId\": \"2235415211\",\n      \"name\": \"H. Yildiz\"\n    },\n    {\n      \"authorId\": \"104317636\",\n      \"name\": \"D. Whiteson\"\n    },\n    {\n      \"authorId\": \"144790701\",\n      \"name\": \"A. Dewhurst\"\n    },\n    {\n      \"authorId\": \"47664976\",\n      \"name\": \"K. Shaw\"\n    },\n    {\n      \"authorId\": \"100896538\",\n      \"name\": \"Yingchun Zhu\"\n    },\n    {\n      \"authorId\": \"152161211\",\n      \"name\": \"S. Maeland\"\n    },\n    {\n      \"authorId\": \"47479595\",\n      \"name\": \"C. Young\"\n    },\n    {\n      \"authorId\": \"145042721\",\n      \"name\": \"N. Biesuz\"\n    },\n    {\n      \"authorId\": \"31486824\",\n      \"name\": \"J. Terron\"\n    },\n    {\n      \"authorId\": \"103871545\",\n      \"name\": \"M. G. Bostanabad\"\n    },\n    {\n      \"authorId\": \"152429782\",\n      \"name\": \"S. P. Yuen\"\n    },\n    {\n      \"authorId\": \"100722736\",\n      \"name\": \"V. C. Gimenez\"\n    },\n    {\n      \"authorId\": \"3047896\",\n      \"name\": \"A. Stabile\"\n    },\n    {\n      \"authorId\": \"30101872\",\n      \"name\": \"T. Barillari\"\n    },\n    {\n      \"authorId\": \"143913717\",\n      \"name\": \"T. Neep\"\n    },\n    {\n      \"authorId\": \"46281446\",\n      \"name\": \"F. Peri\"\n    },\n    {\n      \"authorId\": \"2169939756\",\n      \"name\": \"P. Clark\"\n    },\n    {\n      \"authorId\": \"102549428\",\n      \"name\": \"S. Schier\"\n    },\n    {\n      \"authorId\": \"152458337\",\n      \"name\": \"K. Vorobev\"\n    },\n    {\n      \"authorId\": \"2305284\",\n      \"name\": \"J. Hrivnac\"\n    },\n    {\n      \"authorId\": \"2709844\",\n      \"name\": \"M. Barisits\"\n    },\n    {\n      \"authorId\": \"152182219\",\n      \"name\": \"T. Kunigo\"\n    },\n    {\n      \"authorId\": \"30416625\",\n      \"name\": \"A. Grillo\"\n    },\n    {\n      \"authorId\": \"108814117\",\n      \"name\": \"S. Camarda\"\n    },\n    {\n      \"authorId\": \"71932760\",\n      \"name\": \"I. Ueda\"\n    },\n    {\n      \"authorId\": \"2255524320\",\n      \"name\": \"R. Kopeliansky\"\n    },\n    {\n      \"authorId\": \"102372319\",\n      \"name\": \"M. Swiatlowski\"\n    },\n    {\n      \"authorId\": \"5655043\",\n      \"name\": \"N. Konstantinidis\"\n    },\n    {\n      \"authorId\": \"117846583\",\n      \"name\": \"O. Jinnouchi\"\n    },\n    {\n      \"authorId\": \"153592398\",\n      \"name\": \"H. Sadrozinski\"\n    },\n    {\n      \"authorId\": \"1390631596\",\n      \"name\": \"V. Kazanin\"\n    },\n    {\n      \"authorId\": \"13307608\",\n      \"name\": \"E. Barberio\"\n    },\n    {\n      \"authorId\": \"152291644\",\n      \"name\": \"J. Pacalt\"\n    },\n    {\n      \"authorId\": \"3676526\",\n      \"name\": \"K. Tackmann\"\n    },\n    {\n      \"authorId\": \"104221368\",\n      \"name\": \"B. Tannenwald\"\n    },\n    {\n      \"authorId\": \"123319429\",\n      \"name\": \"R. Kass\"\n    },\n    {\n      \"authorId\": \"152567943\",\n      \"name\": \"Y. Kano\"\n    },\n    {\n      \"authorId\": \"152268567\",\n      \"name\": \"M. Sutton\"\n    },\n    {\n      \"authorId\": \"144044206\",\n      \"name\": \"M. Hoeferkamp\"\n    },\n    {\n      \"authorId\": \"3079226\",\n      \"name\": \"L. \\u017divkovi\\u0107\"\n    },\n    {\n      \"authorId\": \"1382860701\",\n      \"name\": \"L. Dell\\u2019asta\"\n    },\n    {\n      \"authorId\": \"93964061\",\n      \"name\": \"V. Wallangen\"\n    },\n    {\n      \"authorId\": \"7855672\",\n      \"name\": \"Fangzhou Zhang\"\n    },\n    {\n      \"authorId\": \"152600421\",\n      \"name\": \"M. Vincter\"\n    },\n    {\n      \"authorId\": \"2426899306\",\n      \"name\": \"G. Herten\"\n    },\n    {\n      \"authorId\": \"32902808\",\n      \"name\": \"V. Nikolaenko\"\n    },\n    {\n      \"authorId\": \"152420850\",\n      \"name\": \"D. Kirchmeier\"\n    },\n    {\n      \"authorId\": \"102552206\",\n      \"name\": \"C. Chau\"\n    },\n    {\n      \"authorId\": \"145411966\",\n      \"name\": \"A. Girolamo\"\n    },\n    {\n      \"authorId\": \"1397145715\",\n      \"name\": \"A. O'Rourke\"\n    },\n    {\n      \"authorId\": \"6092017\",\n      \"name\": \"N. Abraham\"\n    },\n    {\n      \"authorId\": \"144122471\",\n      \"name\": \"M. Nomachi\"\n    },\n    {\n      \"authorId\": \"87417035\",\n      \"name\": \"M. Elsing\"\n    },\n    {\n      \"authorId\": \"104227389\",\n      \"name\": \"C. Geng\"\n    },\n    {\n      \"authorId\": \"8207644\",\n      \"name\": \"K. Mochizuki\"\n    },\n    {\n      \"authorId\": \"47341175\",\n      \"name\": \"A. Ciaccio\"\n    },\n    {\n      \"authorId\": \"92625916\",\n      \"name\": \"B. Burghgrave\"\n    },\n    {\n      \"authorId\": \"3959354\",\n      \"name\": \"A. S. Mete\"\n    },\n    {\n      \"authorId\": \"92636425\",\n      \"name\": \"S. Sivoklokov\"\n    },\n    {\n      \"authorId\": \"30550846\",\n      \"name\": \"L. Rossini\"\n    },\n    {\n      \"authorId\": \"37682228\",\n      \"name\": \"S. Bahrasemani\"\n    },\n    {\n      \"authorId\": \"104270429\",\n      \"name\": \"C. J. Mcnicol\"\n    },\n    {\n      \"authorId\": \"47484254\",\n      \"name\": \"F. Corriveau\"\n    },\n    {\n      \"authorId\": \"145334691\",\n      \"name\": \"I. Bloch\"\n    },\n    {\n      \"authorId\": \"152129195\",\n      \"name\": \"K. Smolek\"\n    },\n    {\n      \"authorId\": \"145249963\",\n      \"name\": \"R. Brenner\"\n    },\n    {\n      \"authorId\": \"147848225\",\n      \"name\": \"P. Tas\"\n    },\n    {\n      \"authorId\": \"107875558\",\n      \"name\": \"A. Gomez\"\n    },\n    {\n      \"authorId\": \"152315953\",\n      \"name\": \"G. Marceca\"\n    },\n    {\n      \"authorId\": \"122902225\",\n      \"name\": \"B. Petersen\"\n    },\n    {\n      \"authorId\": \"143766739\",\n      \"name\": \"V. Solovyev\"\n    },\n    {\n      \"authorId\": \"145689620\",\n      \"name\": \"B. Haney\"\n    },\n    {\n      \"authorId\": \"1382860543\",\n      \"name\": \"S. Gonzalez-Sevilla\"\n    },\n    {\n      \"authorId\": \"49316740\",\n      \"name\": \"C. Shimmin\"\n    },\n    {\n      \"authorId\": \"49878565\",\n      \"name\": \"P. Werner\"\n    },\n    {\n      \"authorId\": \"3928659\",\n      \"name\": \"P. Schacht\"\n    },\n    {\n      \"authorId\": \"145416866\",\n      \"name\": \"N. Whallon\"\n    },\n    {\n      \"authorId\": \"152336128\",\n      \"name\": \"A. Negri\"\n    },\n    {\n      \"authorId\": \"3049895\",\n      \"name\": \"S. Farrington\"\n    },\n    {\n      \"authorId\": \"50548028\",\n      \"name\": \"M. Villa\"\n    },\n    {\n      \"authorId\": \"33573907\",\n      \"name\": \"V. Cindro\"\n    },\n    {\n      \"authorId\": \"70571163\",\n      \"name\": \"A. Minaenko\"\n    },\n    {\n      \"authorId\": \"2519598\",\n      \"name\": \"S. Honda\"\n    },\n    {\n      \"authorId\": \"1390432922\",\n      \"name\": \"X. Ruan\"\n    },\n    {\n      \"authorId\": \"95447639\",\n      \"name\": \"P. F. Salvatore\"\n    },\n    {\n      \"authorId\": \"104182040\",\n      \"name\": \"M. Franklin\"\n    },\n    {\n      \"authorId\": \"103948267\",\n      \"name\": \"B. Mansoulie\"\n    },\n    {\n      \"authorId\": \"2368481566\",\n      \"name\": \"Yang Qin\"\n    },\n    {\n      \"authorId\": \"152569874\",\n      \"name\": \"G. Galster\"\n    },\n    {\n      \"authorId\": \"17066130\",\n      \"name\": \"C. Leggett\"\n    },\n    {\n      \"authorId\": \"78210766\",\n      \"name\": \"N. M. Koehler\"\n    },\n    {\n      \"authorId\": \"2223610974\",\n      \"name\": \"P. Buchholz\"\n    },\n    {\n      \"authorId\": \"152595853\",\n      \"name\": \"K. Zoch\"\n    },\n    {\n      \"authorId\": \"152159785\",\n      \"name\": \"Zuzana Blenessy\"\n    },\n    {\n      \"authorId\": \"2175710613\",\n      \"name\": \"C. Ferretti\"\n    },\n    {\n      \"authorId\": \"34216298\",\n      \"name\": \"D. Biedermann\"\n    },\n    {\n      \"authorId\": \"103736372\",\n      \"name\": \"J. Kroll\"\n    },\n    {\n      \"authorId\": \"152594154\",\n      \"name\": \"A. Behera\"\n    },\n    {\n      \"authorId\": \"32447976\",\n      \"name\": \"H. Torre\"\n    },\n    {\n      \"authorId\": \"2212872545\",\n      \"name\": \"Maosen Zhou\"\n    },\n    {\n      \"authorId\": \"102310812\",\n      \"name\": \"S. Shimizu\"\n    },\n    {\n      \"authorId\": \"148044992\",\n      \"name\": \"S. Fracchia\"\n    },\n    {\n      \"authorId\": \"21641672\",\n      \"name\": \"F. Tresoldi\"\n    },\n    {\n      \"authorId\": \"102353070\",\n      \"name\": \"D. Corral\"\n    },\n    {\n      \"authorId\": \"152208781\",\n      \"name\": \"S. Che\"\n    },\n    {\n      \"authorId\": \"152429289\",\n      \"name\": \"S. Oda\"\n    },\n    {\n      \"authorId\": \"82347792\",\n      \"name\": \"C. Gutschow\"\n    },\n    {\n      \"authorId\": \"88459670\",\n      \"name\": \"M. Saito\"\n    },\n    {\n      \"authorId\": \"1388868936\",\n      \"name\": \"F. L. Sterzo\"\n    },\n    {\n      \"authorId\": \"152188119\",\n      \"name\": \"J. Vossebeld\"\n    },\n    {\n      \"authorId\": \"98670426\",\n      \"name\": \"J. Moss\"\n    },\n    {\n      \"authorId\": \"102828587\",\n      \"name\": \"M. Dunford\"\n    },\n    {\n      \"authorId\": \"145659175\",\n      \"name\": \"R. Middleton\"\n    },\n    {\n      \"authorId\": \"46435899\",\n      \"name\": \"A. Kowalewska\"\n    },\n    {\n      \"authorId\": \"102867906\",\n      \"name\": \"Kyungeon Choi\"\n    },\n    {\n      \"authorId\": \"40935361\",\n      \"name\": \"S. Harkusha\"\n    },\n    {\n      \"authorId\": \"152148008\",\n      \"name\": \"P. Saha\"\n    },\n    {\n      \"authorId\": \"152237998\",\n      \"name\": \"J. Hrdinka\"\n    },\n    {\n      \"authorId\": \"117026771\",\n      \"name\": \"R. Roehrig\"\n    },\n    {\n      \"authorId\": \"103484755\",\n      \"name\": \"S. Wahrmund\"\n    },\n    {\n      \"authorId\": \"145053949\",\n      \"name\": \"E. Hansen\"\n    },\n    {\n      \"authorId\": \"1409765700\",\n      \"name\": \"Matt Zhang\"\n    },\n    {\n      \"authorId\": \"49495124\",\n      \"name\": \"A. Bailey\"\n    },\n    {\n      \"authorId\": \"46734435\",\n      \"name\": \"M. Biglietti\"\n    },\n    {\n      \"authorId\": \"50305602\",\n      \"name\": \"S. Jones\"\n    },\n    {\n      \"authorId\": \"152424605\",\n      \"name\": \"T. Jakoubek\"\n    },\n    {\n      \"authorId\": \"144299385\",\n      \"name\": \"S. Connell\"\n    },\n    {\n      \"authorId\": \"2408642681\",\n      \"name\": \"A. Doria\"\n    },\n    {\n      \"authorId\": \"1409932221\",\n      \"name\": \"Hoang Dai Nghia Nguyen\"\n    },\n    {\n      \"authorId\": \"46749601\",\n      \"name\": \"M. Danninger\"\n    },\n    {\n      \"authorId\": \"1383539769\",\n      \"name\": \"L. McClymont\"\n    },\n    {\n      \"authorId\": \"50878398\",\n      \"name\": \"C. Blocker\"\n    },\n    {\n      \"authorId\": \"152482997\",\n      \"name\": \"S. Istin\"\n    },\n    {\n      \"authorId\": \"152950751\",\n      \"name\": \"E. Varnes\"\n    },\n    {\n      \"authorId\": \"113313283\",\n      \"name\": \"J. Hansen\"\n    },\n    {\n      \"authorId\": \"102416094\",\n      \"name\": \"M. Ghneimat\"\n    },\n    {\n      \"authorId\": \"4977435\",\n      \"name\": \"G. Iakovidis\"\n    },\n    {\n      \"authorId\": \"51052756\",\n      \"name\": \"A. Picazio\"\n    },\n    {\n      \"authorId\": \"46191688\",\n      \"name\": \"C. J. Treado\"\n    },\n    {\n      \"authorId\": \"2006207483\",\n      \"name\": \"G. Jarlskog\"\n    },\n    {\n      \"authorId\": \"91462204\",\n      \"name\": \"K. Nagai\"\n    },\n    {\n      \"authorId\": \"2118386422\",\n      \"name\": \"Ye Chen\"\n    },\n    {\n      \"authorId\": \"3691065\",\n      \"name\": \"M. Ishitsuka\"\n    },\n    {\n      \"authorId\": \"46451183\",\n      \"name\": \"W. Vandelli\"\n    },\n    {\n      \"authorId\": \"104221274\",\n      \"name\": \"A. Salvo\"\n    },\n    {\n      \"authorId\": \"1381497661\",\n      \"name\": \"A. Kourkoumeli-Charalampidi\"\n    },\n    {\n      \"authorId\": \"97542441\",\n      \"name\": \"F. Spettel\"\n    },\n    {\n      \"authorId\": \"152128698\",\n      \"name\": \"Y. Heng\"\n    },\n    {\n      \"authorId\": \"91640405\",\n      \"name\": \"P. Shatalov\"\n    },\n    {\n      \"authorId\": \"40068789\",\n      \"name\": \"Y. Smirnov\"\n    },\n    {\n      \"authorId\": \"51004046\",\n      \"name\": \"S. Majewski\"\n    },\n    {\n      \"authorId\": \"102156785\",\n      \"name\": \"K. Sliwa\"\n    },\n    {\n      \"authorId\": \"65883227\",\n      \"name\": \"B. Wynne\"\n    },\n    {\n      \"authorId\": \"1818160\",\n      \"name\": \"P. Bechtle\"\n    },\n    {\n      \"authorId\": \"2062975545\",\n      \"name\": \"M. Fiolhais\"\n    },\n    {\n      \"authorId\": \"103435246\",\n      \"name\": \"F. H. Phillips\"\n    },\n    {\n      \"authorId\": \"152214758\",\n      \"name\": \"F. Ito\"\n    },\n    {\n      \"authorId\": \"6116287\",\n      \"name\": \"F. Ukegawa\"\n    },\n    {\n      \"authorId\": \"1390635883\",\n      \"name\": \"A. Alonso\"\n    },\n    {\n      \"authorId\": \"49110464\",\n      \"name\": \"Qing Wang\"\n    },\n    {\n      \"authorId\": \"3972530\",\n      \"name\": \"T. Guillemin\"\n    },\n    {\n      \"authorId\": \"152352317\",\n      \"name\": \"E. Winkels\"\n    },\n    {\n      \"authorId\": \"104452912\",\n      \"name\": \"J. J. Kempster\"\n    },\n    {\n      \"authorId\": \"97734906\",\n      \"name\": \"C. Sbarra\"\n    },\n    {\n      \"authorId\": \"1390542522\",\n      \"name\": \"Shuo Han\"\n    },\n    {\n      \"authorId\": \"152113317\",\n      \"name\": \"I. Maznas\"\n    },\n    {\n      \"authorId\": \"152509117\",\n      \"name\": \"M. Wobisch\"\n    },\n    {\n      \"authorId\": \"4310082\",\n      \"name\": \"K. Augsten\"\n    },\n    {\n      \"authorId\": \"49693814\",\n      \"name\": \"J. Ochoa\"\n    },\n    {\n      \"authorId\": \"145474709\",\n      \"name\": \"E. Guirriec\"\n    },\n    {\n      \"authorId\": \"145734235\",\n      \"name\": \"K. Parker\"\n    },\n    {\n      \"authorId\": \"144313373\",\n      \"name\": \"N. Belyaev\"\n    },\n    {\n      \"authorId\": \"4407645\",\n      \"name\": \"A. Ryzhov\"\n    },\n    {\n      \"authorId\": \"104457864\",\n      \"name\": \"D. Moreno\"\n    },\n    {\n      \"authorId\": \"2264575830\",\n      \"name\": \"G. Usai\"\n    },\n    {\n      \"authorId\": \"151705443\",\n      \"name\": \"P. Deviveiros\"\n    },\n    {\n      \"authorId\": \"87955875\",\n      \"name\": \"F. Loebinger\"\n    },\n    {\n      \"authorId\": \"144131498\",\n      \"name\": \"M. Stanitzki\"\n    },\n    {\n      \"authorId\": \"103384189\",\n      \"name\": \"L. Wilkins\"\n    },\n    {\n      \"authorId\": \"145122275\",\n      \"name\": \"B. King\"\n    },\n    {\n      \"authorId\": \"47770773\",\n      \"name\": \"K. Onogi\"\n    },\n    {\n      \"authorId\": \"144123181\",\n      \"name\": \"A. P. Pages\"\n    },\n    {\n      \"authorId\": \"2158606782\",\n      \"name\": \"M. Begel\"\n    },\n    {\n      \"authorId\": \"103592502\",\n      \"name\": \"G. Forcolin\"\n    },\n    {\n      \"authorId\": \"6571644\",\n      \"name\": \"A. Mincer\"\n    },\n    {\n      \"authorId\": \"123634101\",\n      \"name\": \"Young-Kee Kim\"\n    },\n    {\n      \"authorId\": \"152503008\",\n      \"name\": \"L. Morvaj\"\n    },\n    {\n      \"authorId\": \"152372129\",\n      \"name\": \"G. Cabras\"\n    },\n    {\n      \"authorId\": \"2110621652\",\n      \"name\": \"M. Weber\"\n    },\n    {\n      \"authorId\": \"48686698\",\n      \"name\": \"T. Heim\"\n    },\n    {\n      \"authorId\": \"5475283\",\n      \"name\": \"K. Belotskiy\"\n    },\n    {\n      \"authorId\": \"4614647\",\n      \"name\": \"A. Soukharev\"\n    },\n    {\n      \"authorId\": \"23123987\",\n      \"name\": \"J. Jeong\"\n    },\n    {\n      \"authorId\": \"8040856\",\n      \"name\": \"P. Gemmeren\"\n    },\n    {\n      \"authorId\": \"114698935\",\n      \"name\": \"C. Agheorghiesei\"\n    },\n    {\n      \"authorId\": \"152576916\",\n      \"name\": \"H. Pacey\"\n    },\n    {\n      \"authorId\": \"152530425\",\n      \"name\": \"R. Carney\"\n    },\n    {\n      \"authorId\": \"70903711\",\n      \"name\": \"A. Chuinard\"\n    },\n    {\n      \"authorId\": \"73070911\",\n      \"name\": \"R. Jansky\"\n    },\n    {\n      \"authorId\": \"97155500\",\n      \"name\": \"C. Roda\"\n    },\n    {\n      \"authorId\": \"95755256\",\n      \"name\": \"J. M. I. Ponce\"\n    },\n    {\n      \"authorId\": \"1728925\",\n      \"name\": \"D. Boscherini\"\n    },\n    {\n      \"authorId\": \"96397517\",\n      \"name\": \"L. Kashif\"\n    },\n    {\n      \"authorId\": \"1382860610\",\n      \"name\": \"N. Semprini-Cesari\"\n    },\n    {\n      \"authorId\": \"145693306\",\n      \"name\": \"U. Bratzler\"\n    },\n    {\n      \"authorId\": \"3892415\",\n      \"name\": \"P. Fassnacht\"\n    },\n    {\n      \"authorId\": \"93914817\",\n      \"name\": \"K. Finelli\"\n    },\n    {\n      \"authorId\": \"153022142\",\n      \"name\": \"B. Brickwedde\"\n    },\n    {\n      \"authorId\": \"88976857\",\n      \"name\": \"C. David\"\n    },\n    {\n      \"authorId\": \"8683287\",\n      \"name\": \"L. Zwalinski\"\n    },\n    {\n      \"authorId\": \"8488208\",\n      \"name\": \"M. A. Verzini\"\n    },\n    {\n      \"authorId\": \"152394633\",\n      \"name\": \"R. Kukla\"\n    },\n    {\n      \"authorId\": \"21736529\",\n      \"name\": \"T. Stevenson\"\n    },\n    {\n      \"authorId\": \"97583869\",\n      \"name\": \"Jie Yu\"\n    },\n    {\n      \"authorId\": \"144903173\",\n      \"name\": \"D. Boerner\"\n    },\n    {\n      \"authorId\": \"152350803\",\n      \"name\": \"C. Galea\"\n    },\n    {\n      \"authorId\": \"24060472\",\n      \"name\": \"L. Heinrich\"\n    },\n    {\n      \"authorId\": \"102519347\",\n      \"name\": \"A. Zibell\"\n    },\n    {\n      \"authorId\": \"95888159\",\n      \"name\": \"C. Troncon\"\n    },\n    {\n      \"authorId\": \"153065213\",\n      \"name\": \"F. Guescini\"\n    },\n    {\n      \"authorId\": \"50206551\",\n      \"name\": \"D. Denysiuk\"\n    },\n    {\n      \"authorId\": \"2588952\",\n      \"name\": \"J. Pascual\"\n    },\n    {\n      \"authorId\": \"103901183\",\n      \"name\": \"M. Kacimi\"\n    },\n    {\n      \"authorId\": \"2110349004\",\n      \"name\": \"Chunhui Chen\"\n    },\n    {\n      \"authorId\": \"103119294\",\n      \"name\": \"A. Perez\"\n    },\n    {\n      \"authorId\": \"152503031\",\n      \"name\": \"S. Menke\"\n    },\n    {\n      \"authorId\": \"2144446659\",\n      \"name\": \"Chao Wang\"\n    },\n    {\n      \"authorId\": \"49543562\",\n      \"name\": \"E. Shabalina\"\n    },\n    {\n      \"authorId\": \"103055516\",\n      \"name\": \"G. Unal\"\n    },\n    {\n      \"authorId\": \"41203336\",\n      \"name\": \"R. Gardner\"\n    },\n    {\n      \"authorId\": \"152344273\",\n      \"name\": \"A. Forti\"\n    },\n    {\n      \"authorId\": \"49889094\",\n      \"name\": \"Yu Zhang\"\n    },\n    {\n      \"authorId\": \"34759074\",\n      \"name\": \"N. Norjoharuddeen\"\n    },\n    {\n      \"authorId\": \"2169940921\",\n      \"name\": \"M. Morii\"\n    },\n    {\n      \"authorId\": \"152528220\",\n      \"name\": \"A. Sciandra\"\n    },\n    {\n      \"authorId\": \"152490478\",\n      \"name\": \"T. Kosek\"\n    },\n    {\n      \"authorId\": \"103010571\",\n      \"name\": \"Zhiqin Zhang\"\n    },\n    {\n      \"authorId\": \"2432481808\",\n      \"name\": \"T. Brooks\"\n    },\n    {\n      \"authorId\": \"152469094\",\n      \"name\": \"K. Sekhon\"\n    },\n    {\n      \"authorId\": \"152605529\",\n      \"name\": \"R. Iguchi\"\n    },\n    {\n      \"authorId\": \"2333974286\",\n      \"name\": \"Tai-hua Lin\"\n    },\n    {\n      \"authorId\": \"98174130\",\n      \"name\": \"L. Flores\"\n    },\n    {\n      \"authorId\": \"144831185\",\n      \"name\": \"G. Chiodini\"\n    },\n    {\n      \"authorId\": \"2217372496\",\n      \"name\": \"Jun Guo\"\n    },\n    {\n      \"authorId\": \"2675969\",\n      \"name\": \"L. Simi\\u0107\"\n    },\n    {\n      \"authorId\": \"1571995511\",\n      \"name\": \"J. Gonski\"\n    },\n    {\n      \"authorId\": \"152654661\",\n      \"name\": \"A. Gabrielli\"\n    },\n    {\n      \"authorId\": \"152476422\",\n      \"name\": \"E. Akilli\"\n    },\n    {\n      \"authorId\": \"1381463760\",\n      \"name\": \"T. Klapdor-Kleingrothaus\"\n    },\n    {\n      \"authorId\": \"144926983\",\n      \"name\": \"O. Kind\"\n    },\n    {\n      \"authorId\": \"31156702\",\n      \"name\": \"R. Schamberger\"\n    },\n    {\n      \"authorId\": \"69907043\",\n      \"name\": \"A. Schwartzman\"\n    },\n    {\n      \"authorId\": \"66382735\",\n      \"name\": \"L. A. Bella\"\n    },\n    {\n      \"authorId\": \"134790528\",\n      \"name\": \"T. Honda\"\n    },\n    {\n      \"authorId\": \"2072840696\",\n      \"name\": \"F. Ruehr\"\n    },\n    {\n      \"authorId\": \"151533172\",\n      \"name\": \"A. Weidberg\"\n    },\n    {\n      \"authorId\": \"152509460\",\n      \"name\": \"L. Mijovi\\u0107\"\n    },\n    {\n      \"authorId\": \"152304798\",\n      \"name\": \"H. Potti\"\n    },\n    {\n      \"authorId\": \"152199231\",\n      \"name\": \"S. Snyder\"\n    },\n    {\n      \"authorId\": \"143805067\",\n      \"name\": \"U. Blumenschein\"\n    },\n    {\n      \"authorId\": \"1837169\",\n      \"name\": \"R. Konoplich\"\n    },\n    {\n      \"authorId\": \"2057520445\",\n      \"name\": \"P. Maettig\"\n    },\n    {\n      \"authorId\": \"152284232\",\n      \"name\": \"M. Javurkova\"\n    },\n    {\n      \"authorId\": \"40531605\",\n      \"name\": \"E. Celebi\"\n    },\n    {\n      \"authorId\": \"2762190\",\n      \"name\": \"F. Hoenig\"\n    },\n    {\n      \"authorId\": \"152289274\",\n      \"name\": \"M. Tasevsky\"\n    },\n    {\n      \"authorId\": \"152514045\",\n      \"name\": \"S. Turchikhin\"\n    },\n    {\n      \"authorId\": \"51207647\",\n      \"name\": \"C. Solans\"\n    },\n    {\n      \"authorId\": \"3539108\",\n      \"name\": \"J. Kvita\"\n    },\n    {\n      \"authorId\": \"47881649\",\n      \"name\": \"S. Heim\"\n    },\n    {\n      \"authorId\": \"101780407\",\n      \"name\": \"V. Boisvert\"\n    },\n    {\n      \"authorId\": \"104174498\",\n      \"name\": \"B. Allen\"\n    },\n    {\n      \"authorId\": \"152163991\",\n      \"name\": \"G. Lerner\"\n    },\n    {\n      \"authorId\": \"3013183\",\n      \"name\": \"R. Hunter\"\n    },\n    {\n      \"authorId\": \"98032675\",\n      \"name\": \"S. Veneziano\"\n    },\n    {\n      \"authorId\": \"93239574\",\n      \"name\": \"Y. Hasegawa\"\n    },\n    {\n      \"authorId\": \"72250159\",\n      \"name\": \"Y. Takubo\"\n    },\n    {\n      \"authorId\": \"49811283\",\n      \"name\": \"M. Huhtinen\"\n    },\n    {\n      \"authorId\": \"152154517\",\n      \"name\": \"A. Kiryunin\"\n    },\n    {\n      \"authorId\": \"71635003\",\n      \"name\": \"A. Beddall\"\n    },\n    {\n      \"authorId\": \"2148890\",\n      \"name\": \"N. Kimura\"\n    },\n    {\n      \"authorId\": \"95874777\",\n      \"name\": \"S. Amoroso\"\n    },\n    {\n      \"authorId\": \"152323290\",\n      \"name\": \"L. Serkin\"\n    },\n    {\n      \"authorId\": \"152324358\",\n      \"name\": \"Dengfeng Zhang\"\n    },\n    {\n      \"authorId\": \"153590278\",\n      \"name\": \"P. Gris\"\n    },\n    {\n      \"authorId\": \"152142353\",\n      \"name\": \"I. Gkialas\"\n    },\n    {\n      \"authorId\": \"120770955\",\n      \"name\": \"S. Smirnov\"\n    },\n    {\n      \"authorId\": \"49766771\",\n      \"name\": \"M. Haleem\"\n    },\n    {\n      \"authorId\": \"102062767\",\n      \"name\": \"D. Froidevaux\"\n    },\n    {\n      \"authorId\": \"82438351\",\n      \"name\": \"R. Pezoa\"\n    },\n    {\n      \"authorId\": \"71468629\",\n      \"name\": \"B. Ali\"\n    },\n    {\n      \"authorId\": \"47306301\",\n      \"name\": \"F. Lyu\"\n    },\n    {\n      \"authorId\": \"102916379\",\n      \"name\": \"D. Emeliyanov\"\n    },\n    {\n      \"authorId\": \"3275218\",\n      \"name\": \"A. Filip\\u010di\\u010d\"\n    },\n    {\n      \"authorId\": \"49216150\",\n      \"name\": \"S. Kuehn\"\n    },\n    {\n      \"authorId\": \"32169062\",\n      \"name\": \"M. Lassnig\"\n    },\n    {\n      \"authorId\": \"103521938\",\n      \"name\": \"T. Pauly\"\n    },\n    {\n      \"authorId\": \"14016985\",\n      \"name\": \"A. Redelbach\"\n    },\n    {\n      \"authorId\": \"104052860\",\n      \"name\": \"H. Hakobyan\"\n    },\n    {\n      \"authorId\": \"152576963\",\n      \"name\": \"B. Wosiek\"\n    },\n    {\n      \"authorId\": \"32713143\",\n      \"name\": \"Yang Liu\"\n    },\n    {\n      \"authorId\": \"148145011\",\n      \"name\": \"S. Strandberg\"\n    },\n    {\n      \"authorId\": \"9786368\",\n      \"name\": \"A. Karyukhin\"\n    },\n    {\n      \"authorId\": \"6202975\",\n      \"name\": \"A. Mizukami\"\n    },\n    {\n      \"authorId\": \"70673066\",\n      \"name\": \"L. Pontecorvo\"\n    },\n    {\n      \"authorId\": \"104470116\",\n      \"name\": \"Liang Li\"\n    },\n    {\n      \"authorId\": \"152378814\",\n      \"name\": \"T. Lenz\"\n    },\n    {\n      \"authorId\": \"2264558658\",\n      \"name\": \"J. Butterworth\"\n    },\n    {\n      \"authorId\": \"152591796\",\n      \"name\": \"S. Stark\"\n    },\n    {\n      \"authorId\": \"10668281\",\n      \"name\": \"A. Korn\"\n    },\n    {\n      \"authorId\": \"153822689\",\n      \"name\": \"N. Barlow\"\n    },\n    {\n      \"authorId\": \"152153327\",\n      \"name\": \"K. Todome\"\n    },\n    {\n      \"authorId\": \"103740720\",\n      \"name\": \"G. Mullier\"\n    },\n    {\n      \"authorId\": \"80641945\",\n      \"name\": \"F. Dallaire\"\n    },\n    {\n      \"authorId\": \"66732565\",\n      \"name\": \"E. Rossi\"\n    }\n  ],\n  \"title\": \"Search for chargino-neutralino production using recursive jigsaw reconstruction in final states with two or three charged leptons in proton-proton collisions at $\\\\sqrt{s}$=13 TeV with the ATLAS detector\",\n  \"externalIds\": {\n    \"ArXiv\": \"1806.02293\",\n    \"DOI\": \"10.1103/PhysRevD.98.092012\",\n    \"CorpusId\": 125706805\n  },\n  \"baseline_trust_score\": 5,\n  \"cite_key\": \"we-are-working-with-a-g1-for-our-unitree-research...\"\n}\n-->",
+  "metadata": {
+    "year": 2018,
+    "venue": "",
+    "citationCount": 89,
+    "authors": [
+      {
+        "authorId": "103732793",
+        "name": "M. Aaboud"
+      },
+      {
+        "authorId": "104212839",
+        "name": "A. Kupco"
+      },
+      {
+        "authorId": "151225015",
+        "name": "S. Webb"
+      },
+      {
+        "authorId": "1410970652",
+        "name": "T. Dreyer"
+      },
+      {
+        "authorId": "2108110977",
+        "name": "Yufeng Wang"
+      },
+      {
+        "authorId": "51517832",
+        "name": "K. Jakobs"
+      },
+      {
+        "authorId": "70624406",
+        "name": "M. Spousta"
+      },
+      {
+        "authorId": "145428351",
+        "name": "M. Cobal"
+      },
+      {
+        "authorId": "2118950732",
+        "name": "Peilong Wang"
+      },
+      {
+        "authorId": "93437488",
+        "name": "S. Schmitt"
+      },
+      {
+        "authorId": "2250465",
+        "name": "J. Schovancová"
+      },
+      {
+        "authorId": "3762852",
+        "name": "A. Bassalat"
+      },
+      {
+        "authorId": "152283387",
+        "name": "M. Melo"
+      },
+      {
+        "authorId": "48362085",
+        "name": "M. Shapiro"
+      },
+      {
+        "authorId": "152146263",
+        "name": "G. Tarna"
+      },
+      {
+        "authorId": "2400222",
+        "name": "S. Zimmermann"
+      },
+      {
+        "authorId": "93407077",
+        "name": "T. Eifert"
+      },
+      {
+        "authorId": "152495978",
+        "name": "N. Ozturk"
+      },
+      {
+        "authorId": "152498714",
+        "name": "S. Kuday"
+      },
+      {
+        "authorId": "144863987",
+        "name": "F. Legger"
+      },
+      {
+        "authorId": "102272210",
+        "name": "M. Sioli"
+      },
+      {
+        "authorId": "5844495",
+        "name": "L. Cerrito"
+      },
+      {
+        "authorId": "144696699",
+        "name": "S. P. Lopez"
+      },
+      {
+        "authorId": "5071328",
+        "name": "N. Bruscino"
+      },
+      {
+        "authorId": "104279228",
+        "name": "F. Giorgi"
+      },
+      {
+        "authorId": "144875493",
+        "name": "J. Huston"
+      },
+      {
+        "authorId": "95311429",
+        "name": "S. Robertson"
+      },
+      {
+        "authorId": "107781677",
+        "name": "R. Gonçalo"
+      },
+      {
+        "authorId": "4887935",
+        "name": "A. Snesarev"
+      },
+      {
+        "authorId": "152561900",
+        "name": "L. Rotonda"
+      },
+      {
+        "authorId": "152460694",
+        "name": "D. Duschinger"
+      },
+      {
+        "authorId": "83004566",
+        "name": "E. Carquin"
+      },
+      {
+        "authorId": "103661234",
+        "name": "A. R. Morales"
+      },
+      {
+        "authorId": "52146151",
+        "name": "I. Yusuff"
+      },
+      {
+        "authorId": "1383080013",
+        "name": "S. Crépé-Renaudin"
+      },
+      {
+        "authorId": "92442946",
+        "name": "J. Parsons"
+      },
+      {
+        "authorId": "7961334",
+        "name": "W. Balunas"
+      },
+      {
+        "authorId": "103201868",
+        "name": "Y. Tikhonov"
+      },
+      {
+        "authorId": "4465252",
+        "name": "M. K. Ayoub"
+      },
+      {
+        "authorId": "152518009",
+        "name": "C. Mwewa"
+      },
+      {
+        "authorId": "103905776",
+        "name": "David Miller"
+      },
+      {
+        "authorId": "152350424",
+        "name": "A. Ivina"
+      },
+      {
+        "authorId": "49420545",
+        "name": "Yanlin Liu"
+      },
+      {
+        "authorId": "84650873",
+        "name": "P. Mastrandrea"
+      },
+      {
+        "authorId": "152491587",
+        "name": "Jan-Ulf Mjoernmark"
+      },
+      {
+        "authorId": "145274722",
+        "name": "S. J. Batista"
+      },
+      {
+        "authorId": "145365747",
+        "name": "W. Leight"
+      },
+      {
+        "authorId": "2664867",
+        "name": "A. Colijn"
+      },
+      {
+        "authorId": "103104236",
+        "name": "M. G. Ratti"
+      },
+      {
+        "authorId": "120600314",
+        "name": "Liaoshan Shi"
+      },
+      {
+        "authorId": "33389370",
+        "name": "M. E. Nelson"
+      },
+      {
+        "authorId": "152827431",
+        "name": "H. Krueger"
+      },
+      {
+        "authorId": "104444641",
+        "name": "J. Ocariz"
+      },
+      {
+        "authorId": "47106250",
+        "name": "M. Nordberg"
+      },
+      {
+        "authorId": "4337420",
+        "name": "J. Maneira"
+      },
+      {
+        "authorId": "152118606",
+        "name": "J. Cúth"
+      },
+      {
+        "authorId": "143975557",
+        "name": "Daniela Bortoletto"
+      },
+      {
+        "authorId": "144769254",
+        "name": "A. Lankford"
+      },
+      {
+        "authorId": "152487739",
+        "name": "N. Sinev"
+      },
+      {
+        "authorId": "15758724",
+        "name": "S. Tapprogge"
+      },
+      {
+        "authorId": "145322505",
+        "name": "F. Parodi"
+      },
+      {
+        "authorId": "143982544",
+        "name": "T. Masubuchi"
+      },
+      {
+        "authorId": "152494170",
+        "name": "D. E. F. Lima"
+      },
+      {
+        "authorId": "3141375",
+        "name": "T. LeCompte"
+      },
+      {
+        "authorId": "2145396194",
+        "name": "Shenjian Chen"
+      },
+      {
+        "authorId": "51256194",
+        "name": "S. Batlamous"
+      },
+      {
+        "authorId": "79570246",
+        "name": "T. Martin"
+      },
+      {
+        "authorId": "145440424",
+        "name": "J. Poveda"
+      },
+      {
+        "authorId": "152307218",
+        "name": "E. Mountricha"
+      },
+      {
+        "authorId": "152289657",
+        "name": "T. N. Manh"
+      },
+      {
+        "authorId": "145666935",
+        "name": "M. Ouchrif"
+      },
+      {
+        "authorId": "145977156",
+        "name": "K. Korcyl"
+      },
+      {
+        "authorId": "152154211",
+        "name": "C. Grefe"
+      },
+      {
+        "authorId": "71194039",
+        "name": "K. Toms"
+      },
+      {
+        "authorId": "47146555",
+        "name": "P. Tipton"
+      },
+      {
+        "authorId": "101268380",
+        "name": "F. Klitzner"
+      },
+      {
+        "authorId": "145217795",
+        "name": "A. Valero"
+      },
+      {
+        "authorId": "50430570",
+        "name": "F. Mueller"
+      },
+      {
+        "authorId": "113243100",
+        "name": "T. Kishimoto"
+      },
+      {
+        "authorId": "152169922",
+        "name": "A. Vartapetian"
+      },
+      {
+        "authorId": "153586836",
+        "name": "K. Kawagoe"
+      },
+      {
+        "authorId": "6983671",
+        "name": "A. Barton"
+      },
+      {
+        "authorId": "95614607",
+        "name": "A. Policicchio"
+      },
+      {
+        "authorId": "152604589",
+        "name": "E. Yigitbasi"
+      },
+      {
+        "authorId": "103700485",
+        "name": "F. Speiser"
+      },
+      {
+        "authorId": "152381672",
+        "name": "S. Zambito"
+      },
+      {
+        "authorId": "46177722",
+        "name": "S. Karpov"
+      },
+      {
+        "authorId": "152306438",
+        "name": "P. Strizenec"
+      },
+      {
+        "authorId": "145499742",
+        "name": "N. Bernard"
+      },
+      {
+        "authorId": "47614700",
+        "name": "C. Lester"
+      },
+      {
+        "authorId": "7599729",
+        "name": "D. Casper"
+      },
+      {
+        "authorId": "143766327",
+        "name": "J. Navarro"
+      },
+      {
+        "authorId": "119931252",
+        "name": "B. Micco"
+      },
+      {
+        "authorId": "152232734",
+        "name": "S. Koperny"
+      },
+      {
+        "authorId": "2064501747",
+        "name": "B. A. Long"
+      },
+      {
+        "authorId": "152242705",
+        "name": "C. Bertella"
+      },
+      {
+        "authorId": "97961029",
+        "name": "P. Schwemling"
+      },
+      {
+        "authorId": "144243989",
+        "name": "M. Vos"
+      },
+      {
+        "authorId": "152169880",
+        "name": "E. Meoni"
+      },
+      {
+        "authorId": "152468429",
+        "name": "T. Holmes"
+      },
+      {
+        "authorId": "30556043",
+        "name": "C. Doglioni"
+      },
+      {
+        "authorId": "152207827",
+        "name": "L. Vigani"
+      },
+      {
+        "authorId": "145417239",
+        "name": "A. Boldyrev"
+      },
+      {
+        "authorId": "81295156",
+        "name": "J. Searcy"
+      },
+      {
+        "authorId": "49293742",
+        "name": "J. Stark"
+      },
+      {
+        "authorId": "102578223",
+        "name": "E. Yatsenko"
+      },
+      {
+        "authorId": "102158496",
+        "name": "M. Kuze"
+      },
+      {
+        "authorId": "5043628",
+        "name": "B. Hooberman"
+      },
+      {
+        "authorId": "33277150",
+        "name": "A. Ferrari"
+      },
+      {
+        "authorId": "69939594",
+        "name": "K. Pachal"
+      },
+      {
+        "authorId": "2262980",
+        "name": "D. Costanzo"
+      },
+      {
+        "authorId": "77595799",
+        "name": "M. Fenton"
+      },
+      {
+        "authorId": "49722820",
+        "name": "Jesse Liu"
+      },
+      {
+        "authorId": "144021890",
+        "name": "A. Klimentov"
+      },
+      {
+        "authorId": "100564615",
+        "name": "S. P. Griso"
+      },
+      {
+        "authorId": "101901347",
+        "name": "I. Panagoulias"
+      },
+      {
+        "authorId": "152886927",
+        "name": "R. Blair"
+      },
+      {
+        "authorId": "2110278860",
+        "name": "Hongbin Liu"
+      },
+      {
+        "authorId": "152110597",
+        "name": "T. Kuhl"
+      },
+      {
+        "authorId": "102264185",
+        "name": "G. Gustavino"
+      },
+      {
+        "authorId": "152324625",
+        "name": "M. Dyndał"
+      },
+      {
+        "authorId": "153879103",
+        "name": "M. Antonelli"
+      },
+      {
+        "authorId": "152408012",
+        "name": "B. Malaescu"
+      },
+      {
+        "authorId": "144971486",
+        "name": "D. K. Abhayasinghe"
+      },
+      {
+        "authorId": "2329914554",
+        "name": "K. Grimm"
+      },
+      {
+        "authorId": "152561561",
+        "name": "D. Zanzi"
+      },
+      {
+        "authorId": "104336468",
+        "name": "L. P. Rodriguez"
+      },
+      {
+        "authorId": "152122627",
+        "name": "A. Horton"
+      },
+      {
+        "authorId": "103649658",
+        "name": "A. Ezhilov"
+      },
+      {
+        "authorId": "102871518",
+        "name": "M. Arratia"
+      },
+      {
+        "authorId": "72304000",
+        "name": "D. Yallup"
+      },
+      {
+        "authorId": "152157437",
+        "name": "A. Bellerive"
+      },
+      {
+        "authorId": "69575086",
+        "name": "J. Masik"
+      },
+      {
+        "authorId": "152254573",
+        "name": "A. Loesle"
+      },
+      {
+        "authorId": "104178783",
+        "name": "M. Janus"
+      },
+      {
+        "authorId": "145791776",
+        "name": "L. Barak"
+      },
+      {
+        "authorId": "121079944",
+        "name": "S. Kama"
+      },
+      {
+        "authorId": "102734033",
+        "name": "G. Iacobucci"
+      },
+      {
+        "authorId": "28287777",
+        "name": "E. Shulga"
+      },
+      {
+        "authorId": "69910679",
+        "name": "B. Gorini"
+      },
+      {
+        "authorId": "152188353",
+        "name": "J. Heilman"
+      },
+      {
+        "authorId": "152397495",
+        "name": "M. Hagihara"
+      },
+      {
+        "authorId": "88759867",
+        "name": "J. Butler"
+      },
+      {
+        "authorId": "145246389",
+        "name": "H. Fox"
+      },
+      {
+        "authorId": "144591897",
+        "name": "S. Grancagnolo"
+      },
+      {
+        "authorId": "3372744",
+        "name": "E. Koffeman"
+      },
+      {
+        "authorId": "2731509",
+        "name": "M. Beattie"
+      },
+      {
+        "authorId": "103798444",
+        "name": "S. Pino"
+      },
+      {
+        "authorId": "152510341",
+        "name": "N. Madysa"
+      },
+      {
+        "authorId": "104361108",
+        "name": "K. Black"
+      },
+      {
+        "authorId": "48542692",
+        "name": "G. Hallewell"
+      },
+      {
+        "authorId": "152520544",
+        "name": "L. Franconi"
+      },
+      {
+        "authorId": "152245496",
+        "name": "L. Horyn"
+      },
+      {
+        "authorId": "2333617346",
+        "name": "D. Fassouliotis"
+      },
+      {
+        "authorId": "2118965381",
+        "name": "J. Smith"
+      },
+      {
+        "authorId": "25833671",
+        "name": "A. Tricoli"
+      },
+      {
+        "authorId": "152290981",
+        "name": "M. Dumancic"
+      },
+      {
+        "authorId": "69346219",
+        "name": "H. Iwasaki"
+      },
+      {
+        "authorId": "38966045",
+        "name": "M. Kuna"
+      },
+      {
+        "authorId": "102860705",
+        "name": "M. Giannelli"
+      },
+      {
+        "authorId": "145783757",
+        "name": "B. Stapf"
+      },
+      {
+        "authorId": "2432481811",
+        "name": "T. Cao"
+      },
+      {
+        "authorId": "35550664",
+        "name": "Michela Paganini"
+      },
+      {
+        "authorId": "102915469",
+        "name": "V. Ellajosyula"
+      },
+      {
+        "authorId": "25570246",
+        "name": "I. Pogrebnyak"
+      },
+      {
+        "authorId": "92120987",
+        "name": "E. Petit"
+      },
+      {
+        "authorId": "152108255",
+        "name": "J. Faltova"
+      },
+      {
+        "authorId": "20854671",
+        "name": "Y. Chiu"
+      },
+      {
+        "authorId": "93964912",
+        "name": "Wenzhong Guo"
+      },
+      {
+        "authorId": "49102135",
+        "name": "S. Swift"
+      },
+      {
+        "authorId": "152327543",
+        "name": "E. Lipeles"
+      },
+      {
+        "authorId": "46862852",
+        "name": "M. Venturi"
+      },
+      {
+        "authorId": "1390689260",
+        "name": "M. Nedden"
+      },
+      {
+        "authorId": "144391894",
+        "name": "A. Ducourthial"
+      },
+      {
+        "authorId": "145520390",
+        "name": "S. Artz"
+      },
+      {
+        "authorId": "2405142600",
+        "name": "M. Oreglia"
+      },
+      {
+        "authorId": "94630571",
+        "name": "H. Neal"
+      },
+      {
+        "authorId": "50473371",
+        "name": "E. Drechsler"
+      },
+      {
+        "authorId": "104484197",
+        "name": "K. Einsweiler"
+      },
+      {
+        "authorId": "103913988",
+        "name": "F. Monticelli"
+      },
+      {
+        "authorId": "101360011",
+        "name": "F. Lorenzi"
+      },
+      {
+        "authorId": "1397147806",
+        "name": "S. Fressard-Batraneanu"
+      },
+      {
+        "authorId": "21032201",
+        "name": "E. Kneringer"
+      },
+      {
+        "authorId": "144034488",
+        "name": "O. Arslan"
+      },
+      {
+        "authorId": "50632997",
+        "name": "B. Freund"
+      },
+      {
+        "authorId": "2235415211",
+        "name": "H. Yildiz"
+      },
+      {
+        "authorId": "104317636",
+        "name": "D. Whiteson"
+      },
+      {
+        "authorId": "144790701",
+        "name": "A. Dewhurst"
+      },
+      {
+        "authorId": "47664976",
+        "name": "K. Shaw"
+      },
+      {
+        "authorId": "100896538",
+        "name": "Yingchun Zhu"
+      },
+      {
+        "authorId": "152161211",
+        "name": "S. Maeland"
+      },
+      {
+        "authorId": "47479595",
+        "name": "C. Young"
+      },
+      {
+        "authorId": "145042721",
+        "name": "N. Biesuz"
+      },
+      {
+        "authorId": "31486824",
+        "name": "J. Terron"
+      },
+      {
+        "authorId": "103871545",
+        "name": "M. G. Bostanabad"
+      },
+      {
+        "authorId": "152429782",
+        "name": "S. P. Yuen"
+      },
+      {
+        "authorId": "100722736",
+        "name": "V. C. Gimenez"
+      },
+      {
+        "authorId": "3047896",
+        "name": "A. Stabile"
+      },
+      {
+        "authorId": "30101872",
+        "name": "T. Barillari"
+      },
+      {
+        "authorId": "143913717",
+        "name": "T. Neep"
+      },
+      {
+        "authorId": "46281446",
+        "name": "F. Peri"
+      },
+      {
+        "authorId": "2169939756",
+        "name": "P. Clark"
+      },
+      {
+        "authorId": "102549428",
+        "name": "S. Schier"
+      },
+      {
+        "authorId": "152458337",
+        "name": "K. Vorobev"
+      },
+      {
+        "authorId": "2305284",
+        "name": "J. Hrivnac"
+      },
+      {
+        "authorId": "2709844",
+        "name": "M. Barisits"
+      },
+      {
+        "authorId": "152182219",
+        "name": "T. Kunigo"
+      },
+      {
+        "authorId": "30416625",
+        "name": "A. Grillo"
+      },
+      {
+        "authorId": "108814117",
+        "name": "S. Camarda"
+      },
+      {
+        "authorId": "71932760",
+        "name": "I. Ueda"
+      },
+      {
+        "authorId": "2255524320",
+        "name": "R. Kopeliansky"
+      },
+      {
+        "authorId": "102372319",
+        "name": "M. Swiatlowski"
+      },
+      {
+        "authorId": "5655043",
+        "name": "N. Konstantinidis"
+      },
+      {
+        "authorId": "117846583",
+        "name": "O. Jinnouchi"
+      },
+      {
+        "authorId": "153592398",
+        "name": "H. Sadrozinski"
+      },
+      {
+        "authorId": "1390631596",
+        "name": "V. Kazanin"
+      },
+      {
+        "authorId": "13307608",
+        "name": "E. Barberio"
+      },
+      {
+        "authorId": "152291644",
+        "name": "J. Pacalt"
+      },
+      {
+        "authorId": "3676526",
+        "name": "K. Tackmann"
+      },
+      {
+        "authorId": "104221368",
+        "name": "B. Tannenwald"
+      },
+      {
+        "authorId": "123319429",
+        "name": "R. Kass"
+      },
+      {
+        "authorId": "152567943",
+        "name": "Y. Kano"
+      },
+      {
+        "authorId": "152268567",
+        "name": "M. Sutton"
+      },
+      {
+        "authorId": "144044206",
+        "name": "M. Hoeferkamp"
+      },
+      {
+        "authorId": "3079226",
+        "name": "L. Živković"
+      },
+      {
+        "authorId": "1382860701",
+        "name": "L. Dell’asta"
+      },
+      {
+        "authorId": "93964061",
+        "name": "V. Wallangen"
+      },
+      {
+        "authorId": "7855672",
+        "name": "Fangzhou Zhang"
+      },
+      {
+        "authorId": "152600421",
+        "name": "M. Vincter"
+      },
+      {
+        "authorId": "2426899306",
+        "name": "G. Herten"
+      },
+      {
+        "authorId": "32902808",
+        "name": "V. Nikolaenko"
+      },
+      {
+        "authorId": "152420850",
+        "name": "D. Kirchmeier"
+      },
+      {
+        "authorId": "102552206",
+        "name": "C. Chau"
+      },
+      {
+        "authorId": "145411966",
+        "name": "A. Girolamo"
+      },
+      {
+        "authorId": "1397145715",
+        "name": "A. O'Rourke"
+      },
+      {
+        "authorId": "6092017",
+        "name": "N. Abraham"
+      },
+      {
+        "authorId": "144122471",
+        "name": "M. Nomachi"
+      },
+      {
+        "authorId": "87417035",
+        "name": "M. Elsing"
+      },
+      {
+        "authorId": "104227389",
+        "name": "C. Geng"
+      },
+      {
+        "authorId": "8207644",
+        "name": "K. Mochizuki"
+      },
+      {
+        "authorId": "47341175",
+        "name": "A. Ciaccio"
+      },
+      {
+        "authorId": "92625916",
+        "name": "B. Burghgrave"
+      },
+      {
+        "authorId": "3959354",
+        "name": "A. S. Mete"
+      },
+      {
+        "authorId": "92636425",
+        "name": "S. Sivoklokov"
+      },
+      {
+        "authorId": "30550846",
+        "name": "L. Rossini"
+      },
+      {
+        "authorId": "37682228",
+        "name": "S. Bahrasemani"
+      },
+      {
+        "authorId": "104270429",
+        "name": "C. J. Mcnicol"
+      },
+      {
+        "authorId": "47484254",
+        "name": "F. Corriveau"
+      },
+      {
+        "authorId": "145334691",
+        "name": "I. Bloch"
+      },
+      {
+        "authorId": "152129195",
+        "name": "K. Smolek"
+      },
+      {
+        "authorId": "145249963",
+        "name": "R. Brenner"
+      },
+      {
+        "authorId": "147848225",
+        "name": "P. Tas"
+      },
+      {
+        "authorId": "107875558",
+        "name": "A. Gomez"
+      },
+      {
+        "authorId": "152315953",
+        "name": "G. Marceca"
+      },
+      {
+        "authorId": "122902225",
+        "name": "B. Petersen"
+      },
+      {
+        "authorId": "143766739",
+        "name": "V. Solovyev"
+      },
+      {
+        "authorId": "145689620",
+        "name": "B. Haney"
+      },
+      {
+        "authorId": "1382860543",
+        "name": "S. Gonzalez-Sevilla"
+      },
+      {
+        "authorId": "49316740",
+        "name": "C. Shimmin"
+      },
+      {
+        "authorId": "49878565",
+        "name": "P. Werner"
+      },
+      {
+        "authorId": "3928659",
+        "name": "P. Schacht"
+      },
+      {
+        "authorId": "145416866",
+        "name": "N. Whallon"
+      },
+      {
+        "authorId": "152336128",
+        "name": "A. Negri"
+      },
+      {
+        "authorId": "3049895",
+        "name": "S. Farrington"
+      },
+      {
+        "authorId": "50548028",
+        "name": "M. Villa"
+      },
+      {
+        "authorId": "33573907",
+        "name": "V. Cindro"
+      },
+      {
+        "authorId": "70571163",
+        "name": "A. Minaenko"
+      },
+      {
+        "authorId": "2519598",
+        "name": "S. Honda"
+      },
+      {
+        "authorId": "1390432922",
+        "name": "X. Ruan"
+      },
+      {
+        "authorId": "95447639",
+        "name": "P. F. Salvatore"
+      },
+      {
+        "authorId": "104182040",
+        "name": "M. Franklin"
+      },
+      {
+        "authorId": "103948267",
+        "name": "B. Mansoulie"
+      },
+      {
+        "authorId": "2368481566",
+        "name": "Yang Qin"
+      },
+      {
+        "authorId": "152569874",
+        "name": "G. Galster"
+      },
+      {
+        "authorId": "17066130",
+        "name": "C. Leggett"
+      },
+      {
+        "authorId": "78210766",
+        "name": "N. M. Koehler"
+      },
+      {
+        "authorId": "2223610974",
+        "name": "P. Buchholz"
+      },
+      {
+        "authorId": "152595853",
+        "name": "K. Zoch"
+      },
+      {
+        "authorId": "152159785",
+        "name": "Zuzana Blenessy"
+      },
+      {
+        "authorId": "2175710613",
+        "name": "C. Ferretti"
+      },
+      {
+        "authorId": "34216298",
+        "name": "D. Biedermann"
+      },
+      {
+        "authorId": "103736372",
+        "name": "J. Kroll"
+      },
+      {
+        "authorId": "152594154",
+        "name": "A. Behera"
+      },
+      {
+        "authorId": "32447976",
+        "name": "H. Torre"
+      },
+      {
+        "authorId": "2212872545",
+        "name": "Maosen Zhou"
+      },
+      {
+        "authorId": "102310812",
+        "name": "S. Shimizu"
+      },
+      {
+        "authorId": "148044992",
+        "name": "S. Fracchia"
+      },
+      {
+        "authorId": "21641672",
+        "name": "F. Tresoldi"
+      },
+      {
+        "authorId": "102353070",
+        "name": "D. Corral"
+      },
+      {
+        "authorId": "152208781",
+        "name": "S. Che"
+      },
+      {
+        "authorId": "152429289",
+        "name": "S. Oda"
+      },
+      {
+        "authorId": "82347792",
+        "name": "C. Gutschow"
+      },
+      {
+        "authorId": "88459670",
+        "name": "M. Saito"
+      },
+      {
+        "authorId": "1388868936",
+        "name": "F. L. Sterzo"
+      },
+      {
+        "authorId": "152188119",
+        "name": "J. Vossebeld"
+      },
+      {
+        "authorId": "98670426",
+        "name": "J. Moss"
+      },
+      {
+        "authorId": "102828587",
+        "name": "M. Dunford"
+      },
+      {
+        "authorId": "145659175",
+        "name": "R. Middleton"
+      },
+      {
+        "authorId": "46435899",
+        "name": "A. Kowalewska"
+      },
+      {
+        "authorId": "102867906",
+        "name": "Kyungeon Choi"
+      },
+      {
+        "authorId": "40935361",
+        "name": "S. Harkusha"
+      },
+      {
+        "authorId": "152148008",
+        "name": "P. Saha"
+      },
+      {
+        "authorId": "152237998",
+        "name": "J. Hrdinka"
+      },
+      {
+        "authorId": "117026771",
+        "name": "R. Roehrig"
+      },
+      {
+        "authorId": "103484755",
+        "name": "S. Wahrmund"
+      },
+      {
+        "authorId": "145053949",
+        "name": "E. Hansen"
+      },
+      {
+        "authorId": "1409765700",
+        "name": "Matt Zhang"
+      },
+      {
+        "authorId": "49495124",
+        "name": "A. Bailey"
+      },
+      {
+        "authorId": "46734435",
+        "name": "M. Biglietti"
+      },
+      {
+        "authorId": "50305602",
+        "name": "S. Jones"
+      },
+      {
+        "authorId": "152424605",
+        "name": "T. Jakoubek"
+      },
+      {
+        "authorId": "144299385",
+        "name": "S. Connell"
+      },
+      {
+        "authorId": "2408642681",
+        "name": "A. Doria"
+      },
+      {
+        "authorId": "1409932221",
+        "name": "Hoang Dai Nghia Nguyen"
+      },
+      {
+        "authorId": "46749601",
+        "name": "M. Danninger"
+      },
+      {
+        "authorId": "1383539769",
+        "name": "L. McClymont"
+      },
+      {
+        "authorId": "50878398",
+        "name": "C. Blocker"
+      },
+      {
+        "authorId": "152482997",
+        "name": "S. Istin"
+      },
+      {
+        "authorId": "152950751",
+        "name": "E. Varnes"
+      },
+      {
+        "authorId": "113313283",
+        "name": "J. Hansen"
+      },
+      {
+        "authorId": "102416094",
+        "name": "M. Ghneimat"
+      },
+      {
+        "authorId": "4977435",
+        "name": "G. Iakovidis"
+      },
+      {
+        "authorId": "51052756",
+        "name": "A. Picazio"
+      },
+      {
+        "authorId": "46191688",
+        "name": "C. J. Treado"
+      },
+      {
+        "authorId": "2006207483",
+        "name": "G. Jarlskog"
+      },
+      {
+        "authorId": "91462204",
+        "name": "K. Nagai"
+      },
+      {
+        "authorId": "2118386422",
+        "name": "Ye Chen"
+      },
+      {
+        "authorId": "3691065",
+        "name": "M. Ishitsuka"
+      },
+      {
+        "authorId": "46451183",
+        "name": "W. Vandelli"
+      },
+      {
+        "authorId": "104221274",
+        "name": "A. Salvo"
+      },
+      {
+        "authorId": "1381497661",
+        "name": "A. Kourkoumeli-Charalampidi"
+      },
+      {
+        "authorId": "97542441",
+        "name": "F. Spettel"
+      },
+      {
+        "authorId": "152128698",
+        "name": "Y. Heng"
+      },
+      {
+        "authorId": "91640405",
+        "name": "P. Shatalov"
+      },
+      {
+        "authorId": "40068789",
+        "name": "Y. Smirnov"
+      },
+      {
+        "authorId": "51004046",
+        "name": "S. Majewski"
+      },
+      {
+        "authorId": "102156785",
+        "name": "K. Sliwa"
+      },
+      {
+        "authorId": "65883227",
+        "name": "B. Wynne"
+      },
+      {
+        "authorId": "1818160",
+        "name": "P. Bechtle"
+      },
+      {
+        "authorId": "2062975545",
+        "name": "M. Fiolhais"
+      },
+      {
+        "authorId": "103435246",
+        "name": "F. H. Phillips"
+      },
+      {
+        "authorId": "152214758",
+        "name": "F. Ito"
+      },
+      {
+        "authorId": "6116287",
+        "name": "F. Ukegawa"
+      },
+      {
+        "authorId": "1390635883",
+        "name": "A. Alonso"
+      },
+      {
+        "authorId": "49110464",
+        "name": "Qing Wang"
+      },
+      {
+        "authorId": "3972530",
+        "name": "T. Guillemin"
+      },
+      {
+        "authorId": "152352317",
+        "name": "E. Winkels"
+      },
+      {
+        "authorId": "104452912",
+        "name": "J. J. Kempster"
+      },
+      {
+        "authorId": "97734906",
+        "name": "C. Sbarra"
+      },
+      {
+        "authorId": "1390542522",
+        "name": "Shuo Han"
+      },
+      {
+        "authorId": "152113317",
+        "name": "I. Maznas"
+      },
+      {
+        "authorId": "152509117",
+        "name": "M. Wobisch"
+      },
+      {
+        "authorId": "4310082",
+        "name": "K. Augsten"
+      },
+      {
+        "authorId": "49693814",
+        "name": "J. Ochoa"
+      },
+      {
+        "authorId": "145474709",
+        "name": "E. Guirriec"
+      },
+      {
+        "authorId": "145734235",
+        "name": "K. Parker"
+      },
+      {
+        "authorId": "144313373",
+        "name": "N. Belyaev"
+      },
+      {
+        "authorId": "4407645",
+        "name": "A. Ryzhov"
+      },
+      {
+        "authorId": "104457864",
+        "name": "D. Moreno"
+      },
+      {
+        "authorId": "2264575830",
+        "name": "G. Usai"
+      },
+      {
+        "authorId": "151705443",
+        "name": "P. Deviveiros"
+      },
+      {
+        "authorId": "87955875",
+        "name": "F. Loebinger"
+      },
+      {
+        "authorId": "144131498",
+        "name": "M. Stanitzki"
+      },
+      {
+        "authorId": "103384189",
+        "name": "L. Wilkins"
+      },
+      {
+        "authorId": "145122275",
+        "name": "B. King"
+      },
+      {
+        "authorId": "47770773",
+        "name": "K. Onogi"
+      },
+      {
+        "authorId": "144123181",
+        "name": "A. P. Pages"
+      },
+      {
+        "authorId": "2158606782",
+        "name": "M. Begel"
+      },
+      {
+        "authorId": "103592502",
+        "name": "G. Forcolin"
+      },
+      {
+        "authorId": "6571644",
+        "name": "A. Mincer"
+      },
+      {
+        "authorId": "123634101",
+        "name": "Young-Kee Kim"
+      },
+      {
+        "authorId": "152503008",
+        "name": "L. Morvaj"
+      },
+      {
+        "authorId": "152372129",
+        "name": "G. Cabras"
+      },
+      {
+        "authorId": "2110621652",
+        "name": "M. Weber"
+      },
+      {
+        "authorId": "48686698",
+        "name": "T. Heim"
+      },
+      {
+        "authorId": "5475283",
+        "name": "K. Belotskiy"
+      },
+      {
+        "authorId": "4614647",
+        "name": "A. Soukharev"
+      },
+      {
+        "authorId": "23123987",
+        "name": "J. Jeong"
+      },
+      {
+        "authorId": "8040856",
+        "name": "P. Gemmeren"
+      },
+      {
+        "authorId": "114698935",
+        "name": "C. Agheorghiesei"
+      },
+      {
+        "authorId": "152576916",
+        "name": "H. Pacey"
+      },
+      {
+        "authorId": "152530425",
+        "name": "R. Carney"
+      },
+      {
+        "authorId": "70903711",
+        "name": "A. Chuinard"
+      },
+      {
+        "authorId": "73070911",
+        "name": "R. Jansky"
+      },
+      {
+        "authorId": "97155500",
+        "name": "C. Roda"
+      },
+      {
+        "authorId": "95755256",
+        "name": "J. M. I. Ponce"
+      },
+      {
+        "authorId": "1728925",
+        "name": "D. Boscherini"
+      },
+      {
+        "authorId": "96397517",
+        "name": "L. Kashif"
+      },
+      {
+        "authorId": "1382860610",
+        "name": "N. Semprini-Cesari"
+      },
+      {
+        "authorId": "145693306",
+        "name": "U. Bratzler"
+      },
+      {
+        "authorId": "3892415",
+        "name": "P. Fassnacht"
+      },
+      {
+        "authorId": "93914817",
+        "name": "K. Finelli"
+      },
+      {
+        "authorId": "153022142",
+        "name": "B. Brickwedde"
+      },
+      {
+        "authorId": "88976857",
+        "name": "C. David"
+      },
+      {
+        "authorId": "8683287",
+        "name": "L. Zwalinski"
+      },
+      {
+        "authorId": "8488208",
+        "name": "M. A. Verzini"
+      },
+      {
+        "authorId": "152394633",
+        "name": "R. Kukla"
+      },
+      {
+        "authorId": "21736529",
+        "name": "T. Stevenson"
+      },
+      {
+        "authorId": "97583869",
+        "name": "Jie Yu"
+      },
+      {
+        "authorId": "144903173",
+        "name": "D. Boerner"
+      },
+      {
+        "authorId": "152350803",
+        "name": "C. Galea"
+      },
+      {
+        "authorId": "24060472",
+        "name": "L. Heinrich"
+      },
+      {
+        "authorId": "102519347",
+        "name": "A. Zibell"
+      },
+      {
+        "authorId": "95888159",
+        "name": "C. Troncon"
+      },
+      {
+        "authorId": "153065213",
+        "name": "F. Guescini"
+      },
+      {
+        "authorId": "50206551",
+        "name": "D. Denysiuk"
+      },
+      {
+        "authorId": "2588952",
+        "name": "J. Pascual"
+      },
+      {
+        "authorId": "103901183",
+        "name": "M. Kacimi"
+      },
+      {
+        "authorId": "2110349004",
+        "name": "Chunhui Chen"
+      },
+      {
+        "authorId": "103119294",
+        "name": "A. Perez"
+      },
+      {
+        "authorId": "152503031",
+        "name": "S. Menke"
+      },
+      {
+        "authorId": "2144446659",
+        "name": "Chao Wang"
+      },
+      {
+        "authorId": "49543562",
+        "name": "E. Shabalina"
+      },
+      {
+        "authorId": "103055516",
+        "name": "G. Unal"
+      },
+      {
+        "authorId": "41203336",
+        "name": "R. Gardner"
+      },
+      {
+        "authorId": "152344273",
+        "name": "A. Forti"
+      },
+      {
+        "authorId": "49889094",
+        "name": "Yu Zhang"
+      },
+      {
+        "authorId": "34759074",
+        "name": "N. Norjoharuddeen"
+      },
+      {
+        "authorId": "2169940921",
+        "name": "M. Morii"
+      },
+      {
+        "authorId": "152528220",
+        "name": "A. Sciandra"
+      },
+      {
+        "authorId": "152490478",
+        "name": "T. Kosek"
+      },
+      {
+        "authorId": "103010571",
+        "name": "Zhiqin Zhang"
+      },
+      {
+        "authorId": "2432481808",
+        "name": "T. Brooks"
+      },
+      {
+        "authorId": "152469094",
+        "name": "K. Sekhon"
+      },
+      {
+        "authorId": "152605529",
+        "name": "R. Iguchi"
+      },
+      {
+        "authorId": "2333974286",
+        "name": "Tai-hua Lin"
+      },
+      {
+        "authorId": "98174130",
+        "name": "L. Flores"
+      },
+      {
+        "authorId": "144831185",
+        "name": "G. Chiodini"
+      },
+      {
+        "authorId": "2217372496",
+        "name": "Jun Guo"
+      },
+      {
+        "authorId": "2675969",
+        "name": "L. Simić"
+      },
+      {
+        "authorId": "1571995511",
+        "name": "J. Gonski"
+      },
+      {
+        "authorId": "152654661",
+        "name": "A. Gabrielli"
+      },
+      {
+        "authorId": "152476422",
+        "name": "E. Akilli"
+      },
+      {
+        "authorId": "1381463760",
+        "name": "T. Klapdor-Kleingrothaus"
+      },
+      {
+        "authorId": "144926983",
+        "name": "O. Kind"
+      },
+      {
+        "authorId": "31156702",
+        "name": "R. Schamberger"
+      },
+      {
+        "authorId": "69907043",
+        "name": "A. Schwartzman"
+      },
+      {
+        "authorId": "66382735",
+        "name": "L. A. Bella"
+      },
+      {
+        "authorId": "134790528",
+        "name": "T. Honda"
+      },
+      {
+        "authorId": "2072840696",
+        "name": "F. Ruehr"
+      },
+      {
+        "authorId": "151533172",
+        "name": "A. Weidberg"
+      },
+      {
+        "authorId": "152509460",
+        "name": "L. Mijović"
+      },
+      {
+        "authorId": "152304798",
+        "name": "H. Potti"
+      },
+      {
+        "authorId": "152199231",
+        "name": "S. Snyder"
+      },
+      {
+        "authorId": "143805067",
+        "name": "U. Blumenschein"
+      },
+      {
+        "authorId": "1837169",
+        "name": "R. Konoplich"
+      },
+      {
+        "authorId": "2057520445",
+        "name": "P. Maettig"
+      },
+      {
+        "authorId": "152284232",
+        "name": "M. Javurkova"
+      },
+      {
+        "authorId": "40531605",
+        "name": "E. Celebi"
+      },
+      {
+        "authorId": "2762190",
+        "name": "F. Hoenig"
+      },
+      {
+        "authorId": "152289274",
+        "name": "M. Tasevsky"
+      },
+      {
+        "authorId": "152514045",
+        "name": "S. Turchikhin"
+      },
+      {
+        "authorId": "51207647",
+        "name": "C. Solans"
+      },
+      {
+        "authorId": "3539108",
+        "name": "J. Kvita"
+      },
+      {
+        "authorId": "47881649",
+        "name": "S. Heim"
+      },
+      {
+        "authorId": "101780407",
+        "name": "V. Boisvert"
+      },
+      {
+        "authorId": "104174498",
+        "name": "B. Allen"
+      },
+      {
+        "authorId": "152163991",
+        "name": "G. Lerner"
+      },
+      {
+        "authorId": "3013183",
+        "name": "R. Hunter"
+      },
+      {
+        "authorId": "98032675",
+        "name": "S. Veneziano"
+      },
+      {
+        "authorId": "93239574",
+        "name": "Y. Hasegawa"
+      },
+      {
+        "authorId": "72250159",
+        "name": "Y. Takubo"
+      },
+      {
+        "authorId": "49811283",
+        "name": "M. Huhtinen"
+      },
+      {
+        "authorId": "152154517",
+        "name": "A. Kiryunin"
+      },
+      {
+        "authorId": "71635003",
+        "name": "A. Beddall"
+      },
+      {
+        "authorId": "2148890",
+        "name": "N. Kimura"
+      },
+      {
+        "authorId": "95874777",
+        "name": "S. Amoroso"
+      },
+      {
+        "authorId": "152323290",
+        "name": "L. Serkin"
+      },
+      {
+        "authorId": "152324358",
+        "name": "Dengfeng Zhang"
+      },
+      {
+        "authorId": "153590278",
+        "name": "P. Gris"
+      },
+      {
+        "authorId": "152142353",
+        "name": "I. Gkialas"
+      },
+      {
+        "authorId": "120770955",
+        "name": "S. Smirnov"
+      },
+      {
+        "authorId": "49766771",
+        "name": "M. Haleem"
+      },
+      {
+        "authorId": "102062767",
+        "name": "D. Froidevaux"
+      },
+      {
+        "authorId": "82438351",
+        "name": "R. Pezoa"
+      },
+      {
+        "authorId": "71468629",
+        "name": "B. Ali"
+      },
+      {
+        "authorId": "47306301",
+        "name": "F. Lyu"
+      },
+      {
+        "authorId": "102916379",
+        "name": "D. Emeliyanov"
+      },
+      {
+        "authorId": "3275218",
+        "name": "A. Filipčič"
+      },
+      {
+        "authorId": "49216150",
+        "name": "S. Kuehn"
+      },
+      {
+        "authorId": "32169062",
+        "name": "M. Lassnig"
+      },
+      {
+        "authorId": "103521938",
+        "name": "T. Pauly"
+      },
+      {
+        "authorId": "14016985",
+        "name": "A. Redelbach"
+      },
+      {
+        "authorId": "104052860",
+        "name": "H. Hakobyan"
+      },
+      {
+        "authorId": "152576963",
+        "name": "B. Wosiek"
+      },
+      {
+        "authorId": "32713143",
+        "name": "Yang Liu"
+      },
+      {
+        "authorId": "148145011",
+        "name": "S. Strandberg"
+      },
+      {
+        "authorId": "9786368",
+        "name": "A. Karyukhin"
+      },
+      {
+        "authorId": "6202975",
+        "name": "A. Mizukami"
+      },
+      {
+        "authorId": "70673066",
+        "name": "L. Pontecorvo"
+      },
+      {
+        "authorId": "104470116",
+        "name": "Liang Li"
+      },
+      {
+        "authorId": "152378814",
+        "name": "T. Lenz"
+      },
+      {
+        "authorId": "2264558658",
+        "name": "J. Butterworth"
+      },
+      {
+        "authorId": "152591796",
+        "name": "S. Stark"
+      },
+      {
+        "authorId": "10668281",
+        "name": "A. Korn"
+      },
+      {
+        "authorId": "153822689",
+        "name": "N. Barlow"
+      },
+      {
+        "authorId": "152153327",
+        "name": "K. Todome"
+      },
+      {
+        "authorId": "103740720",
+        "name": "G. Mullier"
+      },
+      {
+        "authorId": "80641945",
+        "name": "F. Dallaire"
+      },
+      {
+        "authorId": "66732565",
+        "name": "E. Rossi"
+      }
+    ],
+    "title": "Search for chargino-neutralino production using recursive jigsaw reconstruction in final states with two or three charged leptons in proton-proton collisions at $\\sqrt{s}$=13 TeV with the ATLAS detector",
+    "externalIds": {
+      "ArXiv": "1806.02293",
+      "DOI": "10.1103/PhysRevD.98.092012",
+      "CorpusId": 125706805
+    },
+    "baseline_trust_score": 5,
+    "cite_key": "we-are-working-with-a-g1-for-our-unitree-research..."
+  },
+  "pdf_text": "Since you are deploying the G1 in a university setting, the stakes are a bit higher due to \ninstitutional IT policies. Recent independent cybersecurity audits on the Unitree G1 (specifically \nreports from Alias Robotics in late 2025 and a major presentation at the 39C3 hacker congress) \nhave confirmed exactly what Benn Jordan suspected. \nHere is what the latest research has found specifically regarding the G1: \n●​ The 300-Second Ping: The G1 is hardcoded to transmit multimodal telemetry (battery, \njoint torque, motion state, and raw camera/microphone data) to servers in China every \n300 seconds. \n●​ Hardcoded Encryption Keys: Every G1 unit shares the exact same 128-bit AES \nencryption key for its Bluetooth Low Energy (BLE) interface. \n●​ CloudSail Backdoor: Vulnerabilities in Unitree's \"CloudSail\" remote management system \nallow for remote code execution and prompt-injections into the on-board embodied AI. \nTo safely operate the G1 in your university lab without running afoul of your IT security \ndepartment, you must treat the robot as a \"hostile\" node. Here is the best-practice framework \nfor securing it: \n1. The \"Host-Routed\" Network Architecture (Recommended) \nDo not connect the G1 directly to your university's Wi-Fi (like eduroam or a lab subnet). Instead, \ntether it to a trusted intermediary machine. \n●​ Wired LAN Only: Connect the G1’s internal development PC directly to a host \nworkstation via Ethernet (using Port 4 or 5 on the G1’s electrical interface). \n●​ NAT Routing: If the G1 strictly needs internet access (e.g., to download ROS packages or \nconnect to a specific HuggingFace repo for inference), configure your Host PC to share \nits internet connection via NAT/IP Tables. \n●​ Default-Deny Firewall: On the Host PC, set up a firewall that drops all outbound traffic \nfrom the G1 by default. You should only \"whitelist\" the specific IP addresses or domains \nyour research requires (e.g., GitHub, your local ROS master URI, or specific API \nendpoints). \n2. Disable or Mitigate Wireless Interfaces \nBecause the BLE password setup uses a universal, hardcoded key, anyone in the hallway \noutside your lab with a smartphone could potentially inject commands into the robot if its \nBluetooth is active. \n●​ If your research does not require the Unitree mobile app or wireless controllers, log into \nthe G1's internal Linux environment via SSH and completely disable the Bluetooth daemon \n(sudo systemctl disable bluetooth). \n●​ Ensure the onboard Wi-Fi interface (wlan0) is disabled at the OS level so the robot cannot \nautonomously attempt to connect to open university guest networks to \"phone home.\" \n3. Internal OS Hardening (Killing the Telemetry) \nIf your G1 must have general internet access, you need to manually block its telemetry services. \n●​ Modify the Hosts File: SSH into the G1 (the default IP is usually 192.168.123.164) and edit \nthe /etc/hosts file. Route known Unitree telemetry domains (and any \nbaidu/tencent/alibaba domains you spot in network sniffers) to 127.0.0.1. \n●​ Kill the Cloud Services: Identify the specific background processes handling the \n\"CloudSail\" or \"image_server\" telemetry and disable them. \nBy using a wired, strictly routed connection through a host PC, you strip the robot of its ability \nto secretly exfiltrate data, ensuring your lab's proprietary research—and your university's \nnetwork—remains secure. \nAre you primarily running control loops locally (like ROS2/Z1 controller stacks), or does your \nproject require the G1 to reach out to external cloud APIs for vision-language models? \n"
+}

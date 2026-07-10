@@ -1,0 +1,84 @@
+{
+  "cite_key": "title--robot-dogs-are-a-security-nightmare-channe...",
+  "task_type": "paper_profile",
+  "output_path": "./wiki/papers/unitree-safety/title--robot-dogs-are-a-security-nightmare-channe....md",
+  "system_prompt": "You are a research librarian formatting an Obsidian note for an academic vault. Output valid Obsidian markdown only — no code fences, no preamble, no explanation. Start directly with the YAML frontmatter block (---). Use only the metadata values provided — do not hallucinate citation counts, venues, or authors.",
+  "user_prompt": "You are a research librarian processing an academic paper for an Obsidian knowledge vault.\nThe vault supports a research project on robotics, autonomous agents, and multi-agent systems.\nYour output must be valid Obsidian markdown and conform to the `papers` entity schema.\n\nCRITICAL: Begin your response with the exact YAML block below. Do not alter any field values.\n\n---\ntitle: \"Computed tomography findings of current nonspecific interstitial pneumonia based on the 2013 updated classification of idiopathic interstitial pneumonias: What is a characteristic of previously diagnosed nonspecific interstitial pneumonia excluded from the updated classification\"\nauthors: \"J. Tominaga, T. Iwasawa, Makiko Murota, H. Arakawa, T. Johkoh, Y. Yamano, Yoshiaki Zaizen, K. Ichikado, Mikiko Hashisako, Y. Kondoh, K. Kataoka, M. Okamoto, K. Fujimoto, J. Fukuoka, on behalf of the Study Group of Creation of Radiologi Disease\"\nyear: 2020\njournal: \"Japanese Journal of Radiology\"\ncitation-count: 0\nurl: \"https://doi.org/10.1007/s11604-020-01036-x\"\ntags: [literature, unprocessed]\ncite-key: \"title--robot-dogs-are-a-security-nightmare-channe...\"\n---\n# Computed tomography findings of current nonspecific interstitial pneumonia based on the 2013 updated classification of idiopathic interstitial pneumonias: What is a characteristic of previously diagnosed nonspecific interstitial pneumonia excluded from the updated classification\nsource: https://doi.org/10.1007/s11604-020-01036-x\nproject-relevance: [One sentence — why does this paper matter for the project?]\n\n## Summary\n2–4 sentences. Central claim or contribution. Plain academic prose, no bullets.\n\n## Methodology\nOne sentence per point:\n- **Study type**: experiment / simulation / survey / meta-analysis / theoretical\n- **Robot platform / hardware**: specific robots used (e.g., Unitree H1, Spot, Franka Emika Panda) or \"none\"\n- **Simulation environment**: e.g., Isaac Sim, MuJoCo, PyBullet, Gazebo, or \"none\"\n- **Key software tools & frameworks**: e.g., PyTorch, JAX, ROS2, Hugging Face, or \"none\"\n- **Compute resources**: exact hardware (e.g., 8x H100 GPUs, TPU v4), training hours, dataset size, and model parameters if explicitly stated\n- **Task or environment**: exact task or environment used (e.g., bipedal locomotion, table-top manipulation)\n- **Outcome measures**: primary evaluation metrics (e.g., success rate, tracking error, energy efficiency)\n- **Pre-registered**: yes / no / unclear\n\n## Key findings\nBullet list. Every finding requires an in-text citation: ([Author], [Year], p. X)\n\n## Limitations acknowledged by the authors\nBullet list. State the limitation type, not verbatim text.\n\n## What this paper builds on\nMost important prior works explicitly cited. Use this exact format:\n- [[cite-key]] — (Author, Year) — what this paper takes from it\nNOTE: Use the cite-key format for wikilinks (e.g., [[OBrien2023]]), not the author's display name.\n\n## What this paper leaves open\nGaps directly relevant to the project.\n\n## Project implications\nEffect on agent design and implementation decisions.\n\n## Contradictions with other papers\nNote contradictions, or write: \"No contradictions identified yet.\"\n\n## APA 7th edition reference\n[Full reference here]\n\n---\nREADING RULE: Read the full paper text below. The REFERENCES section at the end\nis a lookup dictionary only — do not summarise it.\n\n=== PAPER TEXT ===\nBased on the findings in Benn Jordan’s investigation and the technical architecture of Unitree’s \nproduct line, the short answer is: Almost certainly, yes. \nWhile the video focuses on the Go2 (the quadruped), the Unitree G1 (the humanoid) is built on \nthe same foundational ecosystem. Here is a breakdown of why these security risks likely \ntranslate—and in some cases, escalate—with the G1. \n1. Shared DNA: The Software Stack \nUnitree doesn't reinvent the wheel for every robot. The G1 and the Go2 share core components \nthat make them vulnerable: \n●​ The Unitree App: Both robots use the same mobile interface for activation and control. \nJordan noted that the \"backdoor\" behavior often initializes during the handshake \nbetween the app, the robot, and the cloud. \n●​ Operating System: Both typically run on a combination of Ubuntu Linux and ROS 2 \n(Robot Operating System). If the underlying OS images are built with the same \n\"phone-home\" scripts or weak root passwords, the G1 inherits those flaws out of the box. \n●​ Compute Hardware: Both use NVIDIA Jetson modules for vision. The \"command \ninjection\" vulnerabilities Jordan exploited (like sending curl commands via Wi-Fi \npasswords) are often flaws in the web-server or setup-script level, which are likely \ncopy-pasted across Unitree’s development department. \n2. The \"Phone-Home\" Architecture \nJordan discovered that the Go2 was making encrypted connections to Chinese servers \n(Alibaba Cloud, Baidu, Tencent) and attempting to hide those connections when it detected a \n\"sandbox\" or monitoring environment. \n●​ Consistency: This isn't a \"bug\"; it’s a design choice for data harvesting or remote \nmanagement. \n●​ The G1 Factor: As a more complex humanoid, the G1 relies even more heavily on \ncloud-based AI processing and data logging to \"learn\" movements. This provides an even \nstronger excuse for the robot to maintain a constant, encrypted stream of data back to \nthe manufacturer's servers. \n3. Increased Physical Risk \nIf the Go2 is a \"security nightmare,\" the G1 is arguably a safety catastrophe waiting to happen. \n●​ Center of Gravity: A 30lb dog falling over is a nuisance. A 77lb (35kg) humanoid with the \nheight of a child falling or \"freaking out\" due to a hijacked safety mechanism is a \nsignificant liability. \n●​ Manipulation: The G1 has three-fingered \"human-like\" hands. If a hacker gains root \naccess (as Jordan did with the dog), they aren't just controlling a camera on legs; they \nare controlling a device capable of interacting with door handles, light switches, or \npotentially tools. \n4. The \"Kill Switch\" Problem \nJordan was able to \"ragdoll\" the Go2 using a simple Software Defined Radio (SDR) or a laptop \nby mimicking the \"damping\" command. \n●​ Standardized Protocols: Unitree uses similar 2.4GHz/5GHz communication protocols for \ntheir remotes. Unless Unitree has drastically overhauled their encryption (which Jordan's \nvideo suggests they haven't), the G1 likely remains susceptible to the same \"no-robot\" \nsignal jamming. \nSummary Table: Go2 vs. G1 Security \nFeature \nGo2 (Quadruped) \nG1 (Humanoid) \nRoot Access \nEasy (via Bluetooth/Wi-Fi \nexploit) \nHighly Likely (Shared firmware \nbase) \nData Backdoor \nConfirmed (Encrypted pings \nto China) \nLikely (Uses same cloud \necosystem) \nSafety Risks \nTrips people, backs into \nobjects \nFalling risk, limb entrapment, \nhigher mass \nRemote Hijack \nSignal mimicking works \nLikely (Similar remote \nhardware) \nThe Verdict: If you are planning on putting a G1 in a sensitive environment (like a \nresearch lab or a home with private data), you should treat it with the same \"Zero \nTrust\" policy Benn Jordan suggests. This means isolating it on a network with no \ninternet access and physically auditing the hardware for hidden transmitters. \nGiven how much more \"capable\" a humanoid is, does the idea of it sending encrypted packets \nto a foreign server feel more or less unsettling to you than the \"dog\" version? \n\n\n<!-- METADATA JSON:\n{\n  \"year\": 2020,\n  \"venue\": \"Japanese Journal of Radiology\",\n  \"citationCount\": 0,\n  \"authors\": [\n    {\n      \"authorId\": \"35000654\",\n      \"name\": \"J. Tominaga\"\n    },\n    {\n      \"authorId\": \"2078461\",\n      \"name\": \"T. Iwasawa\"\n    },\n    {\n      \"authorId\": \"5803709\",\n      \"name\": \"Makiko Murota\"\n    },\n    {\n      \"authorId\": \"3205852\",\n      \"name\": \"H. Arakawa\"\n    },\n    {\n      \"authorId\": \"2152488\",\n      \"name\": \"T. Johkoh\"\n    },\n    {\n      \"authorId\": \"6158290\",\n      \"name\": \"Y. Yamano\"\n    },\n    {\n      \"authorId\": \"34751165\",\n      \"name\": \"Yoshiaki Zaizen\"\n    },\n    {\n      \"authorId\": \"4791926\",\n      \"name\": \"K. Ichikado\"\n    },\n    {\n      \"authorId\": \"3760640\",\n      \"name\": \"Mikiko Hashisako\"\n    },\n    {\n      \"authorId\": \"3044826\",\n      \"name\": \"Y. Kondoh\"\n    },\n    {\n      \"authorId\": \"40458966\",\n      \"name\": \"K. Kataoka\"\n    },\n    {\n      \"authorId\": \"5117422\",\n      \"name\": \"M. Okamoto\"\n    },\n    {\n      \"authorId\": \"40229599\",\n      \"name\": \"K. Fujimoto\"\n    },\n    {\n      \"authorId\": \"4128530\",\n      \"name\": \"J. Fukuoka\"\n    },\n    {\n      \"authorId\": \"2047819118\",\n      \"name\": \"on behalf of the Study Group of Creation of Radiologi Disease\"\n    }\n  ],\n  \"title\": \"Computed tomography findings of current nonspecific interstitial pneumonia based on the 2013 updated classification of idiopathic interstitial pneumonias: What is a characteristic of previously diagnosed nonspecific interstitial pneumonia excluded from the updated classification\",\n  \"externalIds\": {\n    \"MAG\": \"3082193463\",\n    \"DOI\": \"10.1007/s11604-020-01036-x\",\n    \"CorpusId\": 221401319,\n    \"PubMed\": \"32875470\"\n  },\n  \"baseline_trust_score\": 4,\n  \"cite_key\": \"title--robot-dogs-are-a-security-nightmare-channe...\"\n}\n-->",
+  "metadata": {
+    "year": 2020,
+    "venue": "Japanese Journal of Radiology",
+    "citationCount": 0,
+    "authors": [
+      {
+        "authorId": "35000654",
+        "name": "J. Tominaga"
+      },
+      {
+        "authorId": "2078461",
+        "name": "T. Iwasawa"
+      },
+      {
+        "authorId": "5803709",
+        "name": "Makiko Murota"
+      },
+      {
+        "authorId": "3205852",
+        "name": "H. Arakawa"
+      },
+      {
+        "authorId": "2152488",
+        "name": "T. Johkoh"
+      },
+      {
+        "authorId": "6158290",
+        "name": "Y. Yamano"
+      },
+      {
+        "authorId": "34751165",
+        "name": "Yoshiaki Zaizen"
+      },
+      {
+        "authorId": "4791926",
+        "name": "K. Ichikado"
+      },
+      {
+        "authorId": "3760640",
+        "name": "Mikiko Hashisako"
+      },
+      {
+        "authorId": "3044826",
+        "name": "Y. Kondoh"
+      },
+      {
+        "authorId": "40458966",
+        "name": "K. Kataoka"
+      },
+      {
+        "authorId": "5117422",
+        "name": "M. Okamoto"
+      },
+      {
+        "authorId": "40229599",
+        "name": "K. Fujimoto"
+      },
+      {
+        "authorId": "4128530",
+        "name": "J. Fukuoka"
+      },
+      {
+        "authorId": "2047819118",
+        "name": "on behalf of the Study Group of Creation of Radiologi Disease"
+      }
+    ],
+    "title": "Computed tomography findings of current nonspecific interstitial pneumonia based on the 2013 updated classification of idiopathic interstitial pneumonias: What is a characteristic of previously diagnosed nonspecific interstitial pneumonia excluded from the updated classification",
+    "externalIds": {
+      "MAG": "3082193463",
+      "DOI": "10.1007/s11604-020-01036-x",
+      "CorpusId": 221401319,
+      "PubMed": "32875470"
+    },
+    "baseline_trust_score": 4,
+    "cite_key": "title--robot-dogs-are-a-security-nightmare-channe..."
+  },
+  "pdf_text": "Based on the findings in Benn Jordan’s investigation and the technical architecture of Unitree’s \nproduct line, the short answer is: Almost certainly, yes. \nWhile the video focuses on the Go2 (the quadruped), the Unitree G1 (the humanoid) is built on \nthe same foundational ecosystem. Here is a breakdown of why these security risks likely \ntranslate—and in some cases, escalate—with the G1. \n1. Shared DNA: The Software Stack \nUnitree doesn't reinvent the wheel for every robot. The G1 and the Go2 share core components \nthat make them vulnerable: \n●​ The Unitree App: Both robots use the same mobile interface for activation and control. \nJordan noted that the \"backdoor\" behavior often initializes during the handshake \nbetween the app, the robot, and the cloud. \n●​ Operating System: Both typically run on a combination of Ubuntu Linux and ROS 2 \n(Robot Operating System). If the underlying OS images are built with the same \n\"phone-home\" scripts or weak root passwords, the G1 inherits those flaws out of the box. \n●​ Compute Hardware: Both use NVIDIA Jetson modules for vision. The \"command \ninjection\" vulnerabilities Jordan exploited (like sending curl commands via Wi-Fi \npasswords) are often flaws in the web-server or setup-script level, which are likely \ncopy-pasted across Unitree’s development department. \n2. The \"Phone-Home\" Architecture \nJordan discovered that the Go2 was making encrypted connections to Chinese servers \n(Alibaba Cloud, Baidu, Tencent) and attempting to hide those connections when it detected a \n\"sandbox\" or monitoring environment. \n●​ Consistency: This isn't a \"bug\"; it’s a design choice for data harvesting or remote \nmanagement. \n●​ The G1 Factor: As a more complex humanoid, the G1 relies even more heavily on \ncloud-based AI processing and data logging to \"learn\" movements. This provides an even \nstronger excuse for the robot to maintain a constant, encrypted stream of data back to \nthe manufacturer's servers. \n3. Increased Physical Risk \nIf the Go2 is a \"security nightmare,\" the G1 is arguably a safety catastrophe waiting to happen. \n●​ Center of Gravity: A 30lb dog falling over is a nuisance. A 77lb (35kg) humanoid with the \nheight of a child falling or \"freaking out\" due to a hijacked safety mechanism is a \nsignificant liability. \n●​ Manipulation: The G1 has three-fingered \"human-like\" hands. If a hacker gains root \naccess (as Jordan did with the dog), they aren't just controlling a camera on legs; they \nare controlling a device capable of interacting with door handles, light switches, or \npotentially tools. \n4. The \"Kill Switch\" Problem \nJordan was able to \"ragdoll\" the Go2 using a simple Software Defined Radio (SDR) or a laptop \nby mimicking the \"damping\" command. \n●​ Standardized Protocols: Unitree uses similar 2.4GHz/5GHz communication protocols for \ntheir remotes. Unless Unitree has drastically overhauled their encryption (which Jordan's \nvideo suggests they haven't), the G1 likely remains susceptible to the same \"no-robot\" \nsignal jamming. \nSummary Table: Go2 vs. G1 Security \nFeature \nGo2 (Quadruped) \nG1 (Humanoid) \nRoot Access \nEasy (via Bluetooth/Wi-Fi \nexploit) \nHighly Likely (Shared firmware \nbase) \nData Backdoor \nConfirmed (Encrypted pings \nto China) \nLikely (Uses same cloud \necosystem) \nSafety Risks \nTrips people, backs into \nobjects \nFalling risk, limb entrapment, \nhigher mass \nRemote Hijack \nSignal mimicking works \nLikely (Similar remote \nhardware) \nThe Verdict: If you are planning on putting a G1 in a sensitive environment (like a \nresearch lab or a home with private data), you should treat it with the same \"Zero \nTrust\" policy Benn Jordan suggests. This means isolating it on a network with no \ninternet access and physically auditing the hardware for hidden transmitters. \nGiven how much more \"capable\" a humanoid is, does the idea of it sending encrypted packets \nto a foreign server feel more or less unsettling to you than the \"dog\" version? \n"
+}

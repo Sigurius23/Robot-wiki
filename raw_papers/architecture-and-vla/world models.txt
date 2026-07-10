@@ -1,0 +1,33 @@
+https://deepmind.google/blog/genie-3-a-new-frontier-for-world-models/
+
+https://www.worldlabs.ai/about
+
+
+Here are concise summaries of each resource:
+
+### World Models (2018) — https://arxiv.org/abs/1803.10122
+This seminal paper by David Ha and Jürgen Schmidhuber introduces **generative neural network-based "world models"** for reinforcement learning environments. The model learns a compressed spatial and temporal representation of the environment in an unsupervised way from interaction data. A simple policy can then be trained using the extracted latent features from the world model. Notably, the agent can be trained entirely inside the model's "hallucinated dreams" (simulated rollouts) before transferring the policy back to the real environment. The approach enables fast training of compact, effective policies.
+
+### Genie 3: A new frontier for world models
+The provided link is incomplete and leads to a 404 error, so no detailed summary is available from the source. Genie (from Google DeepMind) generally refers to a line of generative world models that can create interactive, playable environments or videos from prompts, advancing generative world simulation.
+
+### About World Labs — https://www.worldlabs.ai/about
+**World Labs** is a spatial intelligence company founded by Fei-Fei Li and collaborators (Justin Johnson, Christoph Lassner, Ben Mildenhall). It focuses on building foundational **world models** that perceive, generate, reason about, and interact with the 3D world. The goal is to advance "spatial intelligence" — turning AI's ability to see into the ability to reason, plan, and act in physical or virtual 3D spaces. Their first product, **Marble**, generates spatially coherent, high-fidelity, persistent 3D worlds from a single image, video, or text prompt. The company emphasizes a tight research-product feedback loop to enable new applications in creativity, design, simulation, and immersive experiences.
+
+### V-JEPA 2: Self-Supervised Video Models Enable Understanding, Prediction and Planning (2025) — https://arxiv.org/abs/2506.09985
+This Meta AI paper presents **V-JEPA 2**, a self-supervised joint-embedding-predictive architecture pre-trained on over 1 million hours of internet video (action-free). It excels at motion understanding (strong results on Something-Something v2), action anticipation (SOTA on Epic-Kitchens), and video question-answering when aligned with an LLM. A variant, **V-JEPA 2-AC**, adds latent action conditioning using only ~62 hours of unlabeled robot videos, enabling zero-shot robotic planning (e.g., pick-and-place with image goals on Franka arms) without task-specific rewards or environment data. It demonstrates how web-scale video pre-training + minimal robot data can create general world models for understanding, prediction, and physical planning.
+
+### Physical AI with World Foundation Models | NVIDIA Cosmos — https://www.nvidia.com/en-us/ai/cosmos/
+**NVIDIA Cosmos** is an open platform for **Physical AI** centered on **World Foundation Models (WFMs)**. It includes tools for generating, understanding, and reasoning about the physical world to support robotics, autonomous vehicles, and industrial applications. Key components:
+- **Cosmos Predict**: Generates predictive video "worlds" (up to 30s) from text/image/video prompts.
+- **Cosmos Transfer**: Turns simulations into photorealistic outputs.
+- **Cosmos Reason**: A vision-language model for physics-aware reasoning.
+It also provides data curation, search, and evaluation tools. The platform addresses data scarcity for physical AI by enabling synthetic data generation, simulation-to-reality transfer, and customizable world models.
+
+### RT-2: Vision-Language-Action Models Transfer Web Knowledge to Robotic Control (2023) — https://arxiv.org/abs/2307.15818
+Google DeepMind's **RT-2** is a **Vision-Language-Action (VLA)** model that co-fine-tunes large vision-language models on both robot trajectory data and internet-scale vision-language tasks. Robotic actions are tokenized as text, allowing the model to treat control as a language modeling problem. This lets the robot inherit semantic knowledge and reasoning from the web (e.g., understanding "pick the smallest object" or "use a rock as a hammer" via chain-of-thought). It shows strong generalization to novel objects/commands and emergent reasoning capabilities, evaluated over thousands of real-robot trials.
+
+### PaliGemma: A versatile 3B VLM for transfer (2024) — https://arxiv.org/abs/2407.07726
+**PaliGemma** is a compact 3-billion-parameter **Vision-Language Model (VLM)** designed for strong transfer learning across a wide range of vision-language tasks. It combines a vision encoder with a language model and is highly effective when fine-tuned on downstream applications (e.g., captioning, VQA, detection, segmentation). Its small size and versatility make it practical for adaptation while retaining competitive performance after transfer. (Note: Detailed architecture/results were limited in the accessible abstract.)
+
+These works collectively represent the rapid progress toward general **world models** — systems that can simulate, understand, predict, and enable planning/action in visual, dynamic, or physical environments.
