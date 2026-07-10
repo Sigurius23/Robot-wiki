@@ -22,13 +22,13 @@ graph TD
         LA["Language MLLM<br/>(e.g., Qwen 3.5 9B / Gemini)"]
         
         TDM["TODO List Memory (TDM)<br/>Maintains JSON Checklist"]
-        LA <-->|add(), remove(), update()| TDM
+        LA <-->|"add(), remove(), update()"| TDM
         
         LA_Out{"Discrete Semantic Tool Call"}
-        LA_Out -->|turn(front, left, right, back)| VA
-        LA_Out -->|go_stair(UP/DOWN)| StairMode["Trigger Stair-Climbing Mode"]
-        LA_Out -->|backtrack(waypoint)| SCB["Second Chance Backtrack"]
-        LA_Out -->|double_check(STOP)| StopCheck["Verify Goal & End Episode"]
+        LA_Out -->|"turn(front, left, right, back)"| VA
+        LA_Out -->|"go_stair(UP/DOWN)"| StairMode["Trigger Stair-Climbing Mode"]
+        LA_Out -->|"backtrack(waypoint)"| SCB["Second Chance Backtrack"]
+        LA_Out -->|"double_check(STOP)"| StopCheck["Verify Goal & End Episode"]
     end
     LA --> LA_Out
 
