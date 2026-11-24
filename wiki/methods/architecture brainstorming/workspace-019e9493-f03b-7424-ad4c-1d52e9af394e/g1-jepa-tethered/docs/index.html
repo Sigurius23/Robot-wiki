@@ -1,0 +1,616 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark light">
+  <meta name="description" content="Master Control Portal and Navigation Hub for Unitree G1 Humanoid JEPA & Tethered Navigation Suite.">
+  <title>Unitree G1 Navigation Architecture Master Hub</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --page: #080d14;
+      --surface: #0f1724;
+      --surface-raised: #162234;
+      --surface-soft: #121c2b;
+      --text: #edf4ff;
+      --muted: #94a3b8;
+      --line: #24344d;
+      --line-strong: #3b506e;
+      --cyan: #38bdf8;
+      --cyan-soft: rgba(56, 189, 248, 0.12);
+      --purple: #c084fc;
+      --purple-soft: rgba(192, 132, 252, 0.12);
+      --blue: #60a5fa;
+      --blue-soft: rgba(96, 165, 250, 0.12);
+      --amber: #fbbf24;
+      --amber-soft: rgba(251, 191, 36, 0.12);
+      --green: #4ade80;
+      --green-soft: rgba(74, 222, 128, 0.12);
+      --red: #f87171;
+      --red-soft: rgba(248, 113, 113, 0.12);
+      --shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
+      --radius: 20px;
+      --radius-small: 12px;
+      --max-width: 1600px;
+    }
+
+    html[data-theme="light"] {
+      color-scheme: light;
+      --page: #f8fafc;
+      --surface: #ffffff;
+      --surface-raised: #f1f5f9;
+      --surface-soft: #e2e8f0;
+      --text: #0f172a;
+      --muted: #475569;
+      --line: #cbd5e1;
+      --line-strong: #94a3b8;
+      --cyan: #0284c7;
+      --purple: #7e22ce;
+      --blue: #2563eb;
+      --amber: #d97706;
+      --green: #15803d;
+      --red: #dc2626;
+      --shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      min-width: 320px;
+      background:
+        radial-gradient(circle at 10% 0%, var(--cyan-soft), transparent 32rem),
+        radial-gradient(circle at 90% 20%, var(--purple-soft), transparent 35rem),
+        var(--page);
+      color: var(--text);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.5;
+    }
+
+    a { color: var(--cyan); text-underline-offset: 0.18em; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    .shell {
+      width: min(100% - 32px, var(--max-width));
+      margin: 0 auto;
+      padding: 32px 0 48px;
+    }
+
+    /* Top Navigation Bar */
+    .nav-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 32px;
+      padding: 16px 24px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--surface);
+      box-shadow: var(--shadow);
+    }
+
+    .brand-title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 1.1rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+
+    .brand-badge {
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: var(--cyan-soft);
+      color: var(--cyan);
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .nav-actions {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .btn {
+      padding: 9px 18px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--surface-raised);
+      color: var(--text);
+      font-size: 0.88rem;
+      font-weight: 650;
+      cursor: pointer;
+      transition: all 180ms ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn:hover {
+      border-color: var(--cyan);
+      background: var(--surface-soft);
+    }
+
+    .btn-primary {
+      border-color: var(--cyan);
+      background: var(--cyan-soft);
+      color: var(--cyan);
+    }
+
+    /* Hero Section */
+    .hero {
+      margin-bottom: 36px;
+      text-align: center;
+    }
+
+    .eyebrow {
+      margin: 0 0 10px;
+      color: var(--cyan);
+      font-size: 0.85rem;
+      font-weight: 750;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 0 0 16px;
+      font-size: clamp(2.2rem, 4vw, 3.6rem);
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      line-height: 1.08;
+    }
+
+    .lede {
+      max-width: 920px;
+      margin: 0 auto 24px;
+      color: var(--muted);
+      font-size: 1.12rem;
+    }
+
+    /* Hub Grid Cards */
+    .hub-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+      gap: 24px;
+      margin-bottom: 36px;
+    }
+
+    .hub-card {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      padding: 28px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--surface);
+      box-shadow: var(--shadow);
+      transition: transform 220ms ease, border-color 220ms ease, box-shadow 220ms ease;
+      cursor: pointer;
+    }
+
+    .hub-card:hover {
+      transform: translateY(-4px);
+      border-color: var(--card-color, var(--cyan));
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.4);
+    }
+
+    .hub-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 16px;
+    }
+
+    .hub-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: var(--radius-small);
+      background: var(--card-bg, var(--cyan-soft));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+    }
+
+    .hub-card-title {
+      margin: 0 0 8px;
+      font-size: 1.3rem;
+      font-weight: 750;
+      color: var(--text);
+    }
+
+    .hub-card-desc {
+      margin: 0 0 20px;
+      color: var(--muted);
+      font-size: 0.94rem;
+      line-height: 1.55;
+      flex-grow: 1;
+    }
+
+    .hub-card-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 16px;
+      border-top: 1px solid var(--line);
+      font-size: 0.88rem;
+      font-weight: 650;
+    }
+
+    .launch-link {
+      color: var(--card-color, var(--cyan));
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* Embedded Viewer Container */
+    .viewer-section {
+      display: none;
+      margin-bottom: 36px;
+      border: 1px solid var(--line-strong);
+      border-radius: var(--radius);
+      background: var(--surface);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .viewer-section.active {
+      display: block;
+    }
+
+    .viewer-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 24px;
+      background: var(--surface-raised);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .viewer-title {
+      font-size: 1.1rem;
+      font-weight: 750;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .viewer-actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    .viewer-iframe {
+      width: 100%;
+      height: 820px;
+      border: none;
+      background: #000;
+    }
+
+    footer {
+      padding-top: 24px;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 0.9rem;
+      text-align: center;
+    }
+    /* Hardware styles moved to separate file */
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <!-- Top Navigation Bar -->
+    <nav class="nav-bar">
+      <div class="brand-title">
+        <span>🤖 Unitree G1 Master Portal</span>
+        <span class="brand-badge">2026 SOTA Suite</span>
+      </div>
+      <div class="nav-actions">
+        <button class="btn" onclick="openAllTabs()">🚀 Open All Visualizers</button>
+        <button class="btn" id="theme-toggle-btn" onclick="toggleTheme()">
+          <span id="theme-icon">☀️ Light Mode</span>
+        </button>
+      </div>
+    </nav>
+
+    <!-- Hero Header -->
+    <header class="hero">
+      <p class="eyebrow">JEPA & Tethered Navigation Architecture</p>
+      <h1>Unitree G1 Master Control Hub</h1>
+      <p class="lede">
+        Unified launchpad connecting all 5 interactive application visualizers, paper matrix databases, and the 2026 Embodied AI frontiers deep-dive report. Click any module below to launch or view inline.
+      </p>
+    </header>
+
+    <!-- Embedded Viewer Area (Hidden by default until a card is launched inline) -->
+    <section class="viewer-section" id="viewer-section">
+      <div class="viewer-header">
+        <div class="viewer-title">
+          <button class="btn" onclick="closeViewer()">⬅️ Back to Hub Cards</button>
+          <span id="viewer-label">Interactive Application View</span>
+        </div>
+        <div class="viewer-actions">
+          <a class="btn btn-primary" id="viewer-open-link" href="#" target="_blank">↗ Open Full Screen</a>
+        </div>
+      </div>
+      <iframe class="viewer-iframe" id="viewer-iframe" src=""></iframe>
+    </section>
+
+    <!-- Interactive Navigation Cards Grid -->
+    <div class="hub-grid" id="hub-grid">
+      
+      <!-- Card 1: 3-Loop Architecture Explorer -->
+      <div class="hub-card" style="--card-color: var(--cyan); --card-bg: var(--cyan-soft);" onclick="loadApp('g1_architecture_sim.html', '🌐 G1 3-Loop Architecture Decision Explorer')">
+        <div class="hub-card-header">
+          <div class="hub-icon">🌐</div>
+          <span class="brand-badge" style="background:var(--cyan-soft); color:var(--cyan);">Architecture</span>
+        </div>
+        <h2 class="hub-card-title">3-Loop Navigation Architecture</h2>
+        <p class="hub-card-desc">
+          Interactive failure-injection simulator for the 500 Hz Reactive Safety, 40 Hz Predictive Planning, and 1 Hz Semantic Context loops, complete with the 25+ method trade-off matrix.
+        </p>
+        <div class="hub-card-footer">
+          <span style="color:var(--muted);">3-Loop Simulator</span>
+          <span class="launch-link">Launch Explorer ➔</span>
+        </div>
+      </div>
+
+      <!-- Card 2: 24GB VRAM Swap System -->
+      <div class="hub-card" style="--card-color: var(--purple); --card-bg: var(--purple-soft);" onclick="loadApp('g1_vram_swap_sim.html', '🎮 24GB VRAM Sequential Model Swap System & Connectograph')">
+        <div class="hub-card-header">
+          <div class="hub-icon">🎮</div>
+          <span class="brand-badge" style="background:var(--purple-soft); color:var(--purple);">VRAM & Connectograph</span>
+        </div>
+        <h2 class="hub-card-title">VRAM Swap & Connectograph</h2>
+        <p class="hub-card-desc">
+          Live PCIe 4.0 x16 model swap timeline, VRAM memory ceiling gauge, 500 Hz safety floor, and interactive Circular System Cyclic Connectograph.
+        </p>
+        <div class="hub-card-footer">
+          <span style="color:var(--muted);">Sequential Swap Engine</span>
+          <span class="launch-link" style="color:var(--purple);">Launch Explorer ➔</span>
+        </div>
+      </div>
+
+      <!-- Card 3: Hybrid GPS-SLAM -->
+      <div class="hub-card" style="--card-color: var(--green); --card-bg: var(--green-soft);" onclick="loadApp('g1_gps_slam_sim.html', '🟢 GPS-SLAM: Hybrid Gaussian-plus-SDF Architecture')">
+        <div class="hub-card-header">
+          <div class="hub-icon">🟢</div>
+          <span class="brand-badge" style="background:var(--green-soft); color:var(--green);">Hybrid SLAM</span>
+        </div>
+        <h2 class="hub-card-title">Hybrid GPS-SLAM (Gaussian-SDF)</h2>
+        <p class="hub-card-desc">
+          Demonstrates >150 FPS rendering throughput, depth-guided ray culling, and watertight 500 Hz Control Barrier Function (CBF) clearance gradients.
+        </p>
+        <div class="hub-card-footer">
+          <span style="color:var(--muted);">SDF + 3DGS Hybrid</span>
+          <span class="launch-link" style="color:var(--green);">Launch Explorer ➔</span>
+        </div>
+      </div>
+
+      <!-- Card 4: AG-SLAM & LCD-Splat -->
+      <div class="hub-card" style="--card-color: var(--amber); --card-bg: var(--amber-soft);" onclick="loadApp('g1_ag_slam_sim.html', '🟣 AG-SLAM & LCD-Splat: Active & Dynamic Exploration')">
+        <div class="hub-card-header">
+          <div class="hub-icon">🟣</div>
+          <span class="brand-badge" style="background:var(--amber-soft); color:var(--amber);">Active Exploration</span>
+        </div>
+        <h2 class="hub-card-title">Active & Dynamic Exploration</h2>
+        <p class="hub-card-desc">
+          Information-theoretic view-entropy reduction, active robot torso/head gaze trajectory selection, and LCD-Splat dynamic human mask filtering (98.4% loop closure precision).
+        </p>
+        <div class="hub-card-footer">
+          <span style="color:var(--muted);">AG-SLAM & LCD-Splat</span>
+          <span class="launch-link" style="color:var(--amber);">Launch Explorer ➔</span>
+        </div>
+      </div>
+
+      <!-- Card 5: Cybersecurity Audit -->
+      <div class="hub-card" style="--card-color: var(--red); --card-bg: var(--red-soft);" onclick="loadApp('g1_cybersecurity_sim.html', '🛡️ Unitree G1 Cybersecurity & Privacy Audit Visualizer')">
+        <div class="hub-card-header">
+          <div class="hub-icon">🛡️</div>
+          <span class="brand-badge" style="background:var(--red-soft); color:var(--red);">Security Risk Audit</span>
+        </div>
+        <h2 class="hub-card-title">Cybersecurity & Privacy Audit</h2>
+        <p class="hub-card-desc">
+          Zero-day BLE root injection vectors (UniPwn), CloudSail AI backdoor disclosures (39C3 Congress), 300s telemetry leaks (1.03 Mbps), and local air-gapped firewall hardening.
+        </p>
+        <div class="hub-card-footer">
+          <span style="color:var(--muted);">Air-Gap Hardening</span>
+          <span class="launch-link" style="color:var(--red);">Launch Explorer ➔</span>
+        </div>
+      </div>
+
+      <!-- Card 6: Technical Deep Dive Report -->
+      <div class="hub-card" style="--card-color: var(--blue); --card-bg: var(--blue-soft);" onclick="loadApp('2026_embodied_ai_frontiers_deep_dive.html', '📄 2026 Embodied AI & Humanoid Navigation Frontiers: Technical Deep Dive')">
+        <div class="hub-card-header">
+          <div class="hub-icon">📄</div>
+          <span class="brand-badge" style="background:var(--blue-soft); color:var(--blue);">Rendered Report</span>
+        </div>
+        <h2 class="hub-card-title">2026 Frontiers Deep Dive Report</h2>
+        <p class="hub-card-desc">
+          Comprehensive technical deep-dive document covering mathematical formulations for GPS-SLAM, AG-SLAM, Physical Intelligence π₀.₅ flow-matching VLAs, and NVIDIA Cosmos 3 Edge.
+        </p>
+        <div class="hub-card-footer">
+          <span style="color:var(--muted);">KaTeX Rendered Report</span>
+          <span class="launch-link" style="color:var(--blue);">Launch Report ➔</span>
+        </div>
+      </div>
+
+      <!-- Card 7: LiDAR Literature Explorer -->
+      <div class="hub-card" style="--card-color: var(--cyan); --card-bg: var(--cyan-soft);" onclick="loadApp('g1_lidar_literature_sim.html', '📡 LiDAR Literature & Architecture Explorer')">
+        <div class="hub-card-header">
+          <div class="hub-icon">📡</div>
+          <span class="brand-badge" style="background:var(--cyan-soft); color:var(--cyan);">Literature Matrix</span>
+        </div>
+        <h2 class="hub-card-title">LiDAR Literature Explorer</h2>
+        <p class="hub-card-desc">
+          Interactive synthesis of FAST-LIO2, GPS-SLAM, and MinkowskiNet literature, explaining the necessity of metric geometric maps for avoiding "Stability Decay".
+        </p>
+        <div class="hub-card-footer">
+          <span style="color:var(--muted);">Sensor Architecture</span>
+          <span class="launch-link" style="color:var(--cyan);">Launch Explorer ➔</span>
+        </div>
+      </div>
+
+      <!-- Card 8: Dynamic Obstacle Sim -->
+      <div class="hub-card" style="--card-color: var(--amber); --card-bg: var(--amber-soft);" onclick="loadApp('g1_dynamic_obstacle_sim.html', '🛡️ Dynamic Obstacle & Crash Avoidance Simulator')">
+        <div class="hub-card-header">
+          <div class="hub-icon">🛡️</div>
+          <span class="brand-badge" style="background:var(--amber-soft); color:var(--amber);">Safety Matrix</span>
+        </div>
+        <h2 class="hub-card-title">Dynamic Crash Avoidance</h2>
+        <p class="hub-card-desc">
+          Interactive "Safety Onion" visualizer. Demonstrates semantic crowd pose tracking (PaliGemma), predictive trajectory bending (MPPI), and the reactive CBF fail-safe.
+        </p>
+        <div class="hub-card-footer">
+          <span style="color:var(--muted);">Social Navigation</span>
+          <span class="launch-link" style="color:var(--amber);">Launch Explorer ➔</span>
+        </div>
+      </div>
+
+      <!-- Card 9: Crowd Nav Stack -->
+      <div class="hub-card" style="--card-color: var(--blue); --card-bg: var(--blue-soft);" onclick="loadApp('g1_crowd_nav_stack.html', '🧠 Ideal Crowd Navigation Data-Flow Stack')">
+        <div class="hub-card-header">
+          <div class="hub-icon">🧠</div>
+          <span class="brand-badge" style="background:var(--blue-soft); color:var(--blue);">Architecture</span>
+        </div>
+        <h2 class="hub-card-title">Crowd Nav Data-Flow</h2>
+        <p class="hub-card-desc">
+          The unified 4-Stage Pipeline designed specifically for the Jetson Orin NX 16GB. Shows the compute split between onboard tracking (LV-DOT) and offboard routing (VLMs).
+        </p>
+        <div class="hub-card-footer">
+          <span style="color:var(--muted);">Hardware/Compute Stack</span>
+          <span class="launch-link" style="color:var(--blue);">Launch Pipeline ➔</span>
+        </div>
+      </div>
+
+      <!-- Card 10: Cosmos VLM Sim -->
+      <div class="hub-card" style="--card-color: var(--amber); --card-bg: var(--amber-soft);" onclick="loadApp('g1_cosmos_vlm_sim.html', '🧠 Cosmos VLM Social Intent Sim')">
+        <div class="hub-card-header">
+          <div class="hub-icon">👁️</div>
+          <span class="brand-badge" style="background:var(--amber-soft); color:var(--amber);">Simulation</span>
+        </div>
+        <h2 class="hub-card-title">Cosmos VLM Brain</h2>
+        <p class="hub-card-desc">
+          Live dashboard simulating the internal Reasoning Engine of Cosmos 3 Nano. Watches the VLM process visual bounding boxes and text prompts to generate social routing graphs.
+        </p>
+        <div class="hub-card-footer">
+          <span style="color:var(--muted);">Cognition / VLM</span>
+          <span class="launch-link" style="color:var(--amber);">Launch Brain ➔</span>
+        </div>
+      </div>
+      <!-- Card 11: Curriculum of Complexity -->
+      <div class="hub-card" style="--card-color: var(--blue); --card-bg: var(--blue-soft);" onclick="loadApp('2026_architecture_justification_curriculum.html', '📈 Curriculum of Complexity: Architectural Justification')">
+        <div class="hub-card-header">
+          <div class="hub-icon">📈</div>
+          <span class="brand-badge" style="background:var(--blue-soft); color:var(--blue);">Curriculum</span>
+        </div>
+        <h2 class="hub-card-title">Curriculum of Complexity</h2>
+        <p class="hub-card-desc">
+          Evaluates 4 architectural paradigms (Classical vs AI vs Hybrid vs Thor) against 8 escalating scenarios to definitively justify the Tethered Hybrid split.
+        </p>
+        <div class="hub-card-footer">
+          <span style="color:var(--muted);">Escalating Scenarios</span>
+          <span class="launch-link" style="color:var(--blue);">Launch Document ➔</span>
+        </div>
+      </div>
+      <!-- Card 12: Classic Block Diagram -->
+      <div class="hub-card" style="--card-color: var(--cyan); --card-bg: var(--cyan-soft);" onclick="loadApp('g1_classic_block_diagram.html', '🔲 Classic System Block Diagram')">
+        <div class="hub-card-header">
+          <div class="hub-icon">🔲</div>
+          <span class="brand-badge" style="background:var(--cyan-soft); color:var(--cyan);">Flowchart</span>
+        </div>
+        <h2 class="hub-card-title">Classic Block Diagram</h2>
+        <p class="hub-card-desc">
+          A traditional Mermaid.js flowchart mapping the complete data-flow between Sensors, the Orin NX Edge Compute, and the tethered RTX 5090 GPU.
+        </p>
+        <div class="hub-card-footer">
+          <span style="color:var(--muted);">System Architecture</span>
+          <span class="launch-link" style="color:var(--cyan);">Launch Diagram ➔</span>
+        </div>
+      </div>
+
+      </div>
+
+      <!-- Card 13: Hardware Evaluation -->
+      <div class="hub-card" style="--card-color: var(--green); --card-bg: var(--green-soft);" onclick="loadApp('g1_hardware_evaluation.html', '📷 360° Camera & Audio Hardware Evaluation')">
+        <div class="hub-card-header">
+          <div class="hub-icon">📷</div>
+          <span class="brand-badge" style="background:var(--green-soft); color:var(--green);">Hardware</span>
+        </div>
+        <h2 class="hub-card-title">Camera & Audio Evaluation</h2>
+        <p class="hub-card-desc">
+          Finalized 2026 hardware architecture constraints for the Unitree G1. Compares PoE, USB-C, and GMSL2 setups for optimal VLA integration.
+        </p>
+        <div class="hub-card-footer">
+          <span style="color:var(--muted);">Sensor Setup</span>
+          <span class="launch-link" style="color:var(--green);">Launch Report ➔</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Hardware Comparison Section moved to g1_hardware_evaluation.html -->
+
+    <footer>
+      Unitree G1 EDU (43-DoF) Master Navigation Architecture Control Hub. All 12 visualizers interlinked.
+    </footer>
+  </main>
+
+  <script>
+    function loadApp(url, title) {
+      var section = document.getElementById("viewer-section");
+      var iframe = document.getElementById("viewer-iframe");
+      var label = document.getElementById("viewer-label");
+      var openLink = document.getElementById("viewer-open-link");
+      var grid = document.getElementById("hub-grid");
+
+      iframe.src = url;
+      label.textContent = title;
+      openLink.href = url;
+
+      section.className = "viewer-section active";
+      grid.style.display = "none";
+      window.scrollTo({ top: section.offsetTop - 20, behavior: 'smooth' });
+    }
+
+    function closeViewer() {
+      var section = document.getElementById("viewer-section");
+      var iframe = document.getElementById("viewer-iframe");
+      var grid = document.getElementById("hub-grid");
+
+      section.className = "viewer-section";
+      iframe.src = "";
+      grid.style.display = "grid";
+    }
+
+    function openAllTabs() {
+      var files = ['g1_architecture_sim.html', 'g1_vram_swap_sim.html', 'g1_gps_slam_sim.html', 'g1_ag_slam_sim.html', 'g1_cybersecurity_sim.html', 'g1_lidar_literature_sim.html', 'g1_dynamic_obstacle_sim.html', 'g1_crowd_nav_stack.html', 'g1_cosmos_vlm_sim.html', 'g1_hardware_evaluation.html'];
+      files.forEach(function(f) { window.open(f, '_blank'); });
+    }
+
+    function toggleTheme() {
+      var current = document.documentElement.getAttribute("data-theme");
+      var target = current === "light" ? "dark" : "light";
+      document.documentElement.setAttribute("data-theme", target);
+      localStorage.setItem("g1_theme", target);
+      var icon = document.getElementById("theme-icon");
+      if (icon) icon.textContent = target === "light" ? "🌙 Dark Mode" : "☀️ Light Mode";
+    }
+
+    (function() {
+      var saved = localStorage.getItem("g1_theme");
+      if (saved) {
+        document.documentElement.setAttribute("data-theme", saved);
+        var icon = document.getElementById("theme-icon");
+        if (icon) icon.textContent = saved === "light" ? "🌙 Dark Mode" : "☀️ Light Mode";
+      }
+    })();
+  </script>
+</body>
+</html>

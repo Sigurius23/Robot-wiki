@@ -1,0 +1,293 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark light">
+  <title>📷 360° Camera & Audio Hardware Evaluation</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --page: #080d14;
+      --surface: #0f1724;
+      --surface-raised: #162234;
+      --surface-soft: #121c2b;
+      --text: #edf4ff;
+      --muted: #94a3b8;
+      --line: #24344d;
+      --cyan: #38bdf8;
+      --green: #4ade80;
+      --amber: #fbbf24;
+      --red: #f87171;
+      --red-soft: rgba(248, 113, 113, 0.12);
+      --shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
+      --radius: 20px;
+    }
+
+    html[data-theme="light"] {
+      color-scheme: light;
+      --page: #f8fafc;
+      --surface: #ffffff;
+      --surface-raised: #f1f5f9;
+      --surface-soft: #e2e8f0;
+      --text: #0f172a;
+      --muted: #475569;
+      --line: #cbd5e1;
+      --red: #dc2626;
+    }
+
+    body {
+      background: var(--page);
+      color: var(--text);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, sans-serif;
+      padding: 40px 20px;
+      margin: 0;
+      line-height: 1.5;
+    }
+
+    .shell {
+      max-width: 1200px;
+      margin: 0 auto;
+      background: var(--surface);
+      padding: 40px;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      border: 1px solid var(--line);
+    }
+
+    h1 {
+      font-size: 2.2rem;
+      margin-top: 0;
+      border-bottom: 1px solid var(--line);
+      padding-bottom: 16px;
+      color: var(--text);
+    }
+
+    .lede {
+      font-size: 1.1rem;
+      color: var(--muted);
+      margin-bottom: 30px;
+    }
+
+    /* Table styles */
+    .table-container {
+      overflow-x: auto;
+      margin: 24px 0;
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      background: var(--surface-raised);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+    }
+
+    th, td {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    th {
+      background: var(--surface-soft);
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    .dealbreaker {
+      background-color: var(--red-soft) !important;
+      color: var(--red) !important;
+      font-weight: 600;
+    }
+
+    /* Budget cards */
+    .budget-groups {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 24px;
+      margin-top: 32px;
+    }
+
+    .budget-card {
+      padding: 24px;
+      border-radius: 16px;
+      border: 1px solid var(--line);
+      background: var(--surface-raised);
+    }
+
+    .budget-card h3 {
+      margin-top: 0;
+      margin-bottom: 12px;
+      font-size: 1.3rem;
+      color: var(--text);
+    }
+
+    p {
+      line-height: 1.6;
+    }
+  </style>
+  <script>
+    // Inherit theme from parent window if loaded in iframe
+    window.onload = () => {
+      const theme = localStorage.getItem("g1_theme");
+      if (theme) document.documentElement.setAttribute("data-theme", theme);
+    };
+  </script>
+</head>
+<body>
+  <div class="shell">
+    <h1>📷 360° Camera & Audio Hardware Evaluation</h1>
+    <p class="lede">
+      <strong>Overarching Goal:</strong> The Unitree G1 needs low-latency, robust spatial perception (Vision-Language-Action, VLA) to dynamically navigate and interact with its environment safely. 
+      <br><br>
+      <strong>The 2026 Hardware Reality Check:</strong> The Unitree G1 uses a custom Jetson Orin NX carrier board with a locked-down BSP. <strong>You cannot directly connect GMSL2 cameras (like the ZED X One) without bricking the robot's OS.</strong> Furthermore, VLA models thrive on discrete perspective views rather than distorted 360° stitched panoramas. 
+      <br><br>
+      <strong>Best Fit: PoE Ethernet Camera Networks.</strong> The G1 exposes a 1000Mbps RJ45 Ethernet port. Connecting Power-over-Ethernet (PoE) cameras (like RealSense D555 or OAK 4 D) via a small PoE switch allows high-speed native ROS 2 / DDS streaming without touching the locked internal motherboard.
+    </p>
+
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Device Setup</th>
+            <th>Interface to G1</th>
+            <th>G1 BSP Compatibility</th>
+            <th>Latency / Sync</th>
+            <th>VLA Suitability</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>RealSense D555 ×4 / OAK 4 D ×2 (PoE)</strong></td>
+            <td>PoE Switch → RJ45</td>
+            <td><strong>Native (DDS / ROS2 via Ethernet)</strong></td>
+            <td><strong>Near-Zero / Hardware Synced</strong></td>
+            <td><strong>Optimal (⭐⭐⭐⭐⭐)</strong></td>
+          </tr>
+          <tr>
+            <td><strong>Ricoh Theta X / Insta360 X5</strong></td>
+            <td>USB-C</td>
+            <td><strong>Native (UVC / USB-C SDK)</strong></td>
+            <td>Medium (~100-300ms)</td>
+            <td>Acceptable (⭐⭐⭐)</td>
+          </tr>
+          <tr>
+            <td><strong>ZED X One S ×3 (GMSL2)</strong></td>
+            <td>Requires external "Backpack" Jetson</td>
+            <td class="dealbreaker">Incompatible with internal board</td>
+            <td>Ultra-Low (internally), Bottlenecked to G1</td>
+            <td>Heavy / Complex (⭐⭐)</td>
+          </tr>
+          <tr>
+            <td><strong>KanDao / PANOCORE360</strong></td>
+            <td>USB-C</td>
+            <td>Native (Webcam)</td>
+            <td class="dealbreaker">High (3-5s delay)</td>
+            <td class="dealbreaker">Not Compatible (❌)</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2 style="margin-top: 48px; border-bottom: 1px solid var(--line); padding-bottom: 12px; font-size: 1.8rem;">📚 What the Literature Uses: Cameras in VLA Papers</h2>
+    
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Paper / Project</th>
+            <th>Visual Reference</th>
+            <th>Camera Hardware</th>
+            <th>Primary Use Case</th>
+            <th>Mounting Strategy</th>
+            <th>Why They Chose It</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Mobile ALOHA</strong><br><span style="color:var(--muted);font-size:0.85rem;">(Stanford, 2024)</span></td>
+            <td><img src="https://mobile-aloha.github.io/static/images/preview.gif" alt="Mobile ALOHA" style="max-width: 150px; border-radius: 8px; border: 1px solid var(--line);"></td>
+            <td>4x Logitech C920 / RealSense D405</td>
+            <td>Bimanual manipulation & navigation</td>
+            <td><strong>Custom Mast & Wrists:</strong> 3D-printed brackets on the ViperX wrists, and a tall vertical aluminum extrusion mast mounted behind the robot for top-down views.</td>
+            <td>Multiple discrete perspective views (2x wrist, 1x top, 1x front) provide robust spatial coverage for the imitation learning model without the distortion of a single 360° lens.</td>
+          </tr>
+          <tr>
+            <td><strong>VR Teleoperation Rigs</strong><br><span style="color:var(--muted);font-size:0.85rem;">(Various, e.g. TeleVision)</span></td>
+            <td><em style="color:var(--muted); font-size: 0.85rem;">(Varies by paper)</em></td>
+            <td>Insta360 X3 / Ricoh Theta / ZED</td>
+            <td>Immersive human-in-the-loop teleop</td>
+            <td><strong>Head-Mounted:</strong> 3D-printed helmet or bracket bolted directly to the robot's head (or pan-tilt unit) to align precisely with human eye-level.</td>
+            <td>180° or 360° cameras are mounted on the robot's head so a human wearing a VR headset can look around naturally to collect training data. <em>Note: These 360° feeds are often used for human operators, while the VLA model runs on separate perspective cameras to avoid latency/distortion.</em></td>
+          </tr>
+          <tr>
+            <td><strong>RT-1 / RT-2</strong><br><span style="color:var(--muted);font-size:0.85rem;">(Google DeepMind, 2022-2023)</span></td>
+            <td><img src="https://robotics-transformer2.github.io/img/fig1.png" alt="RT-2" style="max-width: 150px; border-radius: 8px; border: 1px solid var(--line);"></td>
+            <td>RealSense (Over-the-shoulder) + Base RGB</td>
+            <td>Generalist manipulation policies</td>
+            <td><strong>Articulated Head:</strong> Integrated securely into the robot's articulated head (pan-tilt mechanism) looking over the shoulder and down at the workspace.</td>
+            <td>Prioritized standard, low-latency, un-distorted RGB perspective frames. The VLA architecture relies heavily on raw pixel-to-action mapping, making hardware sync and low latency much more critical than an ultra-wide field of view.</td>
+          </tr>
+          <tr>
+            <td><strong>Open X-Embodiment / Any-Teleop</strong><br><span style="color:var(--muted);font-size:0.85rem;">(Multi-Institution, 2023)</span></td>
+            <td><em style="color:var(--muted); font-size: 0.85rem;">(Cross-embodiment dataset)</em></td>
+            <td>RealSense D435i (Third-person) + D405 (Wrist)</td>
+            <td>Cross-embodiment dataset collection</td>
+            <td><strong>Tripod & Wrists:</strong> Typically a mix of 3D-printed wrist mounts and static heavy-duty tripods (or fixed extrusion masts) placed near the robot.</td>
+            <td>Standardized on Intel RealSense due to its plug-and-play ROS compatibility, reliable global shutter (crucial for moving arms without motion blur), and perfectly synced RGB-D frames.</td>
+          </tr>
+          <tr>
+            <td><strong>Humanoid Robots</strong><br><span style="color:var(--muted);font-size:0.85rem;">(e.g., Figure, Optimus, Berkeley Humanoid)</span></td>
+            <td><em style="color:var(--muted); font-size: 0.85rem;">(Integrated Chassis)</em></td>
+            <td>Custom Stereo Arrays / RealSense / ZED</td>
+            <td>Full-body locomotion & dynamic manipulation</td>
+            <td><strong>Head & Torso Integrated:</strong> Primary stereo/depth cameras are built directly into the head (for SLAM and target tracking). A secondary wide-angle or depth camera is often recessed into the chest/belly, angled downwards.</td>
+            <td>Humanoids cannot rely on external tripods or masts. The head provides human-like gaze tracking, while the chest camera is mandatory to see the hands and objects without the robot's own arms blocking the view.</td>
+          </tr>
+          <tr>
+            <td><strong>Uni-LaViRA (2026)</strong><br><span style="color:var(--muted);font-size:0.85rem;">(arXiv:2605.27582 - May 2026)</span></td>
+            <td>
+              <div style="display: flex; gap: 8px; flex-direction: column; align-items: center;">
+                <img src="img/unilavira_front.png" alt="Uni-LaViRA Front" style="max-width: 120px; border-radius: 8px; border: 1px solid var(--line);">
+                <img src="img/unilavira_back.png" alt="Uni-LaViRA Back" style="max-width: 120px; border-radius: 8px; border: 1px solid var(--line);">
+              </div>
+            </td>
+            <td>4x Orbbec Gemini 336L RGB-D</td>
+            <td>Zero-shot Vision-Language Navigation (VLN)</td>
+            <td><strong>4-Camera Panoramic Ring:</strong> Mounted to provide Front, Left, Right, and Back views simultaneously. Creates a full 360° perspective field.</td>
+            <td>Bypasses the distortion of single 360° fisheye lenses by using 4 discrete perspective cameras. Allows the onboard MLLM to reason about the full surroundings instantly without forcing the robot to physically rotate to map the area.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="budget-groups">
+      <div class="budget-card" style="border-top: 4px solid var(--green);">
+        <h3>🥇 Tier 1: Best Fit (PoE Native Network)</h3>
+        <p><strong>RealSense D555 (x3-x4) OR OAK 4 D Wide (x2) + reSpeaker Flex XVF3800 Circular-4</strong></p>
+        <p><em>Est. Budget: $1,500 - $2,500</em></p>
+        <p style="color: var(--muted); font-size: 0.9rem;">The safest, highest-performance path. Use a small PoE switch to route discrete camera streams directly into the G1's Gigabit Ethernet port via native ROS 2 DDS. The reSpeaker Flex splits the mic from the DSP board, isolating it from the G1's loud head servos.</p>
+      </div>
+      
+      <div class="budget-card" style="border-top: 4px solid var(--amber);">
+        <h3>🥈 Tier 2: Single USB Puck (Simplest)</h3>
+        <p><strong>Ricoh Theta X OR Insta360 X5 + reSpeaker Flex XVF3800</strong></p>
+        <p><em>Est. Budget: $900 - $1,100</em></p>
+        <p style="color: var(--muted); font-size: 0.9rem;">If you just want a single cable plugged into the G1's external USB-C port, the Theta X (open source UVC driver) or Insta360 X5 are the only options. Latency is tolerable (~100-300ms), but you must reproject the equirectangular video on the GPU.</p>
+      </div>
+      
+      <div class="budget-card" style="border-top: 4px solid var(--red);">
+        <h3>❌ Not Recommended (Backpack Jetson)</h3>
+        <p><strong>ZED X One S ×3 + ZED Box Orin NX (Backpack)</strong></p>
+        <p><em>Est. Budget: $3,000+</em></p>
+        <p style="color: var(--muted); font-size: 0.9rem;">While the cameras are incredible, GMSL2 cannot plug into the G1. You are forced to mount a second Jetson computer on the robot, adding 50W+ of power draw and requiring a custom 48V to 12V DC-DC converter from the G1 battery.</p>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

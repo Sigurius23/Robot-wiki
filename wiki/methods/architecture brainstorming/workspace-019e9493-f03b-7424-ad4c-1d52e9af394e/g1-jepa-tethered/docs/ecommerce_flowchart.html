@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Classic Flowchart (Order Process)</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', sans-serif;
+      background: #f4f4f5; /* Light background to match the whiteboard */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .diagram-container {
+      background: #ffffff;
+      padding: 40px;
+      border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+      border: 1px solid #e4e4e7;
+    }
+
+    /* Target the mermaid SVG to enforce a clean look */
+    .mermaid svg {
+      max-width: 100%;
+      height: auto;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="diagram-container">
+    <div class="mermaid">
+      graph TD
+        %% Define precise styles matching the image
+        classDef yellow fill:#fed7aa,stroke:#f97316,stroke-width:2px,color:#000,rx:8px,ry:8px;
+        classDef purple fill:#c4b5fd,stroke:#8b5cf6,stroke-width:2px,color:#000,rx:8px,ry:8px;
+        classDef blue fill:#93c5fd,stroke:#3b82f6,stroke-width:2px,color:#000;
+        classDef pink fill:#fbcfe8,stroke:#ec4899,stroke-width:2px,color:#000,rx:20px,ry:20px;
+
+        %% Nodes
+        Order["Order"]:::yellow
+        ReceiveOrder["Receive order"]:::purple
+        CheckStock["Check stock"]:::purple
+        InStock{"In stock?"}:::blue
+        CancelOrder["Cancel order"]:::purple
+        CheckCreditCard["Check credit card"]:::purple
+        CardValid{"Card valid?"}:::blue
+        ProcessCreditCard["Process credit card"]:::purple
+        Deliver["Deliver"]:::purple
+        Receive["Receive"]:::yellow
+
+        %% Annotations (Floating nodes)
+        Himali("Himali"):::pink
+        Aharon("Aharon"):::pink
+        Anna("Anna"):::pink
+        Bettany("Bettany"):::pink
+
+        %% Flow Connections
+        Order --> ReceiveOrder
+        ReceiveOrder --> CheckStock
+        CheckStock --> InStock
+        
+        InStock -- "Out of stock" --> CancelOrder
+        InStock -- "In stock" --> CheckCreditCard
+        
+        CheckCreditCard --> CardValid
+        
+        CardValid -- "Invalid" --> CancelOrder
+        CardValid -- "Valid" --> ProcessCreditCard
+        
+        ProcessCreditCard --> Deliver
+        Deliver --> Receive
+
+        %% Invisible links to position the annotations near their targets
+        Himali ~~~ ReceiveOrder
+        Aharon ~~~ CancelOrder
+        Anna ~~~ CardValid
+        Bettany ~~~ Deliver
+    </div>
+  </div>
+
+  <script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: 'base',
+      themeVariables: {
+        fontFamily: 'Inter',
+        lineColor: '#52525b',
+        textColor: '#000000',
+      },
+      flowchart: {
+        curve: 'basis',
+        nodeSpacing: 50,
+        rankSpacing: 60
+      }
+    });
+  </script>
+</body>
+</html>

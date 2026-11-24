@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Classic Block Diagram: G1 Architecture</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+  <style>
+    :root {
+      --bg: #09090b;
+      --surface: #18181b;
+      --text: #f4f4f5;
+      --muted: #a1a1aa;
+      --line: #27272a;
+      --cyan: #22d3ee;
+    }
+
+    body.light-mode {
+      --bg: #f8fafc;
+      --surface: #ffffff;
+      --text: #0f172a;
+      --muted: #64748b;
+      --line: #e2e8f0;
+      --cyan: #0284c7;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    header {
+      padding: 24px;
+      border-bottom: 1px solid var(--line);
+      background: var(--surface);
+      text-align: center;
+      flex-shrink: 0;
+    }
+
+    h1 {
+      margin: 0 0 8px 0;
+      font-size: 1.5rem;
+      font-weight: 700;
+    }
+
+    p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .diagram-container {
+      flex-grow: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 40px;
+      overflow: auto;
+    }
+
+    .mermaid {
+      background: var(--surface);
+      padding: 32px;
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    }
+  </style>
+</head>
+<body>
+
+  <header style="display: flex; justify-content: space-between; align-items: center; text-align: left;">
+    <div>
+      <h1>Classic System Block Diagram</h1>
+      <p>Data-flow mapping between Sensors, Orin NX (Survival Loop), and RTX 5090 (Cognition Loop).</p>
+    </div>
+    <button onclick="toggleTheme()" style="padding: 8px 16px; border-radius: 8px; border: 1px solid var(--line); background: var(--surface); color: var(--text); cursor: pointer; font-family: 'Inter', sans-serif; font-weight: 600;">
+      <span id="theme-icon">☀️ Light Mode</span>
+    </button>
+  </header>
+
+  <div class="diagram-container">
+    <div class="mermaid">
+      graph TD
+        %% Define Styling
+        classDef sensor fill:#93c5fd,stroke:#3b82f6,stroke-width:2px,color:#0f172a;
+        classDef orin fill:#6ee7b7,stroke:#10b981,stroke-width:2px,color:#0f172a;
+        classDef rtx fill:#c4b5fd,stroke:#8b5cf6,stroke-width:2px,color:#0f172a;
+        classDef actuator fill:#fca5a5,stroke:#ef4444,stroke-width:2px,color:#0f172a;
+        classDef clusterbox fill:none,stroke:#475569,stroke-width:2px,stroke-dasharray: 5 5;
+
+        %% Subgraphs
+        subgraph Sensors [Input Sensors]
+            L[Livox Mid-360 LiDAR]:::sensor
+            R[RealSense D435i]:::sensor
+            I[Inertial Measurement Unit]:::sensor
+        end
+
+        subgraph Orin [Jetson Orin NX - Edge Compute]
+            F[FAST-LIO2 Odometry]:::orin
+            Y[YOLOv11-pose]:::orin
+            LD[LV-DOT Tracker]:::orin
+            M[Dynamic Masker]:::orin
+            CBF[Control Barrier Function]:::orin
+            WBC[Whole Body Controller]:::orin
+        end
+
+        subgraph RTX [RTX 5090 - Tethered GPU]
+            Splat[LCD-Splat Map]:::rtx
+            VLM[Cosmos 3 Nano VLM]:::rtx
+            EG[GPU Elevation Grid]:::rtx
+            MPPI[MPPI Trajectory Planner]:::rtx
+        end
+        
+        subgraph Actuators [Output]
+            A[G1 Joint Motors]:::actuator
+        end
+
+        %% Connections (Data Flow)
+        L -->|10Hz Sweeps| F
+        I -->|1000Hz Data| F
+        
+        R -->|30Hz RGB-D| Y
+        L -->|Raw Cloud| Y
+        
+        Y -->|BBoxes| LD
+        LD -->|Human Kinematics| M
+        L -->|Raw Cloud| M
+        
+        %% Split to RTX
+        M -->|Clean Static Cloud| Splat
+        M -->|Clean Static Cloud| EG
+        LD -->|Moving Obstacles| MPPI
+        R -->|Ego RGB| VLM
+        
+        Splat -->|Top-Down Render| VLM
+        VLM -->|Macro Route 1Hz| MPPI
+        EG -->|2.5D Costmap 20Hz| MPPI
+        
+        %% Back to Orin
+        MPPI -->|Target Trajectory 30Hz| CBF
+        CBF -->|Verified Safe States 500Hz| WBC
+        WBC -->|Torques| A
+
+        %% Apply cluster styles
+        class Sensors,Orin,RTX,Actuators clusterbox;
+    </div>
+  </div>
+
+  <script>
+    // Store original text so it can be re-rendered cleanly
+    const mermaidDiv = document.querySelector('.mermaid');
+    const originalMermaidText = mermaidDiv.textContent;
+
+    // Initialize Mermaid with a dynamic theme based on the class on body
+    const initMermaid = (isLight) => {
+      mermaid.initialize({
+        startOnLoad: false,
+        theme: isLight ? 'default' : 'dark',
+        securityLevel: 'loose',
+        flowchart: {
+          curve: 'basis',
+          nodeSpacing: 50,
+          rankSpacing: 80
+        }
+      });
+      
+      // Re-render
+      mermaidDiv.removeAttribute('data-processed');
+      mermaidDiv.textContent = originalMermaidText;
+      mermaid.init(undefined, mermaidDiv);
+    };
+
+    // Initial setup
+    initMermaid(document.body.classList.contains('light-mode'));
+
+    // Inherit theme from parent window if embedded
+    window.addEventListener('message', function(event) {
+      if (event.data === 'theme-light') {
+        document.body.classList.add('light-mode');
+        document.getElementById('theme-icon').innerText = "🌙 Dark Mode";
+        initMermaid(true);
+      }
+      if (event.data === 'theme-dark') {
+        document.body.classList.remove('light-mode');
+        document.getElementById('theme-icon').innerText = "☀️ Light Mode";
+        initMermaid(false);
+      }
+    });
+
+    // Standalone manual toggle
+    function toggleTheme() {
+      const isLight = document.body.classList.toggle('light-mode');
+      document.getElementById('theme-icon').innerText = isLight ? "🌙 Dark Mode" : "☀️ Light Mode";
+      initMermaid(isLight);
+    }
+  </script>
+</body>
+</html>

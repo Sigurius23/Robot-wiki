@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ideal Crowd Navigation Stack - Unitree G1 EDU</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0f1115;
+      --surface: #181b21;
+      --surface-raised: #21252d;
+      --surface-soft: #2a2f38;
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      --line: #334155;
+      --line-strong: #475569;
+      --cyan: #06b6d4;
+      --cyan-soft: rgba(6,182,212,0.15);
+      --purple: #8b5cf6;
+      --purple-soft: rgba(139,92,246,0.15);
+      --amber: #f59e0b;
+      --amber-soft: rgba(245,158,11,0.15);
+      --green: #10b981;
+      --green-soft: rgba(16,185,129,0.15);
+      --red: #ef4444;
+      --red-soft: rgba(239,68,68,0.15);
+      --blue: #3b82f6;
+      --blue-soft: rgba(59,130,246,0.15);
+      --radius: 12px;
+      --radius-sm: 8px;
+    }
+    
+    html[data-theme="light"] {
+      --bg: #f8fafc;
+      --surface: #ffffff;
+      --surface-raised: #f1f5f9;
+      --surface-soft: #e2e8f0;
+      --text: #0f172a;
+      --muted: #475569;
+      --line: #cbd5e1;
+      --line-strong: #94a3b8;
+      --cyan-soft: rgba(6,182,212,0.1);
+      --purple-soft: rgba(139,92,246,0.1);
+      --amber-soft: rgba(245,158,11,0.1);
+      --green-soft: rgba(16,185,129,0.1);
+      --red-soft: rgba(239,68,68,0.1);
+      --blue-soft: rgba(59,130,246,0.1);
+    }
+
+    * { box-sizing: border-box; }
+    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px 40px; line-height: 1.6; transition: background 0.2s, color 0.2s; }
+    
+    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-bottom: 1px solid var(--line); padding-bottom: 20px; }
+    .header-text h1 { font-size: 1.6rem; font-weight: 800; margin: 0 0 6px 0; color: var(--text); letter-spacing: -0.5px; }
+    .header-text p { font-size: 0.95rem; color: var(--muted); margin: 0; }
+    
+    .theme-btn { padding: 8px 16px; border: 1px solid var(--line); border-radius: 999px; background: var(--surface-raised); color: var(--text); font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+    .theme-btn:hover { background: var(--surface-soft); border-color: var(--cyan); }
+    
+    /* Flow Layout */
+    .flow-container { display: flex; gap: 20px; margin-bottom: 40px; overflow-x: auto; padding-bottom: 20px; }
+    
+    .stage { flex: 1; min-width: 250px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 20px; display: flex; flex-direction: column; gap: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); position: relative; }
+    
+    /* Connectors between stages */
+    .stage:not(:last-child)::after {
+      content: '➔';
+      position: absolute;
+      right: -16px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--line-strong);
+      font-size: 1.5rem;
+      z-index: 10;
+    }
+    
+    .stage-header { padding-bottom: 12px; border-bottom: 1px solid var(--line); }
+    .stage-header h2 { font-size: 1.1rem; margin: 0 0 4px 0; display: flex; align-items: center; gap: 8px; }
+    .stage-header p { font-size: 0.8rem; color: var(--muted); margin: 0; }
+    
+    .hw-badge { display: inline-block; padding: 3px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: 700; background: var(--surface-soft); color: var(--text); border: 1px solid var(--line-strong); margin-bottom: 12px; font-family: monospace; }
+    
+    .node { padding: 12px; border: 1px solid var(--line); border-radius: var(--radius-sm); background: var(--surface-raised); cursor: pointer; transition: all 0.2s; position: relative; }
+    .node:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); border-color: var(--cyan); }
+    .node.inactive { opacity: 0.3; filter: grayscale(100%); animation: none; box-shadow: none; border-color: var(--line); }
+    
+    .node-title { font-weight: 600; font-size: 0.95rem; margin-bottom: 4px; display: flex; align-items: center; justify-content: space-between; }
+    .node-desc { font-size: 0.8rem; color: var(--muted); margin: 0; }
+    .node-tag { padding: 2px 6px; border-radius: 4px; font-size: 0.65rem; font-weight: bold; background: var(--surface-soft); }
+    
+    .n-sensor { border-left: 4px solid var(--amber); }
+    .n-onboard { border-left: 4px solid var(--cyan); }
+    .n-offboard { border-left: 4px solid var(--purple); }
+    .n-exec { border-left: 4px solid var(--green); }
+    
+    .n-cbf { border-color: var(--red) !important; background: var(--red-soft) !important; color: #fff; }
+    .n-cbf .node-desc { color: rgba(255,255,255,0.8); }
+    
+    /* Info Panel Details */
+    .detail-panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 24px; display: flex; gap: 30px; box-shadow: 0 4px 20px rgba(0,0,0,0.2); }
+    .detail-content { flex: 2; }
+    .detail-stats { flex: 1; background: var(--surface-raised); padding: 16px; border-radius: var(--radius-sm); border: 1px solid var(--line); }
+    
+    .detail-content h2 { margin: 0 0 12px 0; color: var(--cyan); }
+    .detail-content p { font-size: 0.95rem; margin: 0 0 16px 0; color: var(--muted); }
+    
+    .stat-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px dashed var(--line); font-size: 0.85rem; }
+    .stat-row:last-child { border-bottom: none; }
+    .stat-label { color: var(--muted); }
+    .stat-val { font-weight: 600; font-family: monospace; }
+    
+    /* Active Animations */
+    .pulse-data { animation: glow 2s infinite alternate; }
+    @keyframes glow {
+      0% { box-shadow: 0 0 5px var(--cyan); border-color: var(--cyan); }
+      100% { box-shadow: 0 0 20px var(--cyan); border-color: var(--cyan); }
+    }
+    
+    /* VRAM Bar */
+    .vram-container { margin-top: 16px; }
+    .vram-label { font-size: 0.8rem; font-weight: bold; margin-bottom: 4px; display: flex; justify-content: space-between; }
+    .vram-bar { height: 12px; background: var(--surface-soft); border-radius: 6px; overflow: hidden; display: flex; }
+    .vram-fill { height: 100%; transition: width 0.3s ease; }
+    .vf-os { background: var(--line-strong); }
+    .vf-yolo { background: var(--purple); }
+    .vf-free { background: var(--green); }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <div class="header-text">
+      <h1>🧠 Ideal Crowd Navigation Data-Flow Stack</h1>
+      <p>End-to-End compute pipeline optimized for the Unitree G1 EDU (16GB Jetson Orin NX) and an Offboard RTX laptop.</p>
+    </div>
+    <button class="theme-btn" id="theme-icon" onclick="toggleTheme()">☀️ Light Mode</button>
+  </div>
+
+  <!-- Context Mode Switcher -->
+  <div style="display: flex; gap: 10px; margin-bottom: 30px; align-items: center; background: var(--surface); padding: 12px 20px; border-radius: var(--radius); border: 1px solid var(--line);">
+    <strong style="color: var(--muted); margin-right: 10px;">Context Mode:</strong>
+    <button class="theme-btn" style="border-color: var(--amber);" onclick="setMode('explore')">1. Empty Room (Mapping)</button>
+    <button class="theme-btn" style="border-color: var(--purple);" onclick="setMode('nav')">2. Crowd Navigation</button>
+    <button class="theme-btn" style="border-color: var(--green);" onclick="setMode('interact')">3. Social Interaction</button>
+  </div>
+
+  <div class="flow-container">
+    
+    <!-- STAGE 1: Sensors -->
+    <div class="stage">
+      <div class="stage-header">
+        <div class="hw-badge" style="color:var(--amber)">Robot Head Assembly</div>
+        <h2>1. Multi-Sensor Perception</h2>
+        <p>Raw environmental data ingestion.</p>
+      </div>
+      
+      <div class="node n-sensor" onclick="showNode('lidar')">
+        <div class="node-title">Livox Mid-360 3D LiDAR <span class="node-tag">10 Hz</span></div>
+        <p class="node-desc">Omnidirectional non-repetitive Rhodonea-curve scanning.</p>
+      </div>
+      
+      <div class="node n-sensor" onclick="showNode('rgbd')">
+        <div class="node-title">RealSense D435i RGB-D <span class="node-tag">60 Hz</span></div>
+        <p class="node-desc">Active stereo depth and global-shutter RGB.</p>
+      </div>
+      
+      <div class="node n-sensor" onclick="showNode('imu')">
+        <div class="node-title">6-Axis IMU <span class="node-tag">200 Hz</span></div>
+        <p class="node-desc">High-frequency angular velocity & acceleration.</p>
+      </div>
+    </div>
+    
+    <!-- STAGE 2: Onboard Tracking -->
+    <div class="stage">
+      <div class="stage-header">
+        <div class="hw-badge" style="color:var(--cyan)">Jetson Orin NX (16GB RAM)</div>
+        <h2>2. Onboard Tracking</h2>
+        <p>Local state estimation & identity tracking.</p>
+      </div>
+      
+      <div class="node n-onboard" onclick="showNode('fastlio')">
+        <div class="node-title">FAST-LIO2 (CPU) <span class="node-tag">10 Hz</span></div>
+        <p class="node-desc">Deskews point clouds via IEKF.</p>
+      </div>
+      
+      <div class="node n-onboard pulse-data" onclick="showNode('yolo')">
+        <div class="node-title">YOLOv11-pose (GPU) <span class="node-tag">60 FPS</span></div>
+        <p class="node-desc">Extracts 17 COCO keypoints (TensorRT).</p>
+      </div>
+      
+      <div class="node n-onboard pulse-data" onclick="showNode('lvdot')">
+        <div class="node-title">LV-DOT / AEKF (CPU) <span class="node-tag">30 FPS</span></div>
+        <p class="node-desc">Fuses 3D/2D tracking + velocity vectors.</p>
+      </div>
+
+      <div class="node n-onboard pulse-data mode-node mode-explore mode-nav" onclick="showNode('mask')" id="n-mask" style="border-left: 4px solid var(--amber);">
+        <div class="node-title">Dynamic Masking (CPU) <span class="node-tag">10 Hz</span></div>
+        <p class="node-desc">Splits Dynamic (Humans) from Static (Room).</p>
+      </div>
+    </div>
+    
+    <!-- STAGE 3: Offboard Routing & Mapping -->
+    <div class="stage">
+      <div class="stage-header">
+        <div class="hw-badge" style="color:var(--purple)">Offboard Laptop (RTX 5090)</div>
+        <h2>3. Mapping & Routing</h2>
+        <p>Global map generation and semantic intent.</p>
+      </div>
+      
+      <div class="node n-offboard pulse-data mode-node mode-explore" onclick="showNode('mapping')" id="n-mapping">
+        <div class="node-title">AG-SLAM / LCD-Splat <span class="node-tag">10 Hz</span></div>
+        <p class="node-desc">Builds semantic 3D Gaussian map of the static env.</p>
+      </div>
+      
+      <div class="node n-offboard pulse-data mode-node mode-nav" onclick="showNode('vlm')" id="n-vlm">
+        <div class="node-title">Social Intent & Interaction <span class="node-tag">1 Hz</span></div>
+        <p class="node-desc">Cosmos/PaliGemma classify "approachable" vs "busy".</p>
+      </div>
+      
+      <div class="node n-offboard pulse-data mode-node mode-nav" onclick="showNode('flow')" id="n-flow">
+        <div class="node-title">π₀.₅ Flow Routing <span class="node-tag">40 Hz</span></div>
+        <p class="node-desc">Routes TO interested people, AVOIDS busy crowds.</p>
+      </div>
+
+      <div class="node n-offboard pulse-data mode-node mode-interact" onclick="showNode('omnillm')" id="n-omnillm">
+        <div class="node-title">Omni-LLM / GR00T <span class="node-tag">20 Hz</span></div>
+        <p class="node-desc">Real-time Audio-Visual dialogue & manipulation.</p>
+      </div>
+    </div>
+    
+    <!-- STAGE 4: Execution -->
+    <div class="stage">
+      <div class="stage-header">
+        <div class="hw-badge" style="color:var(--green)">G1 Motor Controllers</div>
+        <h2>4. Execution & Safety</h2>
+        <p>Translation to physical torques.</p>
+      </div>
+      
+      <div class="node n-cbf" onclick="showNode('cbf')">
+        <div class="node-title">CBF Safety Floor <span class="node-tag" style="background:#fff; color:#000;">500 Hz</span></div>
+        <p class="node-desc">Overrides VLA if LiDAR SDF < 0.3m.</p>
+      </div>
+      
+      <div class="node n-exec" onclick="showNode('wbc')">
+        <div class="node-title">Whole Body Control <span class="node-tag">500 Hz</span></div>
+        <p class="node-desc">Converts trajectories to 43-DoF joint torques.</p>
+      </div>
+    </div>
+    
+  </div>
+  
+  <div class="detail-panel" id="detail-panel">
+    <div class="detail-content" id="d-content">
+      <h2 style="color:var(--text);">Select a node above to inspect pipeline telemetry.</h2>
+      <p>The Orin NX's 16GB unified memory is a strict bottleneck. By keeping YOLOv11-pose and LV-DOT onboard, we avoid sending raw dense LiDAR/RGB streams over the tether, instead only transmitting lightweight tracked keypoints (bytes/sec) to the offboard laptop.</p>
+    </div>
+    
+    <div class="detail-stats" id="d-stats" style="display:none;">
+      <div class="stat-row">
+        <span class="stat-label">Compute Target:</span>
+        <span class="stat-val" id="s-hw">-</span>
+      </div>
+      <div class="stat-row">
+        <span class="stat-label">Execution:</span>
+        <span class="stat-val" id="s-exec">-</span>
+      </div>
+      <div class="stat-row">
+        <span class="stat-label">Latency:</span>
+        <span class="stat-val" id="s-lat">-</span>
+      </div>
+      
+      <!-- Orin NX RAM context -->
+      <div class="vram-container" id="s-vram-box" style="display:none;">
+        <div class="vram-label">
+          <span>Orin NX Unified RAM (16GB)</span>
+          <span id="s-vram-txt">0GB</span>
+        </div>
+        <div class="vram-bar">
+          <div class="vram-fill vf-os" style="width: 25%;" title="OS / Core (4GB)"></div>
+          <div class="vram-fill vf-yolo" id="s-vram-fill" style="width: 0%;"></div>
+          <div class="vram-fill vf-free" id="s-vram-free" style="width: 75%;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function toggleTheme() {
+      var current = document.documentElement.getAttribute("data-theme");
+      var target = current === "light" ? "dark" : "light";
+      document.documentElement.setAttribute("data-theme", target);
+      localStorage.setItem("g1_theme", target);
+      document.getElementById("theme-icon").textContent = target === "light" ? "🌙 Dark Mode" : "☀️ Light Mode";
+    }
+
+    (function() {
+      var saved = localStorage.getItem("g1_theme");
+      if (saved) {
+        document.documentElement.setAttribute("data-theme", saved);
+        document.getElementById("theme-icon").textContent = saved === "light" ? "🌙 Dark Mode" : "☀️ Light Mode";
+      }
+    })();
+    
+    var db = {
+      'lidar': {
+        title: "Livox Mid-360 LiDAR",
+        desc: "Provides omnidirectional (360° x 59°) non-repetitive Rhodonea-curve scanning patterns, overcoming ambient light degradation and providing metric geometry up to 40m. Sent directly to the Orin NX.",
+        hw: "Robot Head", exec: "Sensor", lat: "10 Hz", mem: 0
+      },
+      'rgbd': {
+        title: "RealSense D435i RGB-D",
+        desc: "Provides active IR stereo depth and global shutter RGB images. Crucial for extracting fine-grained photometric texture for skeleton pose estimation, which LiDAR lacks.",
+        hw: "Robot Head", exec: "Sensor", lat: "60 Hz", mem: 0
+      },
+      'imu': {
+        title: "6-Axis IMU",
+        desc: "Internal 6-DoF sensor providing high-frequency acceleration and gyro data. Used by FAST-LIO2 to predict high-frequency states during the LiDAR integration window.",
+        hw: "Robot Head", exec: "Sensor", lat: "200 Hz", mem: 0
+      },
+      'fastlio': {
+        title: "FAST-LIO2",
+        desc: "An Iterated Extended Kalman Filter (IEKF) that deskews the LiDAR point cloud using the 200Hz IMU. It corrects motion distortion from the bipedal walking gait.",
+        hw: "Orin NX", exec: "CPU Thread", lat: "< 5 ms", mem: 0.1 // 100MB
+      },
+      'yolo': {
+        title: "YOLOv11-pose",
+        desc: "A lightweight pose estimation model accelerated via TensorRT (INT8/FP16). It extracts 17 COCO skeletal keypoints from the RealSense stream at 60 FPS, calculating Head Gaze and Body Heading angles.",
+        hw: "Orin NX", exec: "Ampere GPU (TRT)", lat: "8-15 ms", mem: 1.5 // 1.5GB
+      },
+      'lvdot': {
+        title: "LV-DOT Tracker & AEKF",
+        desc: "LiDAR-Visual Dynamic Obstacle Tracking. It fuses the 3D LiDAR centroids with the 2D visual keypoints. An Adaptive Extended Kalman Filter (AEKF) outputs continuous pedestrian velocity vectors. Passes bounding boxes to the Masking Node.",
+        hw: "Orin NX", exec: "CPU (C++/ROS)", lat: "< 10 ms", mem: 0.3 // 300MB
+      },
+      'mask': {
+        title: "Dynamic Point Removal (The Split)",
+        desc: "The critical separator. Using the LV-DOT bounding boxes, this node erases moving pedestrians from the FAST-LIO2 point cloud. <b>Dynamic stream</b> (just the keypoints) goes to the VLM. <b>Static stream</b> (clean room geometry) goes to AG-SLAM. This prevents 'ghosts' in the map.",
+        hw: "Orin NX", exec: "CPU", lat: "5 ms", mem: 0.1
+      },
+      'mapping': {
+        title: "Global Mapping (AG-SLAM / LCD-Splat)",
+        desc: "Receives ONLY the static, masked data stream from the Orin NX. It constructs a dense, language-embedded 3D Gaussian Splatting map (LCD-Splat) of the static conference environment (booths, walls, chairs) without any corrupted pedestrian artifacts.",
+        hw: "RTX 5090 Laptop", exec: "GPU (Offboard)", lat: "100 ms", mem: 0
+      },
+      'vlm': {
+        title: "Social Intent Classification (Scenario D)",
+        desc: "The tethered laptop receives the lightweight keypoints (gaze/body angles) from LV-DOT. The VLM (Cosmos/PaliGemma) classifies social states: 'Person is looking at robot' (Approachable) vs. 'Person is talking/walking fast' (Busy/Avoid).",
+        hw: "RTX 5090 Laptop", exec: "GPU (Offboard)", lat: "1000 ms", mem: 0
+      },
+      'flow': {
+        title: "Interaction Routing (π₀.₅ Flow)",
+        desc: "High-frequency local trajectory planner. Based on the VLM's social classification, it generates a smooth path to walk up and interact with interested people, while actively bending trajectories to avoid those who are busy.",
+        hw: "RTX 5090 Laptop", exec: "GPU (Offboard)", lat: "25 ms", mem: 0
+      },
+      'omnillm': {
+        title: "Omni-LLM / GR00T",
+        desc: "When the robot reaches a person to interact, the navigation models are paged out of VRAM. A large Audio-Visual conversational model (like Llama-3-Omni) and fine-manipulation policy (GR00T) are loaded to process speech and handshake kinematics.",
+        hw: "RTX 5090 Laptop", exec: "GPU (Offboard)", lat: "20-100 ms", mem: 0
+      },
+      'cbf': {
+        title: "Control Barrier Function (CBF)",
+        desc: "The absolute physical safety floor. If a pedestrian unpredictably steps within 0.3m of the robot, the onboard CBF rejects the laptop's trajectory and forces the WBC to brake kinematics.",
+        hw: "Orin NX", exec: "CPU", lat: "2 ms (500Hz)", mem: 0.1
+      },
+      'wbc': {
+        title: "Whole Body Control",
+        desc: "Translates the approved, CBF-filtered trajectory into inverse kinematics and joint torques for the 43 EtherCAT motors.",
+        hw: "G1 Base", exec: "Motor Board", lat: "2 ms (500Hz)", mem: 0
+      }
+    };
+    
+    function showNode(id) {
+      var data = db[id];
+      document.getElementById('d-stats').style.display = 'block';
+      
+      document.getElementById('d-content').innerHTML = `
+        <h2 style="color:var(--cyan);">${data.title}</h2>
+        <p>${data.desc}</p>
+      `;
+      
+      document.getElementById('s-hw').textContent = data.hw;
+      document.getElementById('s-exec').textContent = data.exec;
+      document.getElementById('s-lat').textContent = data.lat;
+      
+      if(data.hw === "Orin NX") {
+        document.getElementById('s-vram-box').style.display = 'block';
+        document.getElementById('s-vram-txt').textContent = data.mem + " GB Usage";
+        
+        var pct = (data.mem / 16.0) * 100;
+        var free = 100 - 25 - pct; // 25% is OS base
+        document.getElementById('s-vram-fill').style.width = pct + "%";
+        document.getElementById('s-vram-free').style.width = free + "%";
+      } else {
+        document.getElementById('s-vram-box').style.display = 'none';
+      }
+    }
+
+    function setMode(mode) {
+      // Get all mode-dependent nodes in Stage 3
+      var nodes = document.querySelectorAll('.mode-node');
+      
+      nodes.forEach(function(node) {
+        if (node.classList.contains('mode-' + mode)) {
+          node.classList.remove('inactive');
+          node.classList.add('pulse-data');
+        } else {
+          node.classList.add('inactive');
+          node.classList.remove('pulse-data');
+        }
+      });
+    }
+
+    // Initialize default mode
+    window.onload = function() {
+      setMode('nav');
+    };
+  </script>
+</body>
+</html>

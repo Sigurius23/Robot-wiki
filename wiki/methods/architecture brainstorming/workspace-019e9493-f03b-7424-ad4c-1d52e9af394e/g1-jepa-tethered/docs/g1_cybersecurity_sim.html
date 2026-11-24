@@ -1,0 +1,541 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark light">
+  <meta name="description" content="Interactive Visualizer for Unitree G1 Cybersecurity & Privacy Vulnerability Findings and Air-Gapped Hardening Architecture.">
+  <title>Unitree G1 Cybersecurity & Privacy Audit Visualizer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      color-scheme: dark;
+      --page: #0b0f16;
+      --surface: #111820;
+      --surface-raised: #172030;
+      --surface-soft: #0e1520;
+      --text: #edf4ff;
+      --muted: #8e9db3;
+      --line: #243044;
+      --line-strong: #3a4e68;
+      --cyan: #5ad8ec;
+      --cyan-soft: rgba(90,216,236,0.10);
+      --purple: #a78bfa;
+      --purple-soft: rgba(167,139,250,0.10);
+      --blue: #6ea8fe;
+      --blue-soft: rgba(110,168,254,0.10);
+      --amber: #fbbf24;
+      --amber-soft: rgba(251,191,36,0.10);
+      --green: #4ade80;
+      --green-soft: rgba(74,222,128,0.10);
+      --red: #f87171;
+      --red-soft: rgba(248,113,113,0.10);
+      --shadow: 0 16px 48px rgba(0,0,0,0.28);
+      --radius: 16px;
+      --radius-sm: 10px;
+      --max-w: 1320px;
+      --svg-bg: #080c12;
+    }
+
+    html[data-theme="light"] {
+      color-scheme: light;
+      --page: #f7f9fc;
+      --surface: #ffffff;
+      --surface-raised: #f0f3f8;
+      --surface-soft: #e4e9f0;
+      --text: #111827;
+      --muted: #4b5563;
+      --line: #d1d9e5;
+      --line-strong: #9ca7b6;
+      --cyan: #0e7490;
+      --purple: #7c3aed;
+      --blue: #2563eb;
+      --amber: #b45309;
+      --green: #15803d;
+      --red: #dc2626;
+      --shadow: 0 8px 28px rgba(0,0,0,0.06);
+      --svg-bg: #f0f2f6;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      min-width: 320px;
+      background:
+        radial-gradient(ellipse 55% 45% at 8% 0%, var(--red-soft), transparent),
+        radial-gradient(ellipse 50% 40% at 92% 20%, var(--amber-soft), transparent),
+        var(--page);
+      color: var(--text);
+      font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
+      line-height: 1.55;
+    }
+
+    a { color: var(--cyan); text-underline-offset: .18em; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    code { font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace; font-size: .86em; background: var(--surface-raised); padding: 2px 6px; border-radius: 5px; }
+
+    .shell { width: min(100% - 28px, var(--max-w)); margin: 0 auto; padding: 28px 0 52px; }
+
+    /* Top Bar */
+    .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; gap: 12px; flex-wrap: wrap; }
+    .pill { display: inline-flex; align-items: center; gap: 7px; padding: 7px 16px; border: 1px solid var(--line); border-radius: 999px; background: var(--surface-raised); color: var(--text); font-size: .82rem; font-weight: 700; cursor: pointer; transition: border-color .18s, background .18s; text-decoration: none; }
+    .pill:hover { border-color: var(--red); background: var(--surface-soft); text-decoration: none; }
+
+    /* Hero */
+    .hero { margin-bottom: 28px; }
+    .eyebrow { margin-bottom: 6px; color: var(--red); font-size: .78rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
+    h1 { font-size: clamp(1.8rem, 3.2vw, 2.8rem); font-weight: 800; letter-spacing: -.03em; line-height: 1.08; margin-bottom: 12px; }
+    .lede { max-width: 820px; color: var(--muted); font-size: 1.02rem; }
+
+    /* Alert Banner */
+    .alert { padding: 16px 20px; margin-bottom: 24px; border: 1px solid var(--red); border-radius: var(--radius-sm); background: var(--red-soft); }
+    .alert h4 { margin-bottom: 4px; color: var(--red); font-size: .95rem; }
+    .alert p { font-size: .92rem; color: var(--text); }
+
+    /* Mode Tabs */
+    .tabs { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 24px; }
+    .tab { padding: 10px 20px; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); color: var(--muted); font-size: .88rem; font-weight: 650; cursor: pointer; transition: all .18s; display: inline-flex; align-items: center; gap: 8px; }
+    .tab:hover { border-color: var(--red); color: var(--text); }
+    .tab.active-red { border-color: var(--red); background: var(--red-soft); color: var(--red); box-shadow: 0 0 14px rgba(248,113,113,.18); }
+    .tab.active-green { border-color: var(--green); background: var(--green-soft); color: var(--green); box-shadow: 0 0 14px rgba(74,222,128,.18); }
+    .tab.active-amber { border-color: var(--amber); background: var(--amber-soft); color: var(--amber); box-shadow: 0 0 14px rgba(251,191,36,.18); }
+
+    /* Canvas Card */
+    .canvas { padding: 24px; margin-bottom: 28px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); box-shadow: var(--shadow); }
+    .canvas-head { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px; margin-bottom: 14px; }
+    .canvas-title { font-size: 1.12rem; font-weight: 700; }
+    .badges { display: flex; gap: 12px; flex-wrap: wrap; }
+    .badge { padding: 5px 12px; border-radius: 7px; background: var(--surface-soft); border: 1px solid var(--line); font-size: .82rem; }
+    .badge b { font-weight: 700; }
+
+    .viewport { position: relative; width: 100%; height: 460px; border-radius: var(--radius-sm); background: var(--svg-bg); border: 1px solid var(--line-strong); overflow: hidden; }
+    .viewport svg { width: 100%; height: 100%; }
+    .overlay-tags { position: absolute; top: 12px; left: 12px; display: flex; flex-direction: column; gap: 6px; z-index: 5; }
+    .o-tag { padding: 3px 10px; border-radius: 5px; font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; backdrop-filter: blur(6px); }
+    .o-tag.red   { background: rgba(248,113,113,.22); color: var(--red); border: 1px solid var(--red); }
+    .o-tag.green { background: rgba(74,222,128,.22); color: var(--green); border: 1px solid var(--green); }
+    .o-tag.amber { background: rgba(251,191,36,.22); color: var(--amber); border: 1px solid var(--amber); }
+
+    /* Vuln Cards Grid */
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 18px; margin-bottom: 24px; }
+    .card { padding: 22px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); box-shadow: var(--shadow); transition: border-color .2s; }
+    .card:hover { border-color: var(--line-strong); }
+    .card h3 { margin-bottom: 10px; font-size: 1.05rem; }
+    .card p { color: var(--muted); font-size: .9rem; margin-bottom: 10px; }
+    .card ul { padding-left: 18px; font-size: .86rem; }
+    .card li { margin-bottom: 5px; }
+    .severity { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 10px; }
+    .sev-crit { background: var(--red-soft); color: var(--red); border: 1px solid var(--red); }
+    .sev-high { background: var(--amber-soft); color: var(--amber); border: 1px solid var(--amber); }
+
+    /* Sources */
+    .sources { padding: 22px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); box-shadow: var(--shadow); margin-bottom: 24px; }
+    .sources h3 { color: var(--amber); margin-bottom: 10px; font-size: 1.05rem; }
+    .sources ul { padding-left: 18px; font-size: .86rem; line-height: 1.7; }
+
+    footer { margin-top: 28px; padding-top: 18px; border-top: 1px solid var(--line); color: var(--muted); font-size: .84rem; text-align: center; }
+
+    /* SVG animations */
+    @keyframes pulse-red { 0%,100% { opacity:.4; } 50% { opacity:.9; } }
+    @keyframes dash-flow { to { stroke-dashoffset: -40; } }
+    @keyframes blink { 0%,100% { opacity:1; } 50% { opacity:.3; } }
+    .anim-pulse { animation: pulse-red 2s ease-in-out infinite; }
+    .anim-dash  { animation: dash-flow 1.4s linear infinite; }
+    .anim-blink { animation: blink 1.2s ease-in-out infinite; }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <div class="top-bar">
+      <a href="index.html" class="pill">🏠 Back to Master Hub</a>
+      <button class="pill" id="theme-btn" onclick="toggleTheme()"><span id="theme-icon">☀️ Light Mode</span></button>
+    </div>
+
+    <header class="hero">
+      <p class="eyebrow">Cybersecurity & Privacy Risk Register</p>
+      <h1>Unitree G1 Vulnerability & Hardening Visualizer</h1>
+      <p class="lede">
+        Empirical security audits of factory Unitree G1 firmware revealed zero-day BLE command injection vectors, static cryptographic keys, and unencrypted MQTT telemetry leaks at 1.03 Mbps.
+        Explore the attack surface and our local air-gapped hardening architecture.
+      </p>
+    </header>
+
+    <div class="alert">
+      <h4>🚨 Factory Vulnerability Summary (Vilches et al. 2025 — arXiv:2509.14139)</h4>
+      <p>Unpatched factory G1 units expose an unauthenticated BLE provisioning daemon with a fleet-wide static AES-CFB key, allowing remote root command execution via <code>";$(cmd);#"</code> injection strings.</p>
+    </div>
+
+    <div class="tabs" role="tablist">
+      <button class="tab active-red" id="btn-factory" onclick="pick('factory')"><span>🔴</span> Factory Firmware (Vulnerable)</button>
+      <button class="tab" id="btn-hardened" onclick="pick('hardened')"><span>🟢</span> Air-Gapped Sandbox (Hardened)</button>
+      <button class="tab" id="btn-telemetry" onclick="pick('telemetry')"><span>🟡</span> Telemetry Leak Analysis (1.03 Mbps)</button>
+    </div>
+
+    <section class="canvas">
+      <div class="canvas-head">
+        <span class="canvas-title" id="c-title">Unprotected Factory Firmware Attack Surface</span>
+        <div class="badges">
+          <div class="badge">Root Access: <b id="m-risk" style="color:var(--red)">CRITICAL</b></div>
+          <div class="badge">Data Leak: <b id="m-leak" style="color:var(--red)">1.03 Mbps</b></div>
+          <div class="badge">GDPR: <b id="m-gdpr" style="color:var(--red)">VIOLATION</b></div>
+        </div>
+      </div>
+      <div class="viewport">
+        <div class="overlay-tags" id="o-tags">
+          <span class="o-tag red">BLE Root Injection Exposed</span>
+          <span class="o-tag red">Static AES-CFB Key (Fleet-wide)</span>
+        </div>
+        <svg id="viz" viewBox="0 0 880 440" preserveAspectRatio="xMidYMid meet">
+          <defs>
+            <marker id="arr-red" viewBox="0 0 10 8" refX="9" refY="4" markerWidth="8" markerHeight="6" orient="auto"><path d="M0,0 L10,4 L0,8z" fill="#f87171"/></marker>
+            <marker id="arr-amber" viewBox="0 0 10 8" refX="9" refY="4" markerWidth="8" markerHeight="6" orient="auto"><path d="M0,0 L10,4 L0,8z" fill="#fbbf24"/></marker>
+            <marker id="arr-green" viewBox="0 0 10 8" refX="9" refY="4" markerWidth="8" markerHeight="6" orient="auto"><path d="M0,0 L10,4 L0,8z" fill="#4ade80"/></marker>
+            <filter id="glow-r"><feGaussianBlur stdDeviation="4" result="b"/><feComposite in="SourceGraphic" in2="b" operator="over"/></filter>
+            <filter id="glow-g"><feGaussianBlur stdDeviation="3" result="b"/><feComposite in="SourceGraphic" in2="b" operator="over"/></filter>
+            <radialGradient id="rg-danger" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#f87171" stop-opacity=".3"/><stop offset="100%" stop-color="transparent"/></radialGradient>
+          </defs>
+          <g id="scene"></g>
+        </svg>
+      </div>
+    </section>
+
+    <div class="grid">
+      <div class="card">
+        <h3 style="color:var(--red)">1. BLE Provisioning Injection (UniPwn)</h3>
+        <span class="severity sev-crit">Critical</span>
+        <p>The factory BLE daemon accepts unvalidated SSID/password strings. Injecting <code>";$(cmd);#"</code> executes arbitrary shell commands as root. Encrypted with a fleet-wide static AES-CFB key.</p>
+        <ul>
+          <li>Unauthenticated remote root code execution</li>
+          <li>Static encryption key across all sold G1 units</li>
+          <li>Exploitable within 15 meters via BLE scanner</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3 style="color:var(--amber)">2. Obfuscated FMX Protocol</h3>
+        <span class="severity sev-high">High</span>
+        <p>Internal motor/sensor telemetry uses FMX encrypted with Blowfish-ECB and a static 128-bit key. Relies on LCG for obfuscation, violating Kerckhoffs's principle.</p>
+        <ul>
+          <li>Replay attacks on joint motor actuation</li>
+          <li>Static Blowfish-ECB key reverse-engineered</li>
+          <li>Insecure LCG PRNG sequence prediction</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3 style="color:var(--cyan)">3. 300s Telemetry Ping & Cloud Drain</h3>
+        <span class="severity sev-high">High</span>
+        <p>Factory units transmit 300-second multimodal telemetry (battery, joint torque, camera/mic data) to <code>43.175.228.18:17883</code> at 1.03 Mbps with auto-reconnect.</p>
+        <ul>
+          <li>Violates GDPR Articles 6 & 13 (no consent)</li>
+          <li>Exposes room layout & camera metadata</li>
+          <li>Mitigated via <code>/etc/hosts</code> null-routing</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3 style="color:var(--purple)">4. CloudSail AI Backdoor & 39C3 Congress</h3>
+        <span class="severity sev-crit">Critical</span>
+        <p>Confirmed by <strong>39C3 Hacker Congress</strong> and <strong>Benn Jordan</strong>: CloudSail remote management allows RCE and prompt-injections into onboard embodied AI.</p>
+        <ul>
+          <li>Remote LLM/VLA prompt injection vector</li>
+          <li>Bypasses local user permission models</li>
+          <li>Hardened via wired Ethernet host-routed NAT</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3 style="color:var(--green)">5. Author's Prior Security Research (Sigurius23)</h3>
+        <span class="severity sev-high">High Impact</span>
+        <p>Integration of our own prior IoT/Robotics vulnerability research and conference proceedings into the G1 hardening methodology.</p>
+        <ul>
+          <li>Validated against our prior robotic security frameworks</li>
+          <li>Informs the local air-gapped architecture design</li>
+          <li>Contributed to early G1 vulnerability discovery</li>
+        </ul>
+      </div>
+    </div>
+
+    <section class="sources">
+      <h3>📚 Academic Sources & Security Disclosures</h3>
+      <ul>
+        <li><strong>Sigurius23 (2025/2026):</strong> <em>Previous Security Research and Conference Proceedings</em> on IoT & Robotics Vulnerabilities.</li>
+        <li><strong>39C3 Hacker Congress (2025/2026):</strong> <em>Unitree G1 CloudSail Backdoor & Telemetry Audit</em>, Chaos Communication Congress.</li>
+        <li><strong>Benn Jordan Investigation (2025/2026):</strong> <em>University Lab Host-Routed G1 Isolation Framework</em>.</li>
+        <li><strong>Vilches, Makris & Finisterre (2025):</strong> <em>Humanoid Robots as Attack Vectors: Security Audit of Unitree G1 Firmware</em>. <a href="https://doi.org/10.48550/arXiv.2509.14139" target="_blank" rel="noreferrer">arXiv:2509.14139</a></li>
+        <li><strong>UniPwn BLE Exploit Tool (2025):</strong> <em>BLE Provisioning Root Vulnerability Disclosure</em>. <a href="https://aliasrobotics.com" target="_blank" rel="noreferrer">Alias Robotics</a></li>
+      </ul>
+    </section>
+
+    <footer>
+      Companion security explorer for <a href="g1_architecture_sim.html">Architecture</a> · <a href="g1_vram_swap_sim.html">VRAM Swap</a> · <a href="g1_gps_slam_sim.html">GPS-SLAM</a> · <a href="g1_ag_slam_sim.html">AG-SLAM</a>
+    </footer>
+  </main>
+
+  <script>
+  /* ── SVG Helpers ── */
+  var NS = "http://www.w3.org/2000/svg";
+  function el(tag, attrs, parent) {
+    var e = document.createElementNS(NS, tag);
+    for (var k in attrs) e.setAttribute(k, attrs[k]);
+    if (parent) parent.appendChild(e);
+    return e;
+  }
+  function txt(x, y, text, fill, size, anchor, weight, parent) {
+    var t = el("text", { x:x, y:y, fill:fill, "font-size":size||12, "text-anchor":anchor||"start", "font-weight":weight||700, "font-family":"Inter, sans-serif" }, parent);
+    t.textContent = text;
+    return t;
+  }
+  function box(x, y, w, h, fill, stroke, sw, rx, parent) {
+    return el("rect", { x:x, y:y, width:w, height:h, fill:fill, stroke:stroke, "stroke-width":sw||2, rx:rx||10 }, parent);
+  }
+
+  /* ── Factory Vulnerable ── */
+  function renderFactory(svg) {
+    svg.innerHTML = "";
+
+    // G1 Robot central box
+    box(320, 100, 240, 240, "var(--surface-raised)", "var(--red)", 2.5, 14, svg);
+    // Inner labels
+    txt(440, 135, "UNITREE G1 EDU", "var(--red)", 13, "middle", 800, svg);
+    txt(440, 155, "(Factory Firmware — Unpatched)", "var(--muted)", 10, "middle", 500, svg);
+    // Sub-components inside G1
+    box(340, 175, 200, 28, "var(--svg-bg)", "var(--line-strong)", 1, 6, svg);
+    txt(440, 194, "BLE Daemon (root, unauth)", "var(--red)", 9, "middle", 600, svg);
+    box(340, 210, 200, 28, "var(--svg-bg)", "var(--line-strong)", 1, 6, svg);
+    txt(440, 229, "FMX Motor Protocol (Blowfish-ECB)", "var(--amber)", 9, "middle", 600, svg);
+    box(340, 245, 200, 28, "var(--svg-bg)", "var(--line-strong)", 1, 6, svg);
+    txt(440, 264, "MQTT Telemetry Client (auto-connect)", "var(--amber)", 9, "middle", 600, svg);
+    box(340, 280, 200, 28, "var(--svg-bg)", "var(--line-strong)", 1, 6, svg);
+    txt(440, 299, "CloudSail Agent (RCE vector)", "var(--red)", 9, "middle", 600, svg);
+
+    // Attacker node (left)
+    el("circle", { cx:110, cy:180, r:30, fill:"var(--red)", filter:"url(#glow-r)", class:"anim-pulse" }, svg);
+    txt(110, 175, "⚡", "var(--text)", 16, "middle", 800, svg);
+    txt(110, 195, "ATTACKER", "#0b0f16", 8, "middle", 800, svg);
+    txt(110, 230, "BLE Scanner", "var(--muted)", 9, "middle", 500, svg);
+    txt(110, 244, "15m range", "var(--muted)", 9, "middle", 500, svg);
+
+    // BLE attack arrow
+    el("line", { x1:140, y1:180, x2:316, y2:188, stroke:"var(--red)", "stroke-width":2.5, "stroke-dasharray":"6 4", class:"anim-dash", "marker-end":"url(#arr-red)" }, svg);
+    // Attack label box
+    box(165, 148, 140, 22, "var(--red-soft)", "var(--red)", 1, 6, svg);
+    txt(235, 163, '";$(cmd);#" → root', "var(--red)", 9, "middle", 700, svg);
+
+    // Cloud server (right)
+    box(660, 100, 170, 110, "var(--surface-raised)", "var(--amber)", 2, 12, svg);
+    txt(745, 135, "☁️ Cloud Server", "var(--amber)", 11, "middle", 700, svg);
+    txt(745, 155, "43.175.228.18:17883", "var(--muted)", 9, "middle", 500, svg);
+    txt(745, 175, "MQTT (Unencrypted)", "var(--muted)", 9, "middle", 500, svg);
+    txt(745, 195, "Auto-reconnect every 300s", "var(--muted)", 8, "middle", 500, svg);
+
+    // Telemetry leak arrow
+    el("line", { x1:564, y1:155, x2:656, y2:155, stroke:"var(--amber)", "stroke-width":2.5, "stroke-dasharray":"5 4", class:"anim-dash", "marker-end":"url(#arr-amber)" }, svg);
+    box(570, 132, 80, 18, "var(--amber-soft)", "var(--amber)", 1, 5, svg);
+    txt(610, 145, "1.03 Mbps", "var(--amber)", 9, "middle", 700, svg);
+
+    // CloudSail RCE arrow (from cloud back to robot)
+    el("line", { x1:656, y1:190, x2:564, y2:295, stroke:"var(--red)", "stroke-width":2, "stroke-dasharray":"4 4", class:"anim-dash", "marker-end":"url(#arr-red)" }, svg);
+    txt(630, 250, "RCE / Prompt", "var(--red)", 8, "middle", 600, svg);
+    txt(630, 262, "Injection", "var(--red)", 8, "middle", 600, svg);
+
+    // Data types leaked
+    box(350, 355, 180, 50, "var(--surface-raised)", "var(--line-strong)", 1, 8, svg);
+    txt(440, 372, "📹 Camera + 🎤 Mic", "var(--muted)", 9, "middle", 600, svg);
+    txt(440, 388, "🔋 Battery + 🦿 Joint Torques", "var(--muted)", 9, "middle", 600, svg);
+    txt(440, 400, "📍 Room layout metadata", "var(--muted)", 8, "middle", 500, svg);
+
+    // Arrow from G1 to leaked data
+    el("line", { x1:440, y1:340, x2:440, y2:352, stroke:"var(--line-strong)", "stroke-width":1, "stroke-dasharray":"3 2" }, svg);
+
+    // Legend
+    txt(60, 425, "🔴 Active attack vector", "var(--muted)", 10, "start", 500, svg);
+    txt(280, 425, "🟠 Telemetry leak path", "var(--muted)", 10, "start", 500, svg);
+    txt(500, 425, "Dashed lines = Active data flow", "var(--muted)", 10, "start", 500, svg);
+  }
+
+  /* ── Hardened Air-Gapped ── */
+  function renderHardened(svg) {
+    svg.innerHTML = "";
+
+    // Air-gap sandbox border
+    box(150, 40, 580, 340, "rgba(74,222,128,.04)", "var(--green)", 2.5, 16, svg);
+    el("rect", { x:150, y:40, width:580, height:340, rx:16, fill:"none", stroke:"var(--green)", "stroke-width":2.5, "stroke-dasharray":"10 6" }, svg);
+    txt(440, 65, "🔒 LOCAL ISOLATED AIR-GAP SANDBOX", "var(--green)", 11, "middle", 800, svg);
+
+    // Host Workstation
+    box(180, 90, 200, 100, "var(--surface-raised)", "var(--green)", 1.5, 10, svg);
+    txt(280, 115, "Host Workstation", "var(--green)", 11, "middle", 700, svg);
+    txt(280, 135, "RTX 5090 · 24 GB VRAM", "var(--muted)", 9, "middle", 500, svg);
+    txt(280, 152, "eBPF Firewall Active", "var(--green)", 9, "middle", 600, svg);
+    txt(280, 168, "IP Tables + nftables", "var(--muted)", 8, "middle", 500, svg);
+
+    // G1 Orin NX
+    box(420, 90, 280, 100, "var(--surface-raised)", "var(--green)", 1.5, 10, svg);
+    txt(560, 115, "G1 Orin NX (Hardened)", "var(--green)", 11, "middle", 700, svg);
+    txt(560, 135, "BLE Daemon → disabled (systemctl)", "var(--muted)", 9, "middle", 500, svg);
+    txt(560, 152, "Wi-Fi → disabled (rfkill)", "var(--muted)", 9, "middle", 500, svg);
+    txt(560, 168, "/etc/hosts → 127.0.0.1 null-routed", "var(--muted)", 9, "middle", 500, svg);
+
+    // Gigabit tether
+    el("line", { x1:382, y1:140, x2:418, y2:140, stroke:"var(--green)", "stroke-width":3 }, svg);
+    txt(400, 132, "⚡", "var(--green)", 10, "middle", 700, svg);
+
+    // Mitigations list
+    box(200, 210, 500, 130, "var(--surface-raised)", "var(--line)", 1, 10, svg);
+    txt(450, 235, "Applied Hardening Mitigations", "var(--green)", 11, "middle", 700, svg);
+    var mits = [
+      "✅ BLE Provisioning Daemon → systemctl stop + disable",
+      "✅ Wi-Fi Module → rfkill block wlan",
+      "✅ /etc/hosts → 43.175.228.18 → 127.0.0.1 (null-routed)",
+      "✅ Wired Ethernet Host-Routed NAT Isolation",
+      "✅ eBPF + nftables egress-only allowlist"
+    ];
+    for (var i = 0; i < mits.length; i++) {
+      txt(220, 258 + i * 16, mits[i], "var(--text)", 9, "start", 500, svg);
+    }
+
+    // Blocked attacker (left, outside sandbox)
+    el("circle", { cx:80, cy:140, r:22, fill:"var(--line-strong)", opacity:.5 }, svg);
+    txt(80, 136, "⚡", "var(--muted)", 13, "middle", 700, svg);
+    txt(80, 154, "ATK", "var(--muted)", 8, "middle", 700, svg);
+    el("line", { x1:102, y1:140, x2:146, y2:140, stroke:"var(--red)", "stroke-width":2, "stroke-dasharray":"4 3" }, svg);
+    txt(140, 128, "🚫", "var(--red)", 18, "middle", 700, svg);
+
+    // Blocked cloud (right, outside sandbox)
+    box(760, 110, 100, 60, "var(--surface-raised)", "var(--line-strong)", 1, 8, svg);
+    txt(810, 140, "☁️ Cloud", "var(--muted)", 10, "middle", 500, svg);
+    txt(810, 158, "BLOCKED", "var(--red)", 9, "middle", 700, svg);
+    el("line", { x1:734, y1:140, x2:756, y2:140, stroke:"var(--red)", "stroke-width":2, "stroke-dasharray":"4 3" }, svg);
+    txt(745, 128, "🚫", "var(--red)", 18, "middle", 700, svg);
+
+    // Legend
+    txt(60, 425, "🟢 Secure internal connection", "var(--muted)", 10, "start", 500, svg);
+    txt(300, 425, "🚫 Blocked external path", "var(--muted)", 10, "start", 500, svg);
+    txt(520, 425, "Dashed border = Air-gap perimeter", "var(--muted)", 10, "start", 500, svg);
+  }
+
+  /* ── Telemetry Leak Analysis ── */
+  function renderTelemetry(svg) {
+    svg.innerHTML = "";
+
+    // G1 Robot (left)
+    box(80, 80, 280, 280, "var(--surface-raised)", "var(--amber)", 2, 14, svg);
+    txt(220, 110, "UNITREE G1 EDU", "var(--amber)", 13, "middle", 800, svg);
+    txt(220, 130, "Telemetry Emission Sources", "var(--muted)", 10, "middle", 500, svg);
+
+    // Telemetry data rows inside G1
+    var rows = [
+      { y:160, icon:"📹", label:"RGB Cameras (2×)", rate:"640×480 @ 30fps", color:"var(--red)" },
+      { y:190, icon:"🎤", label:"Microphone Array", rate:"16kHz mono stream", color:"var(--red)" },
+      { y:220, icon:"🔋", label:"Battery Telemetry", rate:"Voltage + SoC + temp", color:"var(--amber)" },
+      { y:250, icon:"🦿", label:"Joint Torque (43 DoF)", rate:"Position + velocity + effort", color:"var(--amber)" },
+      { y:280, icon:"📍", label:"IMU + Odometry", rate:"6-axis @ 200 Hz", color:"var(--amber)" },
+      { y:310, icon:"🌐", label:"System Metadata", rate:"Hostname + firmware rev", color:"var(--muted)" }
+    ];
+    for (var i = 0; i < rows.length; i++) {
+      var r = rows[i];
+      box(100, r.y-14, 240, 24, "var(--svg-bg)", "var(--line)", 1, 5, svg);
+      txt(116, r.y+2, r.icon + "  " + r.label, r.color, 9, "start", 600, svg);
+      txt(336, r.y+2, r.rate, "var(--muted)", 8, "end", 500, svg);
+    }
+
+    // Aggregation funnel
+    el("path", { d:"M 364,200 L 420,200 L 420,260 L 364,260", fill:"none", stroke:"var(--amber)", "stroke-width":1.5 }, svg);
+    txt(392, 225, "MQTT", "var(--amber)", 9, "middle", 700, svg);
+    txt(392, 240, "Broker", "var(--amber)", 9, "middle", 700, svg);
+
+    // Main data flow arrow
+    el("line", { x1:424, y1:230, x2:530, y2:230, stroke:"var(--amber)", "stroke-width":3, "stroke-dasharray":"6 4", class:"anim-dash", "marker-end":"url(#arr-amber)" }, svg);
+    // Bandwidth label
+    box(440, 200, 80, 22, "var(--amber-soft)", "var(--amber)", 1, 6, svg);
+    txt(480, 215, "1.03 Mbps", "var(--amber)", 10, "middle", 800, svg);
+
+    // Cloud server (right)
+    box(534, 110, 280, 240, "var(--surface-raised)", "var(--red)", 2, 14, svg);
+    txt(674, 140, "☁️ MANUFACTURER CLOUD", "var(--red)", 12, "middle", 800, svg);
+    txt(674, 160, "IP: 43.175.228.18", "var(--muted)", 10, "middle", 500, svg);
+    txt(674, 180, "Port: 17883 (MQTT)", "var(--muted)", 10, "middle", 500, svg);
+
+    // What cloud receives
+    box(554, 200, 240, 120, "var(--svg-bg)", "var(--line)", 1, 8, svg);
+    txt(674, 222, "Data Received by Cloud:", "var(--red)", 10, "middle", 700, svg);
+    txt(674, 242, "• Room visual layout (camera feeds)", "var(--text)", 9, "middle", 500, svg);
+    txt(674, 258, "• Audio from microphone array", "var(--text)", 9, "middle", 500, svg);
+    txt(674, 274, "• Full robot kinematics state", "var(--text)", 9, "middle", 500, svg);
+    txt(674, 290, "• Device fingerprint + geo metadata", "var(--text)", 9, "middle", 500, svg);
+    txt(674, 310, "• Auto-reconnects every 300 seconds", "var(--text)", 9, "middle", 500, svg);
+
+    // GDPR violation box
+    box(200, 375, 480, 30, "var(--red-soft)", "var(--red)", 1.5, 8, svg);
+    txt(440, 395, "⚠ Violates GDPR Art. 6 & 13 — No user consent, no opt-out mechanism", "var(--red)", 10, "middle", 700, svg);
+
+    // Legend
+    txt(60, 430, "🟠 Unencrypted telemetry", "var(--muted)", 10, "start", 500, svg);
+    txt(300, 430, "🔴 Privacy-sensitive data", "var(--muted)", 10, "start", 500, svg);
+    txt(540, 430, "Every 300s = Continuous surveillance risk", "var(--muted)", 10, "start", 500, svg);
+  }
+
+  /* ── State Machine ── */
+  var states = {
+    factory: {
+      title: "Unprotected Factory Firmware Attack Surface",
+      risk: "CRITICAL", riskC: "var(--red)",
+      leak: "1.03 Mbps", leakC: "var(--red)",
+      gdpr: "VIOLATION", gdprC: "var(--red)",
+      tabClass: "active-red",
+      tags: '<span class="o-tag red">BLE Root Injection Exposed</span><span class="o-tag red">Static AES-CFB Key (Fleet-wide)</span>',
+      render: renderFactory
+    },
+    hardened: {
+      title: "Air-Gapped Local Architecture (Hardened Sandbox)",
+      risk: "MITIGATED", riskC: "var(--green)",
+      leak: "0.00 Mbps", leakC: "var(--green)",
+      gdpr: "COMPLIANT", gdprC: "var(--green)",
+      tabClass: "active-green",
+      tags: '<span class="o-tag green">BLE Daemon Disabled</span><span class="o-tag green">eBPF Firewall Active</span>',
+      render: renderHardened
+    },
+    telemetry: {
+      title: "MQTT Cloud Telemetry Leak Analysis (1.03 Mbps)",
+      risk: "MODERATE", riskC: "var(--amber)",
+      leak: "1.03 Mbps", leakC: "var(--amber)",
+      gdpr: "NON-COMPLIANT", gdprC: "var(--amber)",
+      tabClass: "active-amber",
+      tags: '<span class="o-tag amber">Continuous Telemetry to 43.175.228.18</span>',
+      render: renderTelemetry
+    }
+  };
+
+  function pick(key) {
+    document.querySelectorAll(".tab").forEach(function(b) { b.className = "tab"; });
+    var btn = document.getElementById("btn-" + key);
+    if (btn) btn.className = "tab " + states[key].tabClass;
+
+    var s = states[key];
+    document.getElementById("c-title").textContent = s.title;
+    var mr = document.getElementById("m-risk"); mr.textContent = s.risk; mr.style.color = s.riskC;
+    var ml = document.getElementById("m-leak"); ml.textContent = s.leak; ml.style.color = s.leakC;
+    var mg = document.getElementById("m-gdpr"); mg.textContent = s.gdpr; mg.style.color = s.gdprC;
+    document.getElementById("o-tags").innerHTML = s.tags;
+    s.render(document.getElementById("scene"));
+  }
+
+  function toggleTheme() {
+    var c = document.documentElement.getAttribute("data-theme");
+    var t = c === "light" ? "dark" : "light";
+    document.documentElement.setAttribute("data-theme", t);
+    localStorage.setItem("g1_theme", t);
+    document.getElementById("theme-icon").textContent = t === "light" ? "🌙 Dark Mode" : "☀️ Light Mode";
+  }
+
+  (function() {
+    var s = localStorage.getItem("g1_theme");
+    if (s) {
+      document.documentElement.setAttribute("data-theme", s);
+      document.getElementById("theme-icon").textContent = s === "light" ? "🌙 Dark Mode" : "☀️ Light Mode";
+    }
+  })();
+
+  pick("factory");
+  </script>
+</body>
+</html>

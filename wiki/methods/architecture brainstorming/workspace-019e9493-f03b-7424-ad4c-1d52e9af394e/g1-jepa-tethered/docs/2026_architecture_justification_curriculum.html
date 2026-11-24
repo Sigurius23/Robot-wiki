@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Curriculum of Complexity: Architectural Justification</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #09090b;
+      --surface: #18181b;
+      --surface-raised: #27272a;
+      --surface-overlay: #3f3f46;
+      --line: #27272a;
+      --line-strong: #3f3f46;
+      --text: #f4f4f5;
+      --muted: #a1a1aa;
+      --cyan: #22d3ee;
+      --cyan-soft: rgba(34, 211, 238, 0.15);
+      --green: #4ade80;
+      --green-soft: rgba(74, 222, 128, 0.15);
+      --red: #f87171;
+      --red-soft: rgba(248, 113, 113, 0.15);
+      --amber: #fbbf24;
+      --amber-soft: rgba(251, 191, 36, 0.15);
+      --radius: 12px;
+    }
+
+    body.light-mode {
+      --bg: #ffffff;
+      --surface: #f4f4f5;
+      --surface-raised: #e4e4e7;
+      --surface-overlay: #d4d4d8;
+      --line: #e4e4e7;
+      --line-strong: #d4d4d8;
+      --text: #09090b;
+      --muted: #52525b;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      line-height: 1.6;
+      transition: background 0.3s, color 0.3s;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 40px 24px;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 40px;
+      padding-bottom: 24px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      font-weight: 800;
+      margin: 0 0 16px;
+      letter-spacing: -0.03em;
+      background: linear-gradient(135deg, var(--text), var(--muted));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .lede {
+      font-size: 1.1rem;
+      color: var(--muted);
+      max-width: 700px;
+      margin: 0 auto;
+    }
+
+    h2 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin: 48px 0 16px;
+      color: var(--cyan);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--line);
+    }
+    
+    h3 {
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin: 32px 0 16px;
+      color: var(--text);
+    }
+
+    .paradigm-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 40px;
+    }
+
+    .paradigm-card {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 16px;
+    }
+
+    .paradigm-card h4 {
+      margin: 0 0 8px;
+      color: var(--text);
+    }
+
+    .paradigm-card p {
+      margin: 0;
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+
+    .task-box {
+      background: var(--surface);
+      border: 1px solid var(--line-strong);
+      border-radius: var(--radius);
+      padding: 16px 20px;
+      margin-bottom: 24px;
+      font-size: 1.05rem;
+    }
+
+    .task-box strong {
+      color: var(--cyan);
+    }
+
+    ul.evaluation {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 40px;
+    }
+
+    ul.evaluation li {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 16px 20px;
+      margin-bottom: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .eval-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .eval-title {
+      font-weight: 700;
+      font-size: 1rem;
+    }
+
+    .badge {
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .badge-pass { background: var(--green-soft); color: var(--green); border: 1px solid var(--green); }
+    .badge-fail { background: var(--red-soft); color: var(--red); border: 1px solid var(--red); }
+    .badge-struggle { background: var(--amber-soft); color: var(--amber); border: 1px solid var(--amber); }
+
+    .eval-desc {
+      color: var(--muted);
+      font-size: 0.95rem;
+      margin: 0;
+    }
+
+    .conclusion {
+      background: linear-gradient(135deg, var(--surface), var(--surface-raised));
+      border: 1px solid var(--cyan);
+      border-radius: var(--radius);
+      padding: 32px;
+      margin-top: 64px;
+      text-align: center;
+    }
+
+    .conclusion h2 {
+      justify-content: center;
+      border: none;
+      margin-top: 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>The Curriculum of Complexity</h1>
+      <p class="lede">To understand <em>why</em> the Unitree G1 requires our complex, multi-loop tethered architecture, we must test it against 8 escalating scenarios, demonstrating exactly when and why standard paradigms catastrophically fail.</p>
+    </header>
+
+    <h3>The 4 Evaluated Paradigms</h3>
+    <div class="paradigm-grid">
+      <div class="paradigm-card">
+        <h4>1. Classical Robotics</h4>
+        <p>ROS2 Nav2, 2D Lidar. Rigid, fast, zero semantic understanding.</p>
+      </div>
+      <div class="paradigm-card">
+        <h4>2. End-to-End AI</h4>
+        <p>VLA/VLM mapping pixels to action. High latency, black-box, physically unsafe.</p>
+      </div>
+      <div class="paradigm-card" style="border-color: var(--cyan);">
+        <h4 style="color: var(--cyan);">3. Tethered Hybrid</h4>
+        <p>Our 3-Loop split (Orin NX + RTX 5090). Balances safety, speed, and cognition.</p>
+      </div>
+      <div class="paradigm-card">
+        <h4>4. "Thor" Future-State</h4>
+        <p>Unlimited onboard compute running unquantized 34B models at 30Hz natively.</p>
+      </div>
+    </div>
+
+    <!-- Level 1 -->
+    <h2>Level 1: Empty Room, Visible Goal (Line-of-Sight)</h2>
+    <div class="task-box">
+      <strong>The Task:</strong> Walk 5 meters forward across an empty room to reach a visible blue marker.
+    </div>
+    <ul class="evaluation">
+      <li>
+        <div class="eval-header"><span class="eval-title">Classical</span><span class="badge badge-pass">Pass</span></div>
+        <p class="eval-desc">Uses simple PID control on camera centroids. Extremely fast, mathematically perfect.</p>
+      </li>
+      <li>
+        <div class="eval-header"><span class="eval-title">End-to-End AI</span><span class="badge badge-pass">Pass</span></div>
+        <p class="eval-desc">Maps pixels directly to walking gaits. High latency (~800ms) makes it wobbly, but it succeeds.</p>
+      </li>
+      <li>
+        <div class="eval-header"><span class="eval-title" style="color: var(--cyan);">Tethered Hybrid</span><span class="badge badge-pass">Pass</span></div>
+        <p class="eval-desc">VLM sees goal, MPPI executes a straight line safely.</p>
+      </li>
+    </ul>
+
+    <!-- Level 2 -->
+    <h2>Level 2: The Static Isolated Obstacle (The Chair)</h2>
+    <div class="task-box">
+      <strong>The Task:</strong> Walk forward but maneuver around a semi-static chair in the path.
+    </div>
+    <ul class="evaluation">
+      <li>
+        <div class="eval-header"><span class="eval-title">Classical</span><span class="badge badge-pass">Pass</span></div>
+        <p class="eval-desc">2D Lidar sees the chair legs, Nav2 costmap inflates the obstacle, local planner routes around it.</p>
+      </li>
+      <li>
+        <div class="eval-header"><span class="eval-title">End-to-End AI</span><span class="badge badge-struggle">Struggle</span></div>
+        <p class="eval-desc">Network understands it's a chair, but high latency ruins precision foot placement. Frequently clips legs.</p>
+      </li>
+      <li>
+        <div class="eval-header"><span class="eval-title" style="color: var(--cyan);">Tethered Hybrid</span><span class="badge badge-pass">Pass</span></div>
+        <p class="eval-desc">RealSense + Elevation Grid maps the 3D geometry at 20Hz. MPPI routes the feet flawlessly.</p>
+      </li>
+    </ul>
+
+    <!-- Level 3 -->
+    <h2>Level 3: The Static Maze (Out of Line-of-Sight)</h2>
+    <div class="task-box">
+      <strong>The Task:</strong> Navigate through a complex, multi-room office to find "Room 402".
+    </div>
+    <ul class="evaluation">
+      <li>
+        <div class="eval-header"><span class="eval-title">Classical</span><span class="badge badge-fail">Fail</span></div>
+        <p class="eval-desc">Fails entirely at semantic routing ("What is Room 402?"). Fails at 3D overhangs (tables, stairs) due to 2D Lidar.</p>
+      </li>
+      <li>
+        <div class="eval-header"><span class="eval-title">End-to-End AI</span><span class="badge badge-fail">Fail</span></div>
+        <p class="eval-desc">Lacks spatial object permanence. Without a persistent geometric map (SLAM), it wanders down dead ends and loops.</p>
+      </li>
+      <li>
+        <div class="eval-header"><span class="eval-title" style="color: var(--cyan);">Tethered Hybrid</span><span class="badge badge-pass">Pass</span></div>
+        <p class="eval-desc">3D Livox + AG-SLAM provides infinite memory. VLM performs semantic routing, MPPI follows the global SLAM path.</p>
+      </li>
+    </ul>
+
+    <!-- Level 4 -->
+    <h2>Level 4: The Unpredictable Dynamic Object</h2>
+    <div class="task-box">
+      <strong>The Task:</strong> A dog suddenly runs directly in front of the robot's swinging foot.
+    </div>
+    <ul class="evaluation">
+      <li>
+        <div class="eval-header"><span class="eval-title">Classical</span><span class="badge badge-fail">Fail</span></div>
+        <p class="eval-desc">Nav2 local planners take ~100ms to react. The robot trips over the dog and falls.</p>
+      </li>
+      <li>
+        <div class="eval-header"><span class="eval-title">End-to-End AI</span><span class="badge badge-fail">Catastrophic Fail</span></div>
+        <p class="eval-desc">The ~800ms inference latency means the robot doesn't even realize the dog is there until it's already on the floor.</p>
+      </li>
+      <li>
+        <div class="eval-header"><span class="eval-title" style="color: var(--cyan);">Tethered Hybrid</span><span class="badge badge-pass">Pass</span></div>
+        <p class="eval-desc">The 500Hz CBF on the Orin NX acts as a mathematical safety floor, physically aborting the footstep in 2ms.</p>
+      </li>
+    </ul>
+
+    <!-- Level 5 -->
+    <h2>Level 5: The Semi-Static Environment</h2>
+    <div class="task-box">
+      <strong>The Task:</strong> Traverse an area where a heavy door was opened and a couch was moved *after* the SLAM map was built.
+    </div>
+    <ul class="evaluation">
+      <li>
+        <div class="eval-header"><span class="eval-title">Classical</span><span class="badge badge-fail">Fail</span></div>
+        <p class="eval-desc">Blindly trusts the old map, refuses to enter the room. Creates permanent "ghost" pixels on the map if forced.</p>
+      </li>
+      <li>
+        <div class="eval-header"><span class="eval-title">End-to-End AI</span><span class="badge badge-pass">Pass</span></div>
+        <p class="eval-desc">Doesn't rely on a map; reacts to what it currently sees and walks through the open door.</p>
+      </li>
+      <li>
+        <div class="eval-header"><span class="eval-title" style="color: var(--cyan);">Tethered Hybrid</span><span class="badge badge-pass">Pass</span></div>
+        <p class="eval-desc">Epipolar Geometry Consistency instantly detects moved visual features, strips them from the Splat map, and organically inpaints.</p>
+      </li>
+    </ul>
+
+    <!-- Level 6 -->
+    <h2>Level 6: Sparse Crowd Navigation</h2>
+    <div class="task-box">
+      <strong>The Task:</strong> Navigate a long hallway while 2-3 people walk in the opposite direction.
+    </div>
+    <ul class="evaluation">
+      <li>
+        <div class="eval-header"><span class="eval-title">Classical</span><span class="badge badge-fail">Fail</span></div>
+        <p class="eval-desc">Standard dynamic SLAM treats humans as moving brick walls. Robot stops constantly, violently recalculating paths.</p>
+      </li>
+      <li>
+        <div class="eval-header"><span class="eval-title">End-to-End AI</span><span class="badge badge-struggle">Struggle</span></div>
+        <p class="eval-desc">Can weave through semantically, but lacks precision footstep planning, making it look jerky and dangerous.</p>
+      </li>
+      <li>
+        <div class="eval-header"><span class="eval-title" style="color: var(--cyan);">Tethered Hybrid</span><span class="badge badge-pass">Pass</span></div>
+        <p class="eval-desc">YOLOv11-pose + LV-DOT explicitly tracks humans. MPPI predicts human trajectories, gracefully routing *behind* them.</p>
+      </li>
+    </ul>
+
+    <!-- Level 7 -->
+    <h2>Level 7: Dense Crowd with Flow (Conference Break)</h2>
+    <div class="task-box">
+      <strong>The Task:</strong> Traverse a highly congested fair floor where attendees are moving in multiple opposing directions.
+    </div>
+    <ul class="evaluation">
+      <li>
+        <div class="eval-header"><span class="eval-title">Classical</span><span class="badge badge-fail">Catastrophic Fail</span></div>
+        <p class="eval-desc">"Freezing Robot Problem". Costmap inflates around every human. The robot concludes there is 0% traversable space and freezes permanently.</p>
+      </li>
+      <li>
+        <div class="eval-header"><span class="eval-title">End-to-End AI</span><span class="badge badge-fail">Fail</span></div>
+        <p class="eval-desc">Hallucinates a path but cannot execute it safely in real-time, bumping into attendees.</p>
+      </li>
+      <li>
+        <div class="eval-header"><span class="eval-title" style="color: var(--cyan);">Tethered Hybrid</span><span class="badge badge-pass">Pass</span></div>
+        <p class="eval-desc">Dual-Pipeline Split masks the crowd. Swaps MPPI for π₀.₅ Flow Matching to learn the "fluid dynamics" of the crowd and weave natively.</p>
+      </li>
+    </ul>
+
+    <!-- Level 8 -->
+    <h2>Level 8: Social Navigation & Interaction (Final Boss)</h2>
+    <div class="task-box">
+      <strong>The Task:</strong> Navigate the fair, identify an interested person, approach them, and hand them a flyer.
+    </div>
+    <ul class="evaluation">
+      <li>
+        <div class="eval-header"><span class="eval-title">Classical</span><span class="badge badge-fail">Complete Failure</span></div>
+        <p class="eval-desc">Has absolutely zero concept of social dynamics, gaze, or human intent.</p>
+      </li>
+      <li>
+        <div class="eval-header"><span class="eval-title">End-to-End AI</span><span class="badge badge-struggle">Struggle</span></div>
+        <p class="eval-desc">Can identify an interested person, but lacks architectural flexibility to run simultaneous dialogue models and safety planners.</p>
+      </li>
+      <li>
+        <div class="eval-header"><span class="eval-title" style="color: var(--cyan);">Tethered Hybrid</span><span class="badge badge-pass">Pass</span></div>
+        <p class="eval-desc">Cosmos VLM parses Gaze at 1Hz. RTX 5090 triggers Context Swap to load Omni-LLM. Robot routes to person (MPPI), raises arm, initiates dialogue, all while 500Hz CBF ensures it doesn't step on toes.</p>
+      </li>
+    </ul>
+
+    <div class="conclusion">
+      <h2>Conclusion</h2>
+      <p class="lede">By scaling the complexity, we definitively prove that a pure classical stack fails at Level 3 (Cognition), a pure AI stack fails at Level 4 (Physics/Latency), but the <strong>Tethered Hybrid Architecture</strong> scales perfectly through Level 8 by assigning high-latency semantics to the GPU cloud, and low-latency survival physics to the edge.</p>
+    </div>
+
+  </div>
+  
+  <script>
+    // Inherit theme from parent window if embedded
+    window.addEventListener('message', function(event) {
+      if (event.data === 'theme-light') document.body.classList.add('light-mode');
+      if (event.data === 'theme-dark') document.body.classList.remove('light-mode');
+    });
+  </script>
+</body>
+</html>

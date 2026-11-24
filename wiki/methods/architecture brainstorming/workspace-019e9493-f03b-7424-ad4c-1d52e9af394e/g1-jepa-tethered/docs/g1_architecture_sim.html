@@ -1,0 +1,2037 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark light">
+  <meta name="description" content="Interactive review of the G1 tethered navigation architecture and its 3D scene representation choices.">
+  <title>G1 navigation architecture review</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --page: #0b1018;
+      --surface: #121a26;
+      --surface-raised: #182333;
+      --surface-soft: #101824;
+      --text: #edf4ff;
+      --muted: #9fb0c5;
+      --line: #2c3b50;
+      --line-strong: #465b76;
+      --cyan: #55d6e8;
+      --cyan-soft: rgba(85, 214, 232, 0.12);
+      --purple: #b48cff;
+      --purple-soft: rgba(180, 140, 255, 0.12);
+      --blue: #7aa8ff;
+      --blue-soft: rgba(122, 168, 255, 0.12);
+      --amber: #ffc568;
+      --amber-soft: rgba(255, 197, 104, 0.12);
+      --green: #62d69b;
+      --green-soft: rgba(98, 214, 155, 0.12);
+      --red: #ff7f87;
+      --red-soft: rgba(255, 127, 135, 0.12);
+      --shadow: 0 18px 50px rgba(0, 0, 0, 0.24);
+      --radius: 18px;
+      --radius-small: 11px;
+      --max-width: 1500px;
+    }
+
+    html[data-theme="light"] {
+      color-scheme: light;
+      --page: #f2f6fa;
+      --surface: #ffffff;
+      --surface-raised: #f5f8fc;
+      --surface-soft: #eef3f8;
+      --text: #152235;
+      --muted: #566980;
+      --line: #d6e0ea;
+      --line-strong: #aebdcd;
+      --cyan: #087f91;
+      --cyan-soft: rgba(8, 127, 145, 0.09);
+      --purple: #7048b8;
+      --purple-soft: rgba(112, 72, 184, 0.09);
+      --blue: #315fbd;
+      --blue-soft: rgba(49, 95, 189, 0.09);
+      --amber: #9a5b00;
+      --amber-soft: rgba(154, 91, 0, 0.09);
+      --green: #167449;
+      --green-soft: rgba(22, 116, 73, 0.09);
+      --red: #b8323b;
+      --red-soft: rgba(184, 50, 59, 0.09);
+      --shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+    }
+
+    .theme-toggle-btn {
+      position: absolute;
+      top: 24px;
+      right: 24px;
+      padding: 8px 16px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--surface-raised);
+      color: var(--text);
+      font-size: 0.85rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 180ms ease;
+      z-index: 100;
+    }
+    .theme-toggle-btn:hover {
+      border-color: var(--cyan);
+      background: var(--surface-soft);
+    }
+
+    @media (prefers-color-scheme: light) {
+      :root {
+        color-scheme: light;
+        --page: #f2f6fa;
+        --surface: #ffffff;
+        --surface-raised: #f5f8fc;
+        --surface-soft: #eef3f8;
+        --text: #152235;
+        --muted: #566980;
+        --line: #d6e0ea;
+        --line-strong: #aebdcd;
+        --cyan: #087f91;
+        --cyan-soft: rgba(8, 127, 145, 0.09);
+        --purple: #7048b8;
+        --purple-soft: rgba(112, 72, 184, 0.09);
+        --blue: #315fbd;
+        --blue-soft: rgba(49, 95, 189, 0.09);
+        --amber: #9a5b00;
+        --amber-soft: rgba(154, 91, 0, 0.09);
+        --green: #167449;
+        --green-soft: rgba(22, 116, 73, 0.09);
+        --red: #b8323b;
+        --red-soft: rgba(184, 50, 59, 0.09);
+        --shadow: 0 18px 45px rgba(44, 68, 98, 0.11);
+      }
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      min-width: 320px;
+      background:
+        radial-gradient(circle at 12% 0%, var(--cyan-soft), transparent 28rem),
+        radial-gradient(circle at 92% 18%, var(--blue-soft), transparent 32rem),
+        var(--page);
+      color: var(--text);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.5;
+    }
+
+    button,
+    a {
+      font: inherit;
+    }
+
+    button {
+      color: inherit;
+    }
+
+    a {
+      color: var(--cyan);
+      text-underline-offset: 0.18em;
+    }
+
+    a:hover {
+      text-decoration-thickness: 2px;
+    }
+
+    button:focus-visible,
+    a:focus-visible {
+      outline: 3px solid var(--cyan);
+      outline-offset: 3px;
+    }
+
+    .shell {
+      width: min(100% - 32px, var(--max-width));
+      margin: 0 auto;
+      padding: 32px 0 48px;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.45fr) minmax(300px, 0.55fr);
+      gap: 24px;
+      align-items: end;
+      margin-bottom: 22px;
+    }
+
+    .eyebrow {
+      margin: 0 0 8px;
+      color: var(--cyan);
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    h1,
+    h2,
+    h3,
+    p {
+      margin-top: 0;
+    }
+
+    h1 {
+      max-width: 900px;
+      margin-bottom: 12px;
+      font-size: clamp(2rem, 4vw, 4.1rem);
+      font-weight: 720;
+      letter-spacing: -0.045em;
+      line-height: 1.02;
+    }
+
+    .lede {
+      max-width: 820px;
+      margin-bottom: 0;
+      color: var(--muted);
+      font-size: clamp(1rem, 1.8vw, 1.2rem);
+    }
+
+    .hero-facts {
+      display: grid;
+      gap: 8px;
+      margin: 0;
+    }
+
+    .hero-facts div {
+      display: flex;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 9px 0;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .hero-facts dt {
+      color: var(--muted);
+    }
+
+    .hero-facts dd {
+      margin: 0;
+      text-align: right;
+      font-weight: 700;
+    }
+
+    .topbar {
+      position: sticky;
+      z-index: 20;
+      top: 0;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px;
+      margin-bottom: 20px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: color-mix(in srgb, var(--surface) 92%, transparent);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(18px);
+    }
+
+    .tabs,
+    .scenario-controls,
+    .method-controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+    }
+
+    .tab,
+    .scenario,
+    .method-control {
+      min-height: 42px;
+      padding: 8px 13px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: transparent;
+      cursor: pointer;
+    }
+
+    .tab:hover,
+    .scenario:hover,
+    .method-control:hover {
+      border-color: var(--line-strong);
+      background: var(--surface-raised);
+    }
+
+    .tab[aria-selected="true"],
+    .scenario[aria-pressed="true"],
+    .method-control[aria-pressed="true"] {
+      border-color: var(--cyan);
+      background: var(--cyan-soft);
+      color: var(--cyan);
+    }
+
+    .paper-link {
+      color: var(--cyan);
+      font-weight: 600;
+      font-size: 0.85rem;
+      text-decoration: underline;
+      text-underline-offset: 0.2em;
+    }
+
+    .paper-link:hover {
+      color: var(--blue);
+    }
+
+    .paper-ref {
+      color: var(--muted);
+      font-size: 0.84rem;
+      font-style: italic;
+    }
+
+    .view[hidden] {
+      display: none;
+    }
+
+    .status-strip {
+      display: grid;
+      grid-template-columns: minmax(190px, auto) 1fr auto;
+      gap: 16px;
+      align-items: center;
+      padding: 15px 17px;
+      margin-bottom: 18px;
+      border: 1px solid var(--line);
+      border-left: 5px solid var(--green);
+      border-radius: var(--radius-small);
+      background: var(--surface);
+    }
+
+    .status-strip.degraded {
+      border-left-color: var(--amber);
+    }
+
+    .status-strip.stop {
+      border-left-color: var(--red);
+    }
+
+    .status-title {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      font-weight: 760;
+      letter-spacing: 0.02em;
+    }
+
+    .status-dot {
+      width: 10px;
+      height: 10px;
+      flex: 0 0 auto;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 0 5px var(--green-soft);
+    }
+
+    .degraded .status-dot {
+      background: var(--amber);
+      box-shadow: 0 0 0 5px var(--amber-soft);
+    }
+
+    .stop .status-dot {
+      background: var(--red);
+      box-shadow: 0 0 0 5px var(--red-soft);
+    }
+
+    #status-detail {
+      margin: 0;
+      color: var(--muted);
+    }
+
+    .scenario-name {
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    .architecture {
+      display: grid;
+      gap: 14px;
+    }
+
+    .loop {
+      --flow-color: var(--cyan);
+      --flow-soft: var(--cyan-soft);
+      display: grid;
+      grid-template-columns: 164px minmax(0, 1fr);
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--surface);
+      box-shadow: var(--shadow);
+    }
+
+    .semantic-loop {
+      --flow-color: var(--purple);
+      --flow-soft: var(--purple-soft);
+    }
+
+    .predictive-loop {
+      --flow-color: var(--amber);
+      --flow-soft: var(--amber-soft);
+    }
+
+    .reactive-loop {
+      --flow-color: var(--green);
+      --flow-soft: var(--green-soft);
+    }
+
+    .loop-label {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 28px;
+      padding: 20px;
+      border-right: 1px solid var(--line);
+      background: var(--surface-soft);
+      box-shadow: inset 3px 0 0 var(--flow-color);
+    }
+
+    .loop-label h2 {
+      margin-bottom: 5px;
+      font-size: 1rem;
+      line-height: 1.2;
+    }
+
+    .loop-label p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.86rem;
+    }
+
+    .loop-rate {
+      color: var(--flow-color);
+      font-weight: 760;
+    }
+
+    .loop-path {
+      display: grid;
+      grid-template-columns: minmax(150px, 1fr) 54px minmax(150px, 1fr) 54px minmax(150px, 1fr) 54px minmax(150px, 1fr);
+      gap: 0;
+      align-items: stretch;
+      padding: 18px;
+    }
+
+    .loop-path.reactive {
+      grid-template-columns:
+        minmax(190px, 1.25fr) 48px
+        minmax(135px, 1fr) 48px
+        minmax(135px, 1fr) 48px
+        minmax(260px, 2fr) 48px
+        minmax(135px, 1fr) 48px
+        minmax(135px, 1fr);
+    }
+
+    .module,
+    .module-group {
+      min-width: 0;
+    }
+
+    .module {
+      position: relative;
+      display: flex;
+      min-height: 104px;
+      flex-direction: column;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      width: 100%;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-small);
+      background: var(--surface-raised);
+      text-align: left;
+      cursor: pointer;
+      transition: border-color 160ms ease, background 160ms ease, transform 160ms ease;
+    }
+
+    .module:hover {
+      border-color: var(--cyan);
+      transform: translateY(-2px);
+    }
+
+    .module.core {
+      border-color: color-mix(in srgb, var(--cyan) 56%, var(--line));
+      background: var(--cyan-soft);
+    }
+
+    .module.safety {
+      border-color: color-mix(in srgb, var(--green) 56%, var(--line));
+      background: var(--green-soft);
+    }
+
+    .module.offline {
+      border-color: color-mix(in srgb, var(--red) 52%, var(--line));
+      background: var(--red-soft);
+      opacity: 0.68;
+    }
+
+    .module.blocked {
+      border-style: dashed;
+      border-color: color-mix(in srgb, var(--amber) 64%, var(--line));
+      background: var(--amber-soft);
+      opacity: 0.74;
+    }
+
+    .module-kicker {
+      color: var(--muted);
+      font-size: 0.72rem;
+      font-weight: 720;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+    }
+
+    .module strong {
+      display: block;
+      font-size: 0.95rem;
+      line-height: 1.22;
+    }
+
+    .module small {
+      display: block;
+      color: var(--muted);
+      font-size: 0.78rem;
+      line-height: 1.35;
+    }
+
+    .hardware-node {
+      isolation: isolate;
+      min-height: 190px;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 50% 28%, var(--flow-soft), transparent 56%),
+        var(--surface-raised);
+    }
+
+    .hardware-node .node-state {
+      margin-top: auto;
+    }
+
+    .hardware-visual {
+      position: relative;
+      display: flex;
+      width: 100%;
+      min-height: 100px;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+    }
+
+    .hardware-visual::before {
+      position: absolute;
+      width: 72%;
+      height: 52%;
+      border-radius: 50%;
+      background: var(--flow-soft);
+      box-shadow: 0 0 38px var(--flow-soft);
+      content: "";
+      filter: blur(8px);
+    }
+
+    .hardware-visual img {
+      position: relative;
+      z-index: 1;
+      display: block;
+      max-width: 100%;
+      height: auto;
+      filter: drop-shadow(0 14px 16px rgba(0, 0, 0, 0.32));
+    }
+
+    .hardware-laptop .hardware-visual img {
+      width: min(100%, 220px);
+      mix-blend-mode: screen;
+    }
+
+    @media (prefers-color-scheme: light) {
+      .hardware-laptop {
+        background:
+          radial-gradient(circle at 50% 28%, rgba(255, 197, 104, 0.14), transparent 56%),
+          #101824;
+        color: #edf4ff;
+      }
+
+      .hardware-laptop .module-kicker,
+      .hardware-laptop small {
+        color: #aab9cc;
+      }
+
+      .hardware-laptop .node-state {
+        color: #62d69b;
+      }
+
+      .hardware-laptop.offline .node-state {
+        color: #ff7f87;
+      }
+
+      .hardware-laptop.blocked .node-state {
+        color: #ffc568;
+      }
+    }
+
+    .hardware-robot .hardware-visual {
+      min-height: 116px;
+    }
+
+    .hardware-robot .hardware-visual img {
+      width: auto;
+      max-height: 130px;
+    }
+
+    .node-state {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--green);
+      font-size: 0.73rem;
+      font-weight: 760;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .offline .node-state {
+      color: var(--red);
+    }
+
+    .blocked .node-state {
+      color: var(--amber);
+    }
+
+    .node-state::before {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: currentColor;
+      content: "";
+    }
+
+    .sensor-grid,
+    .safety-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .sensor-grid .module,
+    .safety-grid .module {
+      min-height: 104px;
+    }
+
+    .connector {
+      display: flex;
+      min-width: 0;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      color: color-mix(in srgb, var(--flow-color) 72%, var(--text));
+      text-align: center;
+    }
+
+    .connector-line {
+      position: relative;
+      display: block;
+      width: calc(100% - 10px);
+      height: 2px;
+      background: repeating-linear-gradient(90deg, var(--flow-color) 0 8px, transparent 8px 13px);
+      filter: drop-shadow(0 0 5px var(--flow-color));
+    }
+
+    .connector-line::after {
+      position: absolute;
+      top: 50%;
+      right: -1px;
+      width: 8px;
+      height: 8px;
+      border-top: 2px solid var(--flow-color);
+      border-right: 2px solid var(--flow-color);
+      content: "";
+      transform: translateY(-50%) rotate(45deg);
+    }
+
+    .connector small {
+      max-width: 76px;
+      font-size: 0.66rem;
+      font-weight: 720;
+      line-height: 1.18;
+    }
+
+    .boundary {
+      display: grid;
+      grid-template-columns: 164px minmax(0, 1fr);
+      border: 1px solid color-mix(in srgb, var(--green) 42%, var(--line));
+      border-radius: var(--radius-small);
+      background: var(--green-soft);
+    }
+
+    .boundary-label {
+      padding: 11px 20px;
+      border-right: 1px solid color-mix(in srgb, var(--green) 42%, var(--line));
+      color: var(--green);
+      font-size: 0.77rem;
+      font-weight: 760;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .boundary p {
+      margin: 0;
+      padding: 11px 18px;
+      color: var(--text);
+      font-size: 0.88rem;
+    }
+
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      padding: 10px 2px 0;
+      color: var(--muted);
+      font-size: 0.8rem;
+    }
+
+    .legend span {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+    }
+
+    .legend i {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: var(--green);
+    }
+
+    .legend .legend-blocked {
+      background: var(--amber);
+    }
+
+    .legend .legend-offline {
+      background: var(--red);
+    }
+
+    .legend i.flow-key {
+      width: 28px;
+      height: 2px;
+      border-radius: 999px;
+      background: repeating-linear-gradient(90deg, currentColor 0 8px, transparent 8px 13px);
+      filter: drop-shadow(0 0 4px currentColor);
+    }
+
+    .legend .semantic-flow {
+      color: var(--purple);
+    }
+
+    .legend .predictive-flow {
+      color: var(--amber);
+    }
+
+    .legend .reactive-flow {
+      color: var(--green);
+    }
+
+    .methods-header {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 18px;
+      align-items: end;
+      margin: 8px 0 18px;
+    }
+
+    .methods-header h2 {
+      margin-bottom: 6px;
+      font-size: clamp(1.45rem, 2.5vw, 2.2rem);
+    }
+
+    .methods-header p {
+      max-width: 780px;
+      margin-bottom: 0;
+      color: var(--muted);
+    }
+
+    .method-summary {
+      display: grid;
+      grid-template-columns: 170px 1fr;
+      margin-bottom: 16px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-small);
+      background: var(--surface);
+    }
+
+    .method-summary strong {
+      padding: 14px 16px;
+      border-right: 1px solid var(--line);
+      color: var(--cyan);
+    }
+
+    .method-summary p {
+      margin: 0;
+      padding: 14px 16px;
+      color: var(--muted);
+    }
+
+    .method-table-wrap {
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--surface);
+      box-shadow: var(--shadow);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th,
+    td {
+      padding: 15px 16px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      background: var(--surface-soft);
+      color: var(--muted);
+      font-size: 0.73rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    tbody tr:last-child td {
+      border-bottom: 0;
+    }
+
+    tbody tr:hover {
+      background: var(--surface-raised);
+    }
+
+    td:first-child {
+      width: 17%;
+      font-weight: 760;
+    }
+
+    td:nth-child(2),
+    td:nth-child(3) {
+      width: 29%;
+    }
+
+    .decision {
+      display: inline-flex;
+      align-items: center;
+      min-height: 27px;
+      padding: 3px 9px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--surface-raised);
+      font-size: 0.76rem;
+      font-weight: 760;
+      white-space: nowrap;
+    }
+
+    .decision.adopt {
+      border-color: color-mix(in srgb, var(--green) 54%, var(--line));
+      background: var(--green-soft);
+      color: var(--green);
+    }
+
+    .decision.support {
+      border-color: color-mix(in srgb, var(--cyan) 54%, var(--line));
+      background: var(--cyan-soft);
+      color: var(--cyan);
+    }
+
+    .decision.research {
+      border-color: color-mix(in srgb, var(--amber) 54%, var(--line));
+      background: var(--amber-soft);
+      color: var(--amber);
+    }
+
+    .decision.reject {
+      border-color: color-mix(in srgb, var(--red) 54%, var(--line));
+      background: var(--red-soft);
+      color: var(--red);
+    }
+
+    .method-rule {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 1px;
+      overflow: hidden;
+      margin-top: 16px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--line);
+    }
+
+    .rule-step {
+      min-height: 134px;
+      padding: 17px;
+      background: var(--surface);
+    }
+
+    .rule-step span {
+      display: inline-grid;
+      width: 28px;
+      height: 28px;
+      place-items: center;
+      margin-bottom: 14px;
+      border-radius: 50%;
+      background: var(--cyan-soft);
+      color: var(--cyan);
+      font-size: 0.78rem;
+      font-weight: 780;
+    }
+
+    .rule-step strong {
+      display: block;
+      margin-bottom: 5px;
+    }
+
+    .rule-step p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.84rem;
+    }
+
+    footer {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 24px 2px 0;
+      color: var(--muted);
+      font-size: 0.8rem;
+    }
+
+    .source-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    @media (max-width: 1460px) {
+      .loop-path.reactive {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 9px;
+      }
+
+      .loop-path.reactive .connector {
+        min-height: 40px;
+      }
+
+      .loop-path.reactive .connector-line {
+        width: 1px;
+        height: 25px;
+        background: repeating-linear-gradient(180deg, var(--flow-color) 0 7px, transparent 7px 12px);
+      }
+
+      .loop-path.reactive .connector-line::after {
+        top: auto;
+        right: auto;
+        bottom: -1px;
+        left: 50%;
+        transform: translateX(-50%) rotate(135deg);
+      }
+
+      .loop-path.reactive .connector small {
+        max-width: none;
+      }
+
+      .sensor-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
+
+      .safety-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .module {
+        min-height: 96px;
+      }
+
+      .hardware-laptop {
+        min-height: 190px;
+      }
+
+      .hardware-robot {
+        display: grid;
+        grid-template-columns: minmax(100px, 132px) minmax(0, 1fr);
+        grid-template-rows: 1fr auto;
+        min-height: 230px;
+        column-gap: 18px;
+        align-items: center;
+      }
+
+      .hardware-robot .hardware-visual {
+        grid-row: 1 / 3;
+        min-height: 204px;
+      }
+
+      .hardware-robot .hardware-visual img {
+        max-height: 214px;
+      }
+
+      .hardware-robot .hardware-copy {
+        align-self: end;
+      }
+
+      .hardware-robot .node-state {
+        align-self: start;
+        margin-top: 10px;
+      }
+    }
+
+    @media (max-width: 1160px) {
+      .loop-path {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 9px;
+      }
+
+      .connector {
+        min-height: 40px;
+      }
+
+      .connector-line {
+        width: 1px;
+        height: 25px;
+        background: repeating-linear-gradient(180deg, var(--flow-color) 0 7px, transparent 7px 12px);
+      }
+
+      .connector-line::after {
+        top: auto;
+        right: auto;
+        bottom: -1px;
+        left: 50%;
+        transform: translateX(-50%) rotate(135deg);
+      }
+
+      .connector small {
+        max-width: none;
+      }
+
+      .hardware-laptop {
+        display: grid;
+        grid-template-columns: minmax(170px, 0.75fr) minmax(0, 1fr);
+        grid-template-rows: 1fr auto;
+        min-height: 215px;
+        column-gap: 20px;
+        align-items: center;
+      }
+
+      .hardware-laptop .hardware-visual {
+        grid-row: 1 / 3;
+        min-height: 180px;
+      }
+
+      .hardware-laptop .hardware-visual img {
+        width: min(100%, 270px);
+      }
+
+      .hardware-laptop .hardware-copy {
+        align-self: end;
+      }
+
+      .hardware-laptop .node-state {
+        align-self: start;
+        margin-top: 10px;
+      }
+    }
+
+    @media (max-width: 820px) {
+      .shell {
+        width: min(100% - 20px, var(--max-width));
+        padding-top: 20px;
+      }
+
+      .hero {
+        grid-template-columns: 1fr;
+        align-items: start;
+      }
+
+      .hero-facts {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 12px;
+      }
+
+      .hero-facts div {
+        display: block;
+        border-bottom: 0;
+      }
+
+      .hero-facts dd {
+        margin-top: 3px;
+        text-align: left;
+      }
+
+      .topbar {
+        position: static;
+      }
+
+      .status-strip {
+        grid-template-columns: 1fr;
+        gap: 7px;
+      }
+
+      .loop,
+      .boundary {
+        grid-template-columns: 1fr;
+      }
+
+      .loop-label,
+      .boundary-label {
+        border-right: 0;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .loop-label {
+        flex-direction: row;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .sensor-grid,
+      .safety-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .methods-header {
+        grid-template-columns: 1fr;
+        align-items: start;
+      }
+
+      .method-summary {
+        grid-template-columns: 1fr;
+      }
+
+      .method-summary strong {
+        border-right: 0;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .method-table-wrap {
+        overflow: visible;
+        border: 0;
+        background: transparent;
+        box-shadow: none;
+      }
+
+      table,
+      thead,
+      tbody,
+      tr,
+      th,
+      td {
+        display: block;
+        width: 100%;
+      }
+
+      thead {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+      }
+
+      tbody {
+        display: grid;
+        gap: 10px;
+      }
+
+      tbody tr {
+        overflow: hidden;
+        border: 1px solid var(--line);
+        border-radius: var(--radius-small);
+        background: var(--surface);
+      }
+
+      td,
+      td:first-child,
+      td:nth-child(2),
+      td:nth-child(3) {
+        width: 100%;
+        padding: 11px 14px 11px 42%;
+        border-bottom: 1px solid var(--line);
+      }
+
+      td {
+        position: relative;
+      }
+
+      td::before {
+        position: absolute;
+        top: 11px;
+        left: 14px;
+        width: calc(42% - 22px);
+        color: var(--muted);
+        content: attr(data-label);
+        font-size: 0.69rem;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+      }
+
+      td:last-child {
+        border-bottom: 0;
+      }
+
+      .method-rule {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 520px) {
+      h1 {
+        font-size: 2.2rem;
+      }
+
+      .hero-facts {
+        grid-template-columns: 1fr;
+        gap: 0;
+      }
+
+      .hero-facts div {
+        display: flex;
+      }
+
+      .hero-facts dd {
+        margin-top: 0;
+        text-align: right;
+      }
+
+      .topbar,
+      .tabs,
+      .scenario-controls,
+      .method-controls {
+        width: 100%;
+      }
+
+      .tab {
+        flex: 1 1 auto;
+      }
+
+      .scenario,
+      .method-control {
+        flex: 1 1 calc(50% - 7px);
+      }
+
+      .loop-path {
+        padding: 10px;
+      }
+
+      .sensor-grid,
+      .safety-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .module {
+        min-height: 88px;
+      }
+
+      .hardware-laptop,
+      .hardware-robot {
+        grid-template-columns: 96px minmax(0, 1fr);
+        min-height: 176px;
+        column-gap: 12px;
+        padding: 10px 12px;
+      }
+
+      .hardware-laptop .hardware-visual,
+      .hardware-robot .hardware-visual {
+        min-height: 152px;
+      }
+
+      .hardware-laptop .hardware-visual img {
+        width: 112px;
+        max-width: 100%;
+      }
+
+      .hardware-robot .hardware-visual img {
+        max-height: 164px;
+      }
+
+      td,
+      td:first-child,
+      td:nth-child(2),
+      td:nth-child(3) {
+        padding-left: 14px;
+        padding-top: 32px;
+      }
+
+      td::before {
+        top: 10px;
+        width: auto;
+      }
+
+      .method-rule {
+        grid-template-columns: 1fr;
+      }
+
+      footer {
+        display: block;
+      }
+
+      .source-links {
+        margin-top: 12px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html {
+        scroll-behavior: auto;
+      }
+
+      *,
+      *::before,
+      *::after {
+        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px;">
+      <a href="index.html" style="display:inline-flex; align-items:center; gap:8px; padding:8px 16px; border:1px solid var(--line); border-radius:999px; background:var(--surface-raised); color:var(--text); font-size:0.85rem; font-weight:700; text-decoration:none;">🏠 Back to Master Hub</a>
+      <button class="theme-toggle-btn" id="theme-toggle-btn" style="position:static;" onclick="toggleTheme()" aria-label="Toggle Light/Dark Theme">
+        <span id="theme-icon">☀️ Light Mode</span>
+      </button>
+    </div>
+    <header class="hero">
+      <div>
+        <p class="eyebrow">Architecture decision explorer</p>
+        <h1>G1 navigation: rich scene understanding with a hard metric safety boundary</h1>
+        <p class="lede">Explore the three control loops, inject failures, and compare the map and depth methods behind the design. Neural maps provide context. Fresh local geometry authorizes motion. Companion explorers: <a href="g1_vram_swap_sim.html">VRAM Swap System</a> | <a href="g1_gps_slam_sim.html">GPS-SLAM Hybrid</a> | <a href="g1_ag_slam_sim.html">AG-SLAM Active Exploration</a> | <a href="g1_cybersecurity_sim.html">G1 Cybersecurity & Privacy Audit</a>.</p>
+      </div>
+      <dl class="hero-facts" aria-label="Project configuration">
+        <div>
+          <dt>Robot</dt>
+          <dd>G1 EDU, 43 DoF</dd>
+        </div>
+        <div>
+          <dt>Local authority</dt>
+          <dd>Occupancy + ESDF</dd>
+        </div>
+        <div>
+          <dt>Global context</dt>
+          <dd>Semantic 3DGS</dd>
+        </div>
+      </dl>
+    </header>
+
+    <nav class="topbar" aria-label="Visualization controls">
+      <div class="tabs" role="tablist" aria-label="Views">
+        <button class="tab" id="tab-architecture" type="button" role="tab" aria-selected="true" aria-controls="architecture-view">Architecture</button>
+        <button class="tab" id="tab-methods" type="button" role="tab" aria-selected="false" aria-controls="methods-view">Method review</button>
+      </div>
+      <div class="scenario-controls" aria-label="Failure scenarios">
+        <button class="scenario" type="button" data-scenario="nominal" aria-pressed="true">Nominal</button>
+        <button class="scenario" type="button" data-scenario="camera-loss" aria-pressed="false">Camera loss</button>
+        <button class="scenario" type="button" data-scenario="link-loss" aria-pressed="false">Link loss</button>
+        <button class="scenario" type="button" data-scenario="offboard-loss" aria-pressed="false">Offboard loss</button>
+        <button class="scenario" type="button" data-scenario="lidar-loss" aria-pressed="false">LiDAR loss</button>
+        <button class="scenario" type="button" data-scenario="stale-map" aria-pressed="false">Stale local map</button>
+      </div>
+    </nav>
+
+    <section class="view" id="architecture-view" role="tabpanel" aria-labelledby="tab-architecture">
+      <div class="status-strip" id="system-status" aria-live="polite" aria-atomic="true">
+        <div class="status-title">
+          <span class="status-dot" aria-hidden="true"></span>
+          <span id="status-label">Nominal</span>
+        </div>
+        <p id="status-detail">All loops are available. The fresh metric local map authorizes motion.</p>
+        <span class="scenario-name" id="scenario-name">Scenario: Nominal</span>
+      </div>
+
+      <div class="architecture" aria-label="Three-loop G1 navigation architecture">
+        <section class="loop semantic-loop" aria-labelledby="semantic-heading">
+          <header class="loop-label">
+            <div>
+              <h2 id="semantic-heading">Semantic loop</h2>
+              <p>Offboard context and task grounding</p>
+            </div>
+            <span class="loop-rate">0.5 to 1 Hz</span>
+          </header>
+          <div class="loop-path">
+            <button class="module" type="button" data-node="rgbd" aria-pressed="true">
+              <span>
+                <span class="module-kicker">Visual input</span>
+                <strong>D435i RGB-D</strong>
+                <small>Color, dense near-field depth, and visual features</small>
+              </span>
+              <span class="node-state" data-state-label>Online</span>
+            </button>
+            <div class="connector" aria-hidden="true">
+              <span class="connector-line"></span>
+              <small>posed frames</small>
+            </div>
+            <button class="module core" type="button" data-node="gs" aria-pressed="true">
+              <span>
+                <span class="module-kicker">Visual map</span>
+                <strong>Semantic 3DGS</strong>
+                <small>Digital twin, relocalization reference, and object features</small>
+              </span>
+              <span class="node-state" data-state-label>Online</span>
+            </button>
+            <div class="connector" aria-hidden="true">
+              <span class="connector-line"></span>
+              <small>feature binding</small>
+            </div>
+            <button class="module" type="button" data-node="dino" aria-pressed="true">
+              <span>
+                <span class="module-kicker">Semantics</span>
+                <strong>DINO + Slots + VL-JEPA</strong>
+                <small>Object identity, language grounding, and scene change cues</small>
+              </span>
+              <span class="node-state" data-state-label>Online</span>
+            </button>
+            <div class="connector" aria-hidden="true">
+              <span class="connector-line"></span>
+              <small>objects and places</small>
+            </div>
+            <button class="module" type="button" data-node="scenegraph" aria-pressed="true">
+              <span>
+                <span class="module-kicker">Task memory</span>
+                <strong>Scene graph</strong>
+                <small>Long-horizon goals linked to the metric frame</small>
+              </span>
+              <span class="node-state" data-state-label>Online</span>
+            </button>
+          </div>
+        </section>
+
+        <section class="loop predictive-loop" aria-labelledby="predictive-heading">
+          <header class="loop-label">
+            <div>
+              <h2 id="predictive-heading">Predictive loop</h2>
+              <p>Offboard world model and trajectory proposal</p>
+            </div>
+            <span class="loop-rate">5 to 40 Hz</span>
+          </header>
+          <div class="loop-path">
+            <button class="module hardware-node hardware-laptop" type="button" data-node="link" aria-pressed="true">
+              <span class="hardware-visual" aria-hidden="true">
+                <img src="../../../../../our-project-hardware/laptop-alienware-aa16250nt-gallery-6.avif" alt="" decoding="async">
+              </span>
+              <span class="hardware-copy">
+                <span class="module-kicker">Offboard compute + tether</span>
+                <strong>Alienware workstation</strong>
+                <small>Runs perception, world prediction, and planning; exchanges timestamped state and bounded trajectories over the Gigabit link.</small>
+              </span>
+              <span class="node-state" data-state-label>Online</span>
+            </button>
+            <div class="connector" aria-hidden="true">
+              <span class="connector-line"></span>
+              <small>metric state</small>
+            </div>
+            <button class="module core" type="button" data-node="voxel" aria-pressed="true">
+              <span>
+                <span class="module-kicker">Predictive memory</span>
+                <strong>4D sparse voxel map</strong>
+                <small>Geometry, learned features, dynamics, age, and uncertainty</small>
+              </span>
+              <span class="node-state" data-state-label>Online</span>
+            </button>
+            <div class="connector" aria-hidden="true">
+              <span class="connector-line"></span>
+              <small>state history</small>
+            </div>
+            <button class="module" type="button" data-node="world" aria-pressed="true">
+              <span>
+                <span class="module-kicker">World prediction</span>
+                <strong>V-JEPA2 + WorldRFT</strong>
+                <small>Short-horizon scene and robot outcome prediction</small>
+              </span>
+              <span class="node-state" data-state-label>Online</span>
+            </button>
+            <div class="connector" aria-hidden="true">
+              <span class="connector-line"></span>
+              <small>rollouts</small>
+            </div>
+            <button class="module" type="button" data-node="mppi" aria-pressed="true">
+              <span>
+                <span class="module-kicker">Planner</span>
+                <strong>Tether-aware MPPI</strong>
+                <small>Proposes collision, uncertainty, freshness, and wrap-aware motion</small>
+              </span>
+              <span class="node-state" data-state-label>Online</span>
+            </button>
+          </div>
+        </section>
+
+        <aside class="boundary" aria-label="Safety authority">
+          <div class="boundary-label">Hard safety boundary</div>
+          <p>Offboard trajectories are proposals. The onboard local map, CBF, freshness watchdog, and whole-body controller decide whether any segment can execute.</p>
+        </aside>
+
+        <section class="loop reactive-loop" aria-labelledby="reactive-heading">
+          <header class="loop-label">
+            <div>
+              <h2 id="reactive-heading">Reactive loop</h2>
+              <p>Onboard estimation, safety, and control</p>
+            </div>
+            <span class="loop-rate">200 to 500 Hz</span>
+          </header>
+          <div class="loop-path reactive">
+            <div class="sensor-grid" aria-label="Onboard sensors">
+              <button class="module" type="button" data-node="lidar" aria-pressed="true">
+                <span>
+                  <span class="module-kicker">Metric depth</span>
+                  <strong>MID-360 LiDAR</strong>
+                  <small>Primary range and free-space evidence</small>
+                </span>
+                <span class="node-state" data-state-label>Online</span>
+              </button>
+              <button class="module" type="button" data-node="imu" aria-pressed="true">
+                <span>
+                  <span class="module-kicker">Inertial state</span>
+                  <strong>IMU</strong>
+                  <small>Deskew, odometry, and balance state</small>
+                </span>
+                <span class="node-state" data-state-label>Online</span>
+              </button>
+              <button class="module" type="button" data-node="joints" aria-pressed="true">
+                <span>
+                  <span class="module-kicker">Proprioception</span>
+                  <strong>43 joint states</strong>
+                  <small>Body configuration and control feedback</small>
+                </span>
+                <span class="node-state" data-state-label>Online</span>
+              </button>
+              <button class="module" type="button" data-node="contacts" aria-pressed="true">
+                <span>
+                  <span class="module-kicker">Support state</span>
+                  <strong>Foot contacts</strong>
+                  <small>Support polygon and slip cues</small>
+                </span>
+                <span class="node-state" data-state-label>Online</span>
+              </button>
+            </div>
+            <div class="connector" aria-hidden="true">
+              <span class="connector-line"></span>
+              <small>synced observations</small>
+            </div>
+            <button class="module core" type="button" data-node="fastlio" aria-pressed="true">
+              <span>
+                <span class="module-kicker">State estimate</span>
+                <strong>FAST-LIO2</strong>
+                <small>LiDAR-inertial odometry and registered point map</small>
+              </span>
+              <span class="node-state" data-state-label>Online</span>
+            </button>
+            <div class="connector" aria-hidden="true">
+              <span class="connector-line"></span>
+              <small>pose + points</small>
+            </div>
+            <button class="module safety" type="button" data-node="localmap" aria-pressed="true">
+              <span>
+                <span class="module-kicker">Safety authority</span>
+                <strong>Local occupancy + ESDF</strong>
+                <small>Fresh free, occupied, unknown, and clearance queries</small>
+              </span>
+              <span class="node-state" data-state-label>Online</span>
+            </button>
+            <div class="connector" aria-hidden="true">
+              <span class="connector-line"></span>
+              <small>clearance</small>
+            </div>
+            <div class="safety-grid" aria-label="Onboard safety gate">
+              <button class="module safety" type="button" data-node="cbf" aria-pressed="true">
+                <span>
+                  <span class="module-kicker">Motion constraint</span>
+                  <strong>Proprioceptive CBF</strong>
+                  <small>Filters unsafe actions and retains inertial fallback</small>
+                </span>
+                <span class="node-state" data-state-label>Online</span>
+              </button>
+              <button class="module safety" type="button" data-node="watchdog" aria-pressed="true">
+                <span>
+                  <span class="module-kicker">Freshness gate</span>
+                  <strong>Watchdog + buffer</strong>
+                  <small>Rejects stale commands and leads into safe stand</small>
+                </span>
+                <span class="node-state" data-state-label>Online</span>
+              </button>
+            </div>
+            <div class="connector" aria-hidden="true">
+              <span class="connector-line"></span>
+              <small>validated motion</small>
+            </div>
+            <button class="module safety" type="button" data-node="wbc" aria-pressed="true">
+              <span>
+                <span class="module-kicker">Execution</span>
+                <strong>Whole-body controller</strong>
+                <small>Balance, contacts, limits, and 43-DoF command tracking</small>
+              </span>
+              <span class="node-state" data-state-label>Online</span>
+            </button>
+            <div class="connector" aria-hidden="true">
+              <span class="connector-line"></span>
+              <small>joint commands</small>
+            </div>
+            <button class="module safety hardware-node hardware-robot" type="button" data-node="robot" aria-pressed="true">
+              <span class="hardware-visual" aria-hidden="true">
+                <img src="../../../../../our-project-hardware/g1%20robot%20image.png" alt="" decoding="async">
+              </span>
+              <span class="hardware-copy">
+                <span class="module-kicker">Robot</span>
+                <strong>G1 EDU, 43 DoF</strong>
+                <small>29 body joints and 14 Dex3-1 hand joints</small>
+              </span>
+              <span class="node-state" data-state-label>Online</span>
+            </button>
+          </div>
+        </section>
+      </div>
+
+      <div class="legend" aria-label="Flow and node-state legend">
+        <span class="semantic-flow"><i class="flow-key" aria-hidden="true"></i> Semantic context</span>
+        <span class="predictive-flow"><i class="flow-key" aria-hidden="true"></i> Predictive planning</span>
+        <span class="reactive-flow"><i class="flow-key" aria-hidden="true"></i> Reactive safety</span>
+        <span><i aria-hidden="true"></i> Online</span>
+        <span><i class="legend-blocked" aria-hidden="true"></i> Blocked by dependency</span>
+        <span><i class="legend-offline" aria-hidden="true"></i> Switched off</span>
+        <span>Click any module to test a custom failure.</span>
+      </div>
+    </section>
+
+    <section class="view" id="methods-view" role="tabpanel" aria-labelledby="tab-methods" hidden>
+      <header class="methods-header">
+        <div>
+          <p class="eyebrow">Engineering comparison</p>
+          <h2>Choose each method by the query it must answer</h2>
+          <p>The stack separates metric safety, learned prediction, visual reconstruction, and task reasoning. That avoids asking a visually convincing map to make a claim it cannot certify.</p>
+        </div>
+        <div class="method-controls" aria-label="Method categories">
+          <button class="method-control" type="button" data-method="representation" aria-pressed="true">Representations</button>
+          <button class="method-control" type="button" data-method="depth" aria-pressed="false">Depth sensors</button>
+          <button class="method-control" type="button" data-method="mapping" aria-pressed="false">Mapping</button>
+          <button class="method-control" type="button" data-method="gaussian" aria-pressed="false">3DGS & Paper Matrix</button>
+        </div>
+      </header>
+
+      <div class="method-summary" aria-live="polite">
+        <strong id="method-summary-title">Representation decision</strong>
+        <p id="method-summary-text">Use occupancy and ESDF for local safety, sparse voxels for prediction, 3DGS for visual-semantic context, and a scene graph for task reasoning.</p>
+      </div>
+
+      <div class="method-table-wrap">
+        <table>
+          <caption class="sr-only" id="method-caption">Comparison of 3D scene representations</caption>
+          <thead>
+            <tr>
+              <th scope="col">Method</th>
+              <th scope="col">Best role</th>
+              <th scope="col">Primary risk</th>
+              <th scope="col">G1 decision</th>
+              <th scope="col">Literature Reference</th>
+            </tr>
+          </thead>
+          <tbody id="method-table-body"></tbody>
+        </table>
+      </div>
+
+      <div class="method-rule" aria-label="Representation selection rules">
+        <div class="rule-step">
+          <span>1</span>
+          <strong>Need collision clearance?</strong>
+          <p>Query fresh occupancy and ESDF built from metric sensors.</p>
+        </div>
+        <div class="rule-step">
+          <span>2</span>
+          <strong>Need predicted motion?</strong>
+          <p>Use a time-aware sparse voxel memory with uncertainty.</p>
+        </div>
+        <div class="rule-step">
+          <span>3</span>
+          <strong>Need visual or semantic context?</strong>
+          <p>Use 3DGS and object features, then confirm geometry locally.</p>
+        </div>
+        <div class="rule-step">
+          <span>4</span>
+          <strong>Need task-level reasoning?</strong>
+          <p>Use a scene graph linked back to the metric coordinate frame.</p>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <span>Interactive companion to <a href="3D_SCENE_REPRESENTATION_REVIEW.md">the full engineering review</a>. Rates are design targets until measured on the deployed hardware.</span>
+      <span class="source-links">
+        <a href="https://arxiv.org/abs/2308.04079" target="_blank" rel="noreferrer">3DGS</a>
+        <a href="https://arxiv.org/abs/2403.02751" target="_blank" rel="noreferrer">Splat-Nav</a>
+        <a href="https://arxiv.org/abs/2107.06829" target="_blank" rel="noreferrer">FAST-LIO2</a>
+        <a href="https://arxiv.org/abs/1611.03631" target="_blank" rel="noreferrer">Voxblox</a>
+        <a href="https://docs.nav2.org/configuration/packages/costmap-plugins/voxel.html" target="_blank" rel="noreferrer">Nav2 voxel layer</a>
+      </span>
+    </footer>
+  </main>
+
+  <script>
+    (function () {
+      "use strict";
+
+      var nodeOrder = [
+        "rgbd", "lidar", "imu", "joints", "contacts", "link",
+        "fastlio", "localmap", "gs", "dino", "scenegraph",
+        "voxel", "world", "mppi", "cbf", "watchdog", "wbc", "robot"
+      ];
+
+      var dependencies = {
+        rgbd: [],
+        lidar: [],
+        imu: [],
+        joints: [],
+        contacts: [],
+        link: [],
+        fastlio: ["lidar", "imu"],
+        localmap: ["fastlio"],
+        gs: ["rgbd", "link"],
+        dino: ["rgbd", "link"],
+        scenegraph: ["gs", "dino"],
+        voxel: ["link", "fastlio", "localmap"],
+        world: ["voxel"],
+        mppi: ["world", "link"],
+        cbf: ["imu", "joints", "contacts"],
+        watchdog: [],
+        wbc: ["cbf", "watchdog", "imu", "joints", "contacts"],
+        robot: ["wbc"]
+      };
+
+      var enabled = {};
+      var available = {};
+      var currentScenario = "nominal";
+
+      var scenarioNames = {
+        nominal: "Nominal",
+        "camera-loss": "Camera loss",
+        "link-loss": "Link loss",
+        "offboard-loss": "Offboard loss",
+        "lidar-loss": "LiDAR loss",
+        "stale-map": "Stale local map",
+        custom: "Custom node state"
+      };
+
+      var scenarioDisabled = {
+        nominal: [],
+        "camera-loss": ["rgbd"],
+        "link-loss": ["link"],
+        "offboard-loss": ["gs", "dino", "scenegraph", "voxel", "world", "mppi"],
+        "lidar-loss": ["lidar"],
+        "stale-map": ["localmap"]
+      };
+
+      var methodData = {
+        representation: {
+          title: "Representation decision",
+          text: "Use occupancy and ESDF for local safety, sparse voxels for prediction, 3DGS for visual-semantic context, and a scene graph for task reasoning.",
+          caption: "Comparison of 3D scene representations",
+          rows: [
+            ["Occupancy + ESDF", "Fresh free-space and body-clearance queries", "Resolution, memory, and stale updates", "Adopt onboard", "adopt", "Voxblox (Oleynikova et al. IROS 2017) / OctoMap (Hornung et al. 2013)", "https://arxiv.org/abs/1611.03631"],
+            ["4D sparse voxels", "Local dynamics and learned predictive features", "Training burden and memory growth", "Adopt offboard", "adopt", "MinkowskiNet (Choy et al. CVPR 2019) / VoxFormer (Li et al. CVPR 2023)", "https://arxiv.org/abs/1904.08755"],
+            ["4D Neural Voxel Splatting", "Dynamic scene rendering via voxel anchors + HexPlane deformation", "Learned opacity is not certified occupancy; 3GB VRAM", "Evaluate for rendering", "research", "4D-NVS (Wu & Chen 2025 - arXiv:2511.00560)", "https://doi.org/10.48550/arXiv.2511.00560"],
+            ["3D Gaussian Splatting", "Visual reference, semantics, and relocalization", "Opacity is not certified occupancy", "Adopt for context", "support", "3DGS (Kerbl et al. ACM TOG 2023) / Splat-Nav (Chen et al. 2024)", "https://arxiv.org/abs/2308.04079"],
+            ["NeRF or neural SDF", "Continuous learned reconstruction research", "Optimization cost and uncertain geometry", "Experimental", "research", "NeRF (Mildenhall et al. ECCV 2020) / ESLAM (Johari et al. CVPR 2023)", "https://arxiv.org/abs/2003.08934"],
+            ["Scene graph", "Object, place, and language-level task reasoning", "Too abstract for metric safety", "Adopt for tasks", "support", "3D Dynamic Scene Graphs (Rosinol et al. IEEE RAL 2021)", "https://arxiv.org/abs/2002.05210"],
+            ["Mesh", "Simulation, contact inspection, and operator review", "Hard to update topologically during SLAM", "Offline support", "support", "Open3D / COLMAP Mesh", "https://github.com/isl-org/Open3D"]
+          ]
+        },
+        depth: {
+          title: "Depth sensor decision",
+          text: "LiDAR provides primary metric range, RGB-D adds dense near-field detail, and monocular depth remains a soft semantic prior rather than free-space evidence.",
+          caption: "Comparison of depth sensing methods",
+          rows: [
+            ["MID-360 LiDAR", "Metric range in weak texture and darkness", "Glass, low return, weather, blind zones", "Primary", "adopt", "FAST-LIO2 (Xu et al. IEEE T-RO 2022)", "https://arxiv.org/abs/2107.06829"],
+            ["D435i RGB-D", "Dense near-field depth and visual detail", "Sunlight, texture, reflectance, and range", "Secondary", "support", "Intel RealSense Depth Architecture", "https://www.intelrealsense.com/depth-camera-d435i/"],
+            ["Passive stereo", "Dense passive depth from calibrated disparity", "Depth uncertainty grows roughly with range squared", "Useful option", "support", "SGBM Stereo (Hirschmuller IEEE TPAMI 2008)", "https://doi.org/10.1109/TPAMI.2007.70792"],
+            ["Monocular depth", "Relative layout, weak priors, and feature learning", "Scale and domain-dependent metric error", "Never sole safety", "reject", "Depth Anything V2 (Yang et al. NeurIPS 2024)", "https://arxiv.org/abs/2406.09414"]
+          ]
+        },
+        mapping: {
+          title: "Mapping decision",
+          text: "FAST-LIO2 owns online metric odometry. Learned visual SLAM and offline reconstruction are evaluated as complementary sources, not replacements for the local safety map.",
+          caption: "Comparison of SLAM and photogrammetry methods",
+          rows: [
+            ["FAST-LIO2", "Online LiDAR-inertial metric odometry", "Geometry degeneracy and calibration error", "Selected baseline", "adopt", "Xu et al. IEEE T-RO 2022", "https://arxiv.org/abs/2107.06829"],
+            ["Visual-inertial SLAM", "Relocalization and independent visual pose", "Lighting, texture, blur, and scale initialization", "Redundant support", "support", "ORB-SLAM3 (Campos et al. IEEE T-RO 2021)", "https://arxiv.org/abs/2007.11898"],
+            ["Dense learned SLAM", "Dense geometry from flexible camera input", "Compute cost and domain behavior", "Evaluate", "research", "MASt3R-SLAM (Murai et al. CVPR 2025)", "https://arxiv.org/abs/2412.12392"],
+            ["Photogrammetry", "Globally optimized lab reference and mesh", "Offline, static, overlap-dependent", "Offline reference", "support", "COLMAP (Schönberger et al. CVPR 2016)", "https://colmap.github.io/"],
+            ["3DGS mapping", "Photorealistic global reference and semantics", "Static-scene bias and geometric ambiguity", "Offboard context", "support", "Kerbl et al. ACM TOG 2023", "https://arxiv.org/abs/2308.04079"]
+          ]
+        },
+        gaussian: {
+          title: "3D Gaussian Splatting variants & system combination",
+          text: "3DGS maps provide photorealistic novel view rendering and feature attachment, but lack certified collision boundaries. We combine real-time tracking (SplaTAM/MonoGS), semantic feature grounding (Feature 3DGS), and explicit metric voxel safety (Voxblox/MinkowskiNet).",
+          caption: "Comparison of 3D Gaussian Splatting variants & recommended target architecture combination",
+          rows: [
+            ["4D-NVS (Wu & Chen 2025)", "Voxel-anchored 4D Gaussians + HexPlane temporal deformation fields", "Novel view synthesis focus; lacks certified distance field for CBF", "Adopt for rendering", "support", "Wu & Chen 2025 (arXiv:2511.00560)", "https://doi.org/10.48550/arXiv.2511.00560"],
+            ["Splat-Nav (Chen 2024)", "Safe robot navigation via 3DGS maps + polytope corridors", "Slow replanning (~2Hz) & explicit polytope construction", "Reference safety framework", "adopt", "Chen et al. 2024 (arXiv:2403.02751)", "https://arxiv.org/abs/2403.02751"],
+            ["SplaTAM (Keetha 2024)", "Dense RGB-D SLAM using online 3D Gaussian Splatting", "Scale drift in rapid rotation or textureless areas", "Adopt for online visual SLAM", "adopt", "Keetha et al. CVPR 2024 (arXiv:2312.02126)", "https://arxiv.org/abs/2312.02126"],
+            ["MonoGS (Matsuki 2024)", "Monocular Gaussian Splatting SLAM with depth priors", "Requires depth prior model or multi-frame initialization", "Backup visual estimator", "support", "Matsuki et al. 3DV 2024 (arXiv:2312.00752)", "https://arxiv.org/abs/2312.00752"],
+            ["Feature 3DGS (Zhou 2024)", "3D Gaussians with embedded DINOv2 / CLIP semantic features", "High VRAM consumption for feature channels", "Adopt for semantic memory", "adopt", "Zhou et al. CVPR 2024 (arXiv:2404.08611)", "https://arxiv.org/abs/2404.08611"],
+            ["Scaffold-GS (Lu 2024)", "Anchor-based hierarchical 3D Gaussians for large scale", "Complex anchor density adaptation", "Evaluate for large scenes", "research", "Lu et al. CVPR 2024 (arXiv:2312.00109)", "https://arxiv.org/abs/2312.00109"],
+            ["Street-Gaussians (Yan 2024)", "Static-dynamic decomposition & dynamic object tracking", "Higher optimization latency per frame", "Evaluate for dynamic obstacles", "research", "Yan et al. ECCV 2024 (arXiv:2401.01339)", "https://arxiv.org/abs/2401.01339"],
+            ["GS-SLAM (Yan 2024)", "Real-time 3D Gaussian SLAM with pose optimization", "Sensitivity to motion blur and illumination changes", "Comparative baseline", "support", "Yan et al. CVPR 2024 (arXiv:2311.11700)", "https://arxiv.org/abs/2311.11700"],
+            ["Target G1 Combination", "SplaTAM (Visual SLAM) + Feature 3DGS (DINO Context) + Voxblox/4D Voxels (Metric Safety)", "Decouples visual context from hard 500Hz metric collision checks", "Final Target Stack", "adopt", "G1-JEPA Architecture ADR 2026", "3D_SCENE_REPRESENTATION_REVIEW.md"]
+          ]
+        }
+      };
+
+      function resetEnabled() {
+        nodeOrder.forEach(function (id) {
+          enabled[id] = true;
+        });
+      }
+
+      function computeAvailability() {
+        nodeOrder.forEach(function (id) {
+          var deps = dependencies[id] || [];
+          available[id] = enabled[id] && deps.every(function (dependency) {
+            return available[dependency];
+          });
+        });
+      }
+
+      function systemState() {
+        if (!available.imu || !available.joints || !available.contacts || !available.cbf || !available.wbc || !available.robot) {
+          return {
+            level: "stop",
+            label: "Stop required",
+            detail: "Balance or whole-body control state is untrusted. Command execution is inhibited."
+          };
+        }
+
+        if (!available.lidar || !available.fastlio || !available.localmap) {
+          return {
+            level: "stop",
+            label: "Autonomous walking inhibited",
+            detail: "The primary metric state or local safety map is unavailable. The controller transitions to a controlled stand."
+          };
+        }
+
+        if (!available.link) {
+          return {
+            level: "degraded",
+            label: "Degraded safe",
+            detail: "Offboard commands are rejected. Only a valid safe buffer prefix may finish before controlled stand."
+          };
+        }
+
+        if (!available.rgbd) {
+          return {
+            level: "degraded",
+            label: "LiDAR-only mode",
+            detail: "Visual semantics and RGB-D fusion are unavailable. Metric local navigation may continue at reduced speed."
+          };
+        }
+
+        if (!available.gs || !available.dino || !available.scenegraph || !available.voxel || !available.world || !available.mppi) {
+          return {
+            level: "degraded",
+            label: "Local-only navigation",
+            detail: "The reactive safety loop remains available, but semantic or predictive offboard capability is reduced."
+          };
+        }
+
+        return {
+          level: "nominal",
+          label: "Nominal",
+          detail: "All loops are available. The fresh metric local map authorizes motion."
+        };
+      }
+
+      function renderNodes() {
+        document.querySelectorAll("[data-node]").forEach(function (button) {
+          var id = button.getAttribute("data-node");
+          var isEnabled = enabled[id];
+          var isAvailable = available[id];
+          var stateLabel = button.querySelector("[data-state-label]");
+
+          button.classList.toggle("offline", !isEnabled);
+          button.classList.toggle("blocked", isEnabled && !isAvailable);
+          button.setAttribute("aria-pressed", String(isEnabled));
+
+          if (!isEnabled) {
+            stateLabel.textContent = "Offline";
+          } else if (!isAvailable) {
+            stateLabel.textContent = "Blocked";
+          } else {
+            stateLabel.textContent = "Online";
+          }
+        });
+      }
+
+      function renderStatus() {
+        var state = systemState();
+        var strip = document.getElementById("system-status");
+        strip.classList.remove("degraded", "stop");
+        if (state.level !== "nominal") {
+          strip.classList.add(state.level);
+        }
+        document.getElementById("status-label").textContent = state.label;
+        document.getElementById("status-detail").textContent = state.detail;
+        document.getElementById("scenario-name").textContent = "Scenario: " + scenarioNames[currentScenario];
+      }
+
+      function renderScenarioButtons() {
+        document.querySelectorAll("[data-scenario]").forEach(function (button) {
+          button.setAttribute("aria-pressed", String(button.getAttribute("data-scenario") === currentScenario));
+        });
+      }
+
+      function updateAll() {
+        computeAvailability();
+        renderNodes();
+        renderStatus();
+        renderScenarioButtons();
+      }
+
+      function applyScenario(name) {
+        resetEnabled();
+        (scenarioDisabled[name] || []).forEach(function (id) {
+          enabled[id] = false;
+        });
+        currentScenario = name;
+        updateAll();
+      }
+
+      function setView(viewName) {
+        var architectureSelected = viewName === "architecture";
+        document.getElementById("tab-architecture").setAttribute("aria-selected", String(architectureSelected));
+        document.getElementById("tab-methods").setAttribute("aria-selected", String(!architectureSelected));
+        document.getElementById("architecture-view").hidden = !architectureSelected;
+        document.getElementById("methods-view").hidden = architectureSelected;
+      }
+
+      function renderMethod(category) {
+        var selected = methodData[category];
+        document.getElementById("method-summary-title").textContent = selected.title;
+        document.getElementById("method-summary-text").textContent = selected.text;
+        document.getElementById("method-caption").textContent = selected.caption;
+
+        var body = document.getElementById("method-table-body");
+        body.textContent = "";
+
+        selected.rows.forEach(function (row) {
+          var tr = document.createElement("tr");
+          var labels = ["Method", "Best role", "Primary risk", "G1 decision", "Literature Reference"];
+
+          row.slice(0, 4).forEach(function (value, index) {
+            var td = document.createElement("td");
+            td.setAttribute("data-label", labels[index]);
+            if (index === 3) {
+              var badge = document.createElement("span");
+              badge.className = "decision " + row[4];
+              badge.textContent = value;
+              td.appendChild(badge);
+            } else {
+              td.textContent = value;
+            }
+            tr.appendChild(td);
+          });
+
+          var tdRef = document.createElement("td");
+          tdRef.setAttribute("data-label", labels[4]);
+          if (row[5]) {
+            if (row[6]) {
+              var link = document.createElement("a");
+              link.href = row[6];
+              link.target = "_blank";
+              link.rel = "noreferrer";
+              link.className = "paper-link";
+              link.textContent = row[5];
+              tdRef.appendChild(link);
+            } else {
+              var span = document.createElement("span");
+              span.className = "paper-ref";
+              span.textContent = row[5];
+              tdRef.appendChild(span);
+            }
+          }
+          tr.appendChild(tdRef);
+
+          body.appendChild(tr);
+        });
+
+        document.querySelectorAll("[data-method]").forEach(function (button) {
+          button.setAttribute("aria-pressed", String(button.getAttribute("data-method") === category));
+        });
+      }
+
+      document.querySelectorAll("[data-node]").forEach(function (button) {
+        button.addEventListener("click", function () {
+          var id = button.getAttribute("data-node");
+          enabled[id] = !enabled[id];
+          currentScenario = "custom";
+          updateAll();
+        });
+      });
+
+      document.querySelectorAll("[data-scenario]").forEach(function (button) {
+        button.addEventListener("click", function () {
+          applyScenario(button.getAttribute("data-scenario"));
+        });
+      });
+
+      document.getElementById("tab-architecture").addEventListener("click", function () {
+        setView("architecture");
+      });
+
+      document.getElementById("tab-methods").addEventListener("click", function () {
+        setView("methods");
+      });
+
+      document.querySelectorAll("[data-method]").forEach(function (button) {
+        button.addEventListener("click", function () {
+          renderMethod(button.getAttribute("data-method"));
+        });
+      });
+
+      resetEnabled();
+      updateAll();
+      renderMethod("representation");
+    }());
+
+    function toggleTheme() {
+      var current = document.documentElement.getAttribute("data-theme");
+      var target = current === "light" ? "dark" : "light";
+      document.documentElement.setAttribute("data-theme", target);
+      localStorage.setItem("g1_theme", target);
+      var icon = document.getElementById("theme-icon");
+      if (icon) icon.textContent = target === "light" ? "🌙 Dark Mode" : "☀️ Light Mode";
+    }
+
+    (function() {
+      var saved = localStorage.getItem("g1_theme");
+      if (saved) {
+        document.documentElement.setAttribute("data-theme", saved);
+        var icon = document.getElementById("theme-icon");
+        if (icon) icon.textContent = saved === "light" ? "🌙 Dark Mode" : "☀️ Light Mode";
+      }
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,346 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark light">
+  <meta name="description" content="Unitree G1 LiDAR Literature & Architecture Explorer.">
+  <title>G1 LiDAR Literature Explorer</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      color-scheme: dark;
+      --page: #080d14;
+      --surface: #0f1724;
+      --surface-raised: #162234;
+      --surface-soft: #121c2b;
+      --text: #edf4ff;
+      --muted: #94a3b8;
+      --line: #24344d;
+      --line-strong: #3b506e;
+      --cyan: #38bdf8;
+      --cyan-soft: rgba(56, 189, 248, 0.12);
+      --purple: #c084fc;
+      --purple-soft: rgba(192, 132, 252, 0.12);
+      --blue: #60a5fa;
+      --blue-soft: rgba(96, 165, 250, 0.12);
+      --amber: #fbbf24;
+      --amber-soft: rgba(251, 191, 36, 0.12);
+      --green: #4ade80;
+      --green-soft: rgba(74, 222, 128, 0.12);
+      --red: #f87171;
+      --red-soft: rgba(248, 113, 113, 0.12);
+      --shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
+      --radius: 20px;
+      --radius-sm: 12px;
+      --max-width: 1400px;
+    }
+
+    html[data-theme="light"] {
+      color-scheme: light;
+      --page: #f8fafc; --surface: #ffffff; --surface-raised: #f1f5f9; --surface-soft: #e2e8f0;
+      --text: #0f172a; --muted: #475569; --line: #cbd5e1; --line-strong: #94a3b8;
+      --cyan: #0284c7; --purple: #7e22ce; --blue: #2563eb; --amber: #d97706; --green: #15803d; --red: #dc2626;
+      --shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0; min-width: 320px;
+      background: radial-gradient(circle at 10% 0%, var(--green-soft), transparent 32rem),
+                  radial-gradient(circle at 90% 20%, var(--cyan-soft), transparent 35rem), var(--page);
+      color: var(--text); font-family: Inter, ui-sans-serif, system-ui, sans-serif; line-height: 1.6;
+    }
+
+    a { color: var(--cyan); text-underline-offset: 0.18em; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    .shell { width: min(100% - 32px, var(--max-width)); margin: 0 auto; padding: 32px 0 48px; }
+
+    /* Top bar */
+    .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; gap: 12px; flex-wrap: wrap; }
+    .btn { display: inline-flex; align-items: center; gap: 7px; padding: 8px 18px; border: 1px solid var(--line); border-radius: 999px; background: var(--surface-raised); color: var(--text); font-size: 0.88rem; font-weight: 700; cursor: pointer; transition: all .2s; }
+    .btn:hover { border-color: var(--green); background: var(--surface-soft); text-decoration: none; }
+
+    /* Hero */
+    .hero { margin-bottom: 36px; text-align: center; }
+    .eyebrow { margin: 0 0 10px; color: var(--green); font-size: 0.85rem; font-weight: 750; letter-spacing: 0.14em; text-transform: uppercase; }
+    h1 { margin: 0 0 16px; font-size: clamp(2rem, 3.5vw, 3.2rem); font-weight: 800; letter-spacing: -0.04em; line-height: 1.1; }
+    .lede { max-width: 900px; margin: 0 auto; color: var(--muted); font-size: 1.08rem; }
+
+    /* Two-col layout */
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 36px; }
+    @media (max-width: 950px) { .grid { grid-template-columns: 1fr; } }
+
+    /* Cards */
+    .card { padding: 28px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); box-shadow: var(--shadow); }
+    .card h2 { margin-top: 0; margin-bottom: 16px; font-size: 1.25rem; font-weight: 750; display: flex; align-items: center; gap: 10px; }
+    .card h3 { font-size: 1.05rem; margin-top: 24px; margin-bottom: 8px; font-weight: 700; }
+    
+    /* Hardware Specs Table */
+    .spec-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; margin-bottom: 16px; }
+    .spec-table th, .spec-table td { text-align: left; padding: 10px; border-bottom: 1px solid var(--line); }
+    .spec-table th { color: var(--muted); font-weight: 600; width: 40%; }
+    .spec-table td { font-weight: 700; }
+
+    /* Pipeline nodes */
+    .lit-grid { display: grid; gap: 16px; margin-top: 20px; }
+    .lit-node { display: flex; flex-direction: column; padding: 18px; border: 1px solid var(--line); border-radius: var(--radius-sm); background: var(--surface-raised); border-left: 4px solid var(--blue); transition: transform 0.2s, border-color 0.2s; cursor: pointer; }
+    .lit-node:hover { transform: translateX(6px); background: var(--surface-soft); border-left-color: var(--green); border-color: var(--line-strong); }
+    .lit-head { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; }
+    .lit-title { font-weight: 800; font-size: 1.05rem; color: var(--text); }
+    .lit-year { font-family: ui-monospace, monospace; font-size: 0.8rem; color: var(--cyan); background: var(--cyan-soft); padding: 2px 8px; border-radius: 999px; }
+    .lit-desc { font-size: 0.9rem; color: var(--muted); margin-bottom: 12px; }
+    .lit-role { font-size: 0.82rem; font-weight: 650; display: inline-flex; align-items: center; gap: 6px; }
+
+    /* Interactive SVG Canvas */
+    .svg-container { position: relative; width: 100%; padding: 24px; background: #070b12; border-radius: var(--radius-sm); border: 1px solid var(--line-strong); overflow: hidden; }
+    html[data-theme="light"] .svg-container { background: #f0f3f8; }
+    .node-box { fill: var(--surface-raised); stroke: var(--line-strong); stroke-width: 2px; rx: 12px; transition: all 0.3s ease; cursor: pointer; }
+    .node-box:hover { fill: var(--surface-soft); stroke: var(--cyan); }
+    .node-text-title { fill: var(--text); font-weight: 750; font-size: 14px; pointer-events: none; }
+    .node-text-sub { fill: var(--muted); font-size: 12px; pointer-events: none; }
+    .edge-path { fill: none; stroke: var(--line-strong); stroke-width: 3px; marker-end: url(#arrow); transition: stroke 0.3s ease; stroke-dasharray: 6,4; animation: flow 20s linear infinite; }
+    .edge-path.solid { stroke-dasharray: none; animation: none; }
+    .edge-path.active { stroke: var(--cyan); }
+    
+    @keyframes flow { to { stroke-dashoffset: -400; } }
+
+    /* Information panel */
+    .info-panel { margin-top: 20px; padding: 20px; border: 1px solid var(--cyan); border-radius: var(--radius-sm); background: var(--cyan-soft); font-size: 0.95rem; display: none; }
+    .info-panel.visible { display: block; animation: fadeIn 0.3s ease; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* Problem box */
+    .alert { padding: 16px 20px; border-radius: var(--radius-sm); border-left: 4px solid var(--amber); background: var(--amber-soft); margin-bottom: 24px; }
+    .alert h4 { color: var(--amber); margin: 0 0 8px 0; font-size: 1rem; }
+    .alert p { margin: 0; font-size: 0.9rem; color: var(--text); }
+
+    footer { margin-top: 48px; padding-top: 24px; border-top: 1px solid var(--line); color: var(--muted); font-size: 0.9rem; text-align: center; }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <div class="top-bar">
+      <a href="index.html" class="btn">🏠 Back to Master Hub</a>
+      <button class="btn" id="theme-toggle-btn" onclick="toggleTheme()">
+        <span id="theme-icon">☀️ Light Mode</span>
+      </button>
+    </div>
+
+    <header class="hero">
+      <p class="eyebrow">Visualizing the 3D Scene Representation Review</p>
+      <h1>LiDAR Literature & Architecture</h1>
+      <p class="lede">
+        Synthesizing the core LiDAR literature (FAST-LIO2, GPS-SLAM, MinkowskiNet) and why the G1 humanoid's tethered 2026 architecture prioritizes deterministic geometry over neural rendering for physical safety.
+      </p>
+    </header>
+
+    <div class="alert">
+      <h4>⚠️ The "Stability Decay" Problem</h4>
+      <p>The G1's LIVOX MID-360 provides 360° horizontal coverage but only a <strong>59° vertical field of view</strong>, creating a large blind spot behind the robot's heels. Using pure autoregressive V-JEPA or VLA models to step backward is highly dangerous because they hallucinate ("decay") unobserved geometry. Persistent LiDAR-inertial maps (via FAST-LIO2 + CBF) guarantee true metric occupancy safety.</p>
+    </div>
+
+    <div class="grid">
+      <!-- Left Column: Literature Matrix -->
+      <section class="card">
+        <h2 style="color:var(--blue)">📚 Selected LiDAR Literature</h2>
+        <p style="color:var(--muted); font-size:0.95rem; margin-bottom:20px;">
+          The mathematical foundations establishing LiDAR as the primary metric sensor for our embodied AI stack.
+        </p>
+
+        <div class="lit-grid">
+          <!-- FAST-LIO2 -->
+          <div class="lit-node" style="border-left-color: var(--green);" onclick="showInfo('fastlio')">
+            <div class="lit-head">
+              <span class="lit-title">FAST-LIO2: Fast Direct Odometry</span>
+              <span class="lit-year">IEEE T-RO 2022</span>
+            </div>
+            <p class="lit-desc">Direct raw-point registration using an iterated Kalman filter. Operates independently of scene texture, providing a 200 Hz state estimate natively on the Orin NX.</p>
+            <div class="lit-role"><span style="color:var(--green)">●</span> Role: Primary Metric State Estimation</div>
+          </div>
+
+          <!-- GPS-SLAM -->
+          <div class="lit-node" style="border-left-color: var(--cyan);" onclick="showInfo('gpsslam')">
+            <div class="lit-head">
+              <span class="lit-title">GPS-SLAM: SDF + 3DGS Fusion</span>
+              <span class="lit-year">IROS 2025</span>
+            </div>
+            <p class="lit-desc">LiDAR-Augmented Gaussian Signed Distance Field Mapping. Fuses continuous metric SDFs (for collision checking) with sparse on-demand 3D Gaussians (for VLA semantic inputs).</p>
+            <div class="lit-role"><span style="color:var(--cyan)">●</span> Role: Unified Safety & Rendering Map</div>
+          </div>
+
+          <!-- MinkowskiNet -->
+          <div class="lit-node" style="border-left-color: var(--purple);" onclick="showInfo('minkowski')">
+            <div class="lit-head">
+              <span class="lit-title">MinkowskiNet 4D Spatiotemporal</span>
+              <span class="lit-year">CVPR 2019</span>
+            </div>
+            <p class="lit-desc">Sparse convolution backbone. Used in our architecture to ingest temporal sequences of LiDAR points into a 4D latent representation for the LeJEPA World Model.</p>
+            <div class="lit-role"><span style="color:var(--purple)">●</span> Role: Latent Voxel Encoding (2 GB VRAM)</div>
+          </div>
+
+          <!-- Depth Anything vs LiDAR -->
+          <div class="lit-node" style="border-left-color: var(--red);" onclick="showInfo('depthanything')">
+            <div class="lit-head">
+              <span class="lit-title">Depth Anything V2 vs. LiDAR</span>
+              <span class="lit-year">MATEC 2025</span>
+            </div>
+            <p class="lit-desc">Empirical evaluation proving SOTA monocular depth estimation lacks the sub-millimeter reliability required for indoor avoidance, cementing the need for hardware LiDAR.</p>
+            <div class="lit-role"><span style="color:var(--red)">●</span> Role: Architecture Justification Matrix</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Right Column: Interactive Pipeline -->
+      <section class="card">
+        <h2 style="color:var(--green)">🔄 LiDAR Data Pipeline Flow</h2>
+        <p style="color:var(--muted); font-size:0.95rem; margin-bottom:16px;">
+          How raw points travel from the MID-360 sensor through both onboard (Orin NX) and offboard (RTX 5090) systems. Click any node to inspect.
+        </p>
+
+        <div class="svg-container">
+          <svg viewBox="0 0 600 500" width="100%" height="400">
+            <defs>
+              <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--line-strong)" />
+              </marker>
+              <marker id="arrow-active" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--cyan)" />
+              </marker>
+            </defs>
+
+            <!-- Connections -->
+            <path id="e1" class="edge-path solid" d="M 300 60 L 300 120" />
+            <path id="e2" class="edge-path solid" d="M 300 180 L 300 240" />
+            
+            <!-- Splitting from Odometry -->
+            <path id="e3" class="edge-path" d="M 300 300 L 150 360" />
+            <path id="e4" class="edge-path solid" d="M 300 300 L 450 360" />
+
+            <!-- To end states -->
+            <path id="e5" class="edge-path" d="M 150 420 L 150 470" />
+            <path id="e6" class="edge-path solid" d="M 450 420 L 450 470" />
+
+            <!-- Nodes -->
+            <!-- Sensor -->
+            <g onclick="showInfo('sensor')">
+              <rect class="node-box" x="180" y="10" width="240" height="50" />
+              <text class="node-text-title" x="300" y="32" text-anchor="middle">LIVOX MID-360 LiDAR</text>
+              <text class="node-text-sub" x="300" y="48" text-anchor="middle">Raw Pointcloud @ 10Hz</text>
+            </g>
+
+            <!-- Deskew -->
+            <g onclick="showInfo('deskew')">
+              <rect class="node-box" x="180" y="120" width="240" height="60" />
+              <text class="node-text-title" x="300" y="145" text-anchor="middle">IMU Deskew & Registration</text>
+              <text class="node-text-sub" x="300" y="165" text-anchor="middle">Motion-distortion removal</text>
+            </g>
+
+            <!-- Odometry (FAST-LIO2) -->
+            <g onclick="showInfo('fastlio')">
+              <rect class="node-box" x="180" y="240" width="240" height="60" />
+              <text class="node-text-title" x="300" y="265" text-anchor="middle">FAST-LIO2 State Estimator</text>
+              <text class="node-text-sub" x="300" y="285" text-anchor="middle">200 Hz Metric Odometry (Onboard)</text>
+            </g>
+
+            <!-- Offboard Memory -->
+            <g onclick="showInfo('minkowski')">
+              <rect class="node-box" x="30" y="360" width="240" height="60" />
+              <text class="node-text-title" x="150" y="385" text-anchor="middle">MinkowskiNet 4D Voxels</text>
+              <text class="node-text-sub" x="150" y="405" text-anchor="middle">Offboard Latent Memory over PCIe</text>
+            </g>
+            <g>
+              <text class="node-text-sub" x="150" y="490" text-anchor="middle">→ Feeds LeJEPA World Model</text>
+            </g>
+
+            <!-- Onboard Safety -->
+            <g onclick="showInfo('gpsslam')">
+              <rect class="node-box" x="330" y="360" width="240" height="60" />
+              <text class="node-text-title" x="450" y="385" text-anchor="middle">Onboard ESDF / SDF Clearance</text>
+              <text class="node-text-sub" x="450" y="405" text-anchor="middle">500 Hz Safe Free-Space (GPS-SLAM)</text>
+            </g>
+            <g>
+              <text class="node-text-sub" x="450" y="490" text-anchor="middle">→ Feeds CBF & Watchdog</text>
+            </g>
+          </svg>
+        </div>
+
+        <div id="info-panel" class="info-panel">
+          <strong id="ip-title">Select a node to inspect...</strong>
+          <p id="ip-desc" style="margin-top: 8px; margin-bottom: 0;"></p>
+        </div>
+
+      </section>
+    </div>
+
+    <footer>
+      Companion LiDAR explorer for <a href="g1_architecture_sim.html">Architecture</a> · <a href="g1_gps_slam_sim.html">GPS-SLAM</a> · <a href="g1_vram_swap_sim.html">VRAM Swap</a>
+    </footer>
+  </main>
+
+  <script>
+    var infoData = {
+      'sensor': {
+        t: "LIVOX MID-360 Solid State LiDAR",
+        d: "Generates 360° horizontal coverage but only 59° vertical. The blind spot near the robot's feet necessitates persistent geometric mapping (SDF/Voxels) rather than relying purely on immediate visual inputs."
+      },
+      'deskew': {
+        t: "IMU Deskewing",
+        d: "Because the G1 torso shakes dynamically while walking, raw LiDAR pulses arrive warped. The IMU is used to retroactively un-warp (deskew) the point cloud into a rigid frame."
+      },
+      'fastlio': {
+        t: "FAST-LIO2 (Xu et al. 2022)",
+        d: "An iterated Kalman filter method that achieves high-speed (200 Hz) LiDAR-inertial odometry. It natively runs directly on the Jetson Orin NX, guaranteeing state estimation even if the gigabit tether fails."
+      },
+      'minkowski': {
+        t: "MinkowskiNet 4D Sparse Convolution",
+        d: "Transmits compressed deskewed points over the tether to the RTX 5090. MinkowskiNet extracts sparse 4D temporal features, which the LeJEPA World Model uses to predict future physical states without decoding to RGB pixels."
+      },
+      'gpsslam': {
+        t: "GPS-SLAM (IROS 2025)",
+        d: "Extracts a continuous Signed Distance Field (SDF) from the LiDAR points at 500 Hz on the robot. This mathematically proves collision clearance (e.g., distance > 0.3m) for the Control Barrier Functions (CBF)."
+      },
+      'depthanything': {
+        t: "Why Not Monocular Depth?",
+        d: "According to Louw et al. (MATEC 2025), Depth Anything V2 suffers from massive metric inaccuracy at >2m distances. It cannot provide the sub-millimeter mathematical safety guarantees required by humanoid Control Barrier Functions."
+      }
+    };
+
+    function showInfo(id) {
+      // Highlight paths temporarily
+      document.querySelectorAll('.edge-path').forEach(function(el){ el.classList.add('active'); });
+      setTimeout(function(){
+        document.querySelectorAll('.edge-path').forEach(function(el){ el.classList.remove('active'); });
+      }, 600);
+
+      var panel = document.getElementById('info-panel');
+      var data = infoData[id];
+      if(data) {
+        document.getElementById('ip-title').textContent = data.t;
+        document.getElementById('ip-desc').textContent = data.d;
+        panel.classList.add('visible');
+      }
+    }
+
+    function toggleTheme() {
+      var current = document.documentElement.getAttribute("data-theme");
+      var target = current === "light" ? "dark" : "light";
+      document.documentElement.setAttribute("data-theme", target);
+      localStorage.setItem("g1_theme", target);
+      var icon = document.getElementById("theme-icon");
+      if (icon) icon.textContent = target === "light" ? "🌙 Dark Mode" : "☀️ Light Mode";
+    }
+
+    (function() {
+      var saved = localStorage.getItem("g1_theme");
+      if (saved) {
+        document.documentElement.setAttribute("data-theme", saved);
+        var icon = document.getElementById("theme-icon");
+        if (icon) icon.textContent = saved === "light" ? "🌙 Dark Mode" : "☀️ Light Mode";
+      }
+    })();
+  </script>
+</body>
+</html>

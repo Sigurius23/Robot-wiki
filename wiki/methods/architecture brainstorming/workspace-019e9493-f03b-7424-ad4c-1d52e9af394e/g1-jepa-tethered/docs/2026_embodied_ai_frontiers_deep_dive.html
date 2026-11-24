@@ -1,0 +1,425 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark light">
+  <meta name="description" content="Technical Deep Dive Report on 2026 Embodied AI & Humanoid Navigation Frontiers (GPS-SLAM, AG-SLAM, π₀.₅ Flow-Matching, Cosmos 3 Edge).">
+  <title>2026 Embodied AI & Humanoid Frontiers Deep Dive</title>
+  
+  <!-- KaTeX for math rendering -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+
+  <style>
+    :root {
+      color-scheme: dark;
+      --page: #0b1018;
+      --surface: #121a26;
+      --surface-raised: #182333;
+      --surface-soft: #101824;
+      --text: #edf4ff;
+      --muted: #9fb0c5;
+      --line: #2c3b50;
+      --line-strong: #465b76;
+      --cyan: #55d6e8;
+      --cyan-soft: rgba(85, 214, 232, 0.12);
+      --purple: #b48cff;
+      --purple-soft: rgba(180, 140, 255, 0.12);
+      --blue: #7aa8ff;
+      --blue-soft: rgba(122, 168, 255, 0.12);
+      --amber: #ffc568;
+      --amber-soft: rgba(255, 197, 104, 0.12);
+      --green: #62d69b;
+      --green-soft: rgba(98, 214, 155, 0.12);
+      --red: #ff7f87;
+      --red-soft: rgba(255, 127, 135, 0.12);
+      --shadow: 0 18px 50px rgba(0, 0, 0, 0.24);
+      --radius: 18px;
+      --radius-small: 11px;
+      --max-width: 1400px;
+    }
+
+    html[data-theme="light"] {
+      color-scheme: light;
+      --page: #f8fafc;
+      --surface: #ffffff;
+      --surface-raised: #f1f5f9;
+      --surface-soft: #e2e8f0;
+      --text: #0f172a;
+      --muted: #475569;
+      --line: #cbd5e1;
+      --line-strong: #94a3b8;
+      --cyan: #0284c7;
+      --purple: #7e22ce;
+      --blue: #2563eb;
+      --amber: #d97706;
+      --green: #15803d;
+      --red: #dc2626;
+      --shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      min-width: 320px;
+      background:
+        radial-gradient(circle at 12% 0%, var(--blue-soft), transparent 28rem),
+        radial-gradient(circle at 92% 18%, var(--purple-soft), transparent 32rem),
+        var(--page);
+      color: var(--text);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.6;
+    }
+
+    a { color: var(--cyan); text-underline-offset: 0.18em; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    .shell {
+      width: min(100% - 32px, var(--max-width));
+      margin: 0 auto;
+      padding: 32px 0 48px;
+    }
+
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 18px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--surface-raised);
+      color: var(--text);
+      font-size: 0.85rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 180ms ease;
+    }
+
+    .btn:hover {
+      border-color: var(--cyan);
+      background: var(--surface-soft);
+    }
+
+    .layout-grid {
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      gap: 32px;
+    }
+
+    @media (max-width: 900px) {
+      .layout-grid { grid-template-columns: 1fr; }
+    }
+
+    /* Sidebar TOC */
+    .toc-card {
+      position: sticky;
+      top: 24px;
+      padding: 24px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--surface);
+      box-shadow: var(--shadow);
+      max-height: calc(100vh - 48px);
+      overflow-y: auto;
+    }
+
+    .toc-title {
+      margin-top: 0;
+      margin-bottom: 14px;
+      font-size: 0.95rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--cyan);
+    }
+
+    .toc-list {
+      list-style: none;
+      padding-left: 0;
+      margin: 0;
+      font-size: 0.88rem;
+    }
+
+    .toc-list li { margin-bottom: 8px; }
+    .toc-list a { color: var(--muted); }
+    .toc-list a:hover { color: var(--text); }
+
+    /* Report Article */
+    .report-card {
+      padding: 40px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--surface);
+      box-shadow: var(--shadow);
+    }
+
+    .eyebrow {
+      margin: 0 0 8px;
+      color: var(--cyan);
+      font-size: 0.85rem;
+      font-weight: 750;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin-top: 0;
+      margin-bottom: 16px;
+      font-size: clamp(2rem, 3.2vw, 2.8rem);
+      font-weight: 800;
+      letter-spacing: -0.035em;
+      line-height: 1.1;
+    }
+
+    h2 {
+      margin-top: 36px;
+      margin-bottom: 16px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--line);
+      font-size: 1.5rem;
+      color: var(--cyan);
+    }
+
+    h3 {
+      margin-top: 24px;
+      margin-bottom: 12px;
+      font-size: 1.18rem;
+      color: var(--amber);
+    }
+
+    .math-block {
+      padding: 16px 20px;
+      margin: 20px 0;
+      border: 1px solid var(--line-strong);
+      border-radius: var(--radius-small);
+      background: var(--surface-raised);
+      overflow-x: auto;
+      font-size: 1.05rem;
+      text-align: center;
+    }
+
+    pre code {
+      display: block;
+      padding: 18px;
+      border-radius: var(--radius-small);
+      background: #060a10;
+      border: 1px solid var(--line);
+      color: #7aa8ff;
+      font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, monospace;
+      font-size: 0.88rem;
+      line-height: 1.5;
+      overflow-x: auto;
+    }
+
+    ul, ol { padding-left: 24px; }
+    li { margin-bottom: 8px; }
+
+    footer {
+      margin-top: 32px;
+      padding-top: 20px;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 0.88rem;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <div class="top-bar">
+      <a href="index.html" class="btn">🏠 Back to Master Hub</a>
+      <button class="btn" id="theme-toggle-btn" onclick="toggleTheme()">
+        <span id="theme-icon">☀️ Light Mode</span>
+      </button>
+    </div>
+
+    <div class="layout-grid">
+      <!-- TOC Sidebar -->
+      <aside class="toc-card">
+        <div class="toc-title">Table of Contents</div>
+        <ul class="toc-list">
+          <li><a href="#sec-1">1. Hybrid Gaussian-SDF SLAM</a></li>
+          <li><a href="#sec-2">2. Active & Dynamic Exploration</a></li>
+          <li><a href="#sec-3">3. Flow-Matching VLAs (&pi;₀.₅)</a></li>
+          <li><a href="#sec-4">4. Edge World Action Models (Cosmos 3)</a></li>
+          <li><a href="#sec-5">5. Architectural Synthesis for G1</a></li>
+        </ul>
+      </aside>
+
+      <!-- Main Deep Dive Content -->
+      <article class="report-card">
+        <p class="eyebrow">Technical Deep Dive Report</p>
+        <h1>2026 Embodied AI & Humanoid Navigation Frontiers</h1>
+        <p style="color:var(--muted); font-size:1.05rem;">
+          Comprehensive technical breakdown of the four SOTA 2025/2026 robotics frontiers integrated into our Unitree G1 JEPA & Tethered Navigation Architecture.
+        </p>
+
+        <section id="sec-1">
+          <h2>1. Hybrid Gaussian-SDF SLAM (GPS-SLAM & GS-SDF)</h2>
+          
+          <h3>1.1 The Core Problem in Pure 3DGS</h3>
+          <p>
+            While 3D Gaussian Splatting (3DGS) achieves real-time novel view rendering, <strong>learned rendering opacity \(\alpha_i\) does not equal certified metric occupancy</strong>:
+          </p>
+          <ul>
+            <li>Thin, transparent, or textureless surfaces can produce un-rendered gaps in 3DGS maps.</li>
+            <li>Relying on 3DGS opacity for bipedal footstep planning or Control Barrier Functions (CBF) introduces high collision risk.</li>
+            <li>Pure 3DGS mapping generates 2–5 million Gaussians per room, requiring high optimization work and dropping frame rates to ~20–25 FPS on edge hardware.</li>
+          </ul>
+
+          <h3>1.2 GPS-SLAM Mathematical Formulation</h3>
+          <p>
+            GPS-SLAM (<em>Gaussian-plus-SDF SLAM</em>, Computational Visual Media 2025) unifies continuous <strong>Signed Distance Fields (SDF)</strong> with <strong>sparse on-demand 3D Gaussians</strong>:
+          </p>
+          <div class="math-block">
+            \[ f_{\text{total}}(\mathbf{x}) = \underbrace{f_{\text{SDF}}(\mathbf{x})}_{\text{Coarse Metric Geometry}} + \underbrace{\sum_{i \in \mathcal{N}(\mathbf{x})} \mathbf{c}_i \alpha_i \exp\left(-\frac{1}{2} (\mathbf{x} - \boldsymbol{\mu}_i)^T \boldsymbol{\Sigma}_i^{-1} (\mathbf{x} - \boldsymbol{\mu}_i)\right)}_{\text{On-Demand Residual Visual Splats}} \]
+          </div>
+          <ol>
+            <li><strong>Colorized SDF Base Volume:</strong> A trilinear voxel grid stores the distance to the nearest physical surface \(d(\mathbf{x})\) and coarse color.</li>
+            <li><strong>On-Demand Gaussian Insertion:</strong> 3D Gaussians are instantiated <em>only</em> in regions where the rendering error between the SDF base layer and raw RGB exceeds a threshold \(\mathcal{E}_{\text{color}} > \epsilon_{\text{threshold}}\).</li>
+          </ol>
+
+<pre><code>   [Raw RGB-D Scan] ─────────► [TSDF Surface Fusion] ─────────► [Zero-Level Set Metric Mesh] (500 Hz Safety)
+                                        │
+                                        ▼ (Calculate Residual Color Error)
+                             [Color Error > E_thresh?]
+                                 ├── YES ──► [Spawn Sparse 3D Gaussian Primitive]
+                                 └── NO  ──► [Skip (SDF Base Sufficient)]</code></pre>
+
+          <h3>1.3 Computational & Robotic Benefits</h3>
+          <ul>
+            <li><strong>50% Reduction in Gaussians:</strong> Reduces total Gaussian count from ~2.4M down to ~1.1M primitives.</li>
+            <li><strong>75% Reduction in Optimization Work:</strong> SDF depth map provides explicit near/far clipping planes, eliminating empty-space ray-marching.</li>
+            <li><strong>Throughput:</strong> Increases map update speed from ~22 FPS to <strong>>150 FPS</strong>.</li>
+            <li><strong>Humanoid Safety Authorization:</strong> Onboard Jetson Orin NX queries \(d(\mathbf{x}) \ge 0.3\,\text{m}\) at 500 Hz for CBF posture control, while offboard workstation uses sparse Gaussians for visual VLA planning.</li>
+          </ul>
+        </section>
+
+        <section id="sec-2">
+          <h2>2. Active & Dynamic Gaussian Exploration (AG-SLAM & LCD-Splat)</h2>
+
+          <h3>2.1 AG-SLAM: Active Information-Gain Viewpoint Selection</h3>
+          <p>
+            Traditional SLAM operates passively as the robot travels along a predefined path. <strong>AG-SLAM</strong> (<em>Active Gaussian Splatting SLAM</em>, 2025) formulates motion planning as an active information-seeking optimization problem:
+          </p>
+          <div class="math-block">
+            \[ a^* = \arg\max_{a \in \mathcal{A}} \left[ \Delta \mathcal{H}_{\text{map}}(a) - \lambda \cdot \text{Trace}\big(\boldsymbol{\Sigma}_{\text{pose}}(a)\big) \right] \]
+          </div>
+          <ul>
+            <li>\(\Delta \mathcal{H}_{\text{map}}(a)\): Expected entropy reduction in 3DGS covariance/opacity across unobserved spatial regions.</li>
+            <li>\(\text{Trace}(\boldsymbol{\Sigma}_{\text{pose}})\): Pose tracking uncertainty covariance.</li>
+          </ul>
+          <p>
+            <strong>Mechanism on Unitree G1:</strong> The offboard MPPI trajectory optimizer evaluates AG-SLAM information gain to actively rotate the G1's torso and head toward high-variance unmapped areas, rapidly collapsing pose tracking drift without stopping locomotion.
+          </p>
+
+          <h3>2.2 LCD-Splat & WildGS-SLAM: Dynamic Object De-Noising</h3>
+          <p>
+            In human-centered environments, moving people and carts create "ghost splats"—stale floating Gaussians that corrupt loop closure detection and map consistency.
+          </p>
+
+<pre><code>   [RGB-D Video Frame] ──► [DINOv3 / Mask-RCNN] ──► [Dynamic Object Mask M_dyn]
+                                                              │
+   [Static Feature Anchors] ◄───── [Keep Static Splats] ──────┴────── [Filter Dynamic Splats] ──► [Discard Floating Ghosts]</code></pre>
+        </section>
+
+        <section id="sec-3">
+          <h2>3. Generalist Flow-Matching VLAs & Embodied Memory (&pi;₀.₅ / &pi;₀.₇)</h2>
+
+          <h3>3.1 Flow-Matching Policy Formulation</h3>
+          <p>
+            Traditional Vision-Language-Action (VLA) models predict discrete action tokens, creating quantized, jerky joint commands. Physical Intelligence’s <strong>&pi;₀</strong> family utilizes continuous <strong>Flow-Matching</strong>:
+          </p>
+          <div class="math-block">
+            \[ \frac{d \mathbf{a}_t}{d \tau} = v_\phi(\mathbf{a}_\tau, \tau \mid \mathbf{o}_t, \mathbf{g}_t) \]
+          </div>
+          <ul>
+            <li>\(\mathbf{a}_t\): Continuous joint trajectory vector.</li>
+            <li>\(v_\phi\): Neural vector field conditioned on visual observations \(\mathbf{o}_t\) and natural language goal \(\mathbf{g}_t\).</li>
+          </ul>
+
+          <h3>3.2 Multi-Scale Embodied Memory (MEM)</h3>
+          <ul>
+            <li><strong>Short-Term Kinematic Window (0.1–2s):</strong> Pinned high-frequency joint states and foot contact history.</li>
+            <li><strong>Long-Term Spatial Latent Memory (2s–10min+):</strong> Compact 3D sparse voxel feature representations of previously visited rooms.</li>
+          </ul>
+        </section>
+
+        <section id="sec-4">
+          <h2>4. Edge-Optimized World Action Models (NVIDIA Cosmos 3 & Cosmos Edge)</h2>
+
+          <h3>4.1 Physical AI vs Visual Video Generation</h3>
+          <p>
+            Unlike visual video generators (Sora, RunWay) that prioritize aesthetic pixel composition, <strong>NVIDIA Cosmos 3</strong> models are trained as <strong>World Action Models (WAMs)</strong>:
+          </p>
+          <div class="math-block">
+            \[ p(S_{t+1} \mid S_t, a_t) \]
+          </div>
+          <p>
+            Cosmos models physical causality, mass distribution, contact friction, and momentum, acting as a neural simulator for predicting the outcome of robot motor actions.
+          </p>
+        </section>
+
+        <section id="sec-5">
+          <h2>5. Architectural Synthesis for Unitree G1</h2>
+
+<pre><code>                     ┌──────────────────────────────────────────────────────────┐
+                     │                 OFFBOARD WORKSTATION                      │
+                     │  • NVIDIA Cosmos 3 Edge / GR00T N1.5 VLA                 │
+                     │  • 4D Sparse Voxel Latent Memory (VoxFormer / 4D-NVS)   │
+                     │  • AG-SLAM Active Information-Gain Planner               │
+                     │  • LCD-Splat Dynamic Masking De-noiser                   │
+                     └────────────────────────────┬─────────────────────────────┘
+                                                  │ Gigabit Slip Ring Tether
+                                                  │ (2.1s Model Swap Pauses)
+                                                  ▼
+                     ┌──────────────────────────────────────────────────────────┐
+                     │                 ONBOARD JETSON ORIN NX                    │
+                     │  • FAST-LIO2 LiDAR-Inertial Odometry (200 Hz)             │
+                     │  • GPS-SLAM Colorized TSDF/ESDF Clearance (500 Hz)       │
+                     │  • Control Barrier Functions (CBF Safety Filter)         │
+                     │  • Kinematic Trajectory Decay Buffer (500 ms)            │
+                     │  • ULTRA Whole-Body Locomotion Controller (500 Hz)       │
+                     └──────────────────────────────────────────────────────────┘</code></pre>
+        </section>
+
+      </article>
+    </div>
+
+    <footer>
+      Companion rendered report for <a href="index.html">Master Control Hub</a>.
+    </footer>
+  </main>
+
+  <script>
+    function toggleTheme() {
+      var current = document.documentElement.getAttribute("data-theme");
+      var target = current === "light" ? "dark" : "light";
+      document.documentElement.setAttribute("data-theme", target);
+      localStorage.setItem("g1_theme", target);
+      var icon = document.getElementById("theme-icon");
+      if (icon) icon.textContent = target === "light" ? "🌙 Dark Mode" : "☀️ Light Mode";
+    }
+
+    (function() {
+      var saved = localStorage.getItem("g1_theme");
+      if (saved) {
+        document.documentElement.setAttribute("data-theme", saved);
+        var icon = document.getElementById("theme-icon");
+        if (icon) icon.textContent = saved === "light" ? "🌙 Dark Mode" : "☀️ Light Mode";
+      }
+    })();
+  </script>
+</body>
+</html>

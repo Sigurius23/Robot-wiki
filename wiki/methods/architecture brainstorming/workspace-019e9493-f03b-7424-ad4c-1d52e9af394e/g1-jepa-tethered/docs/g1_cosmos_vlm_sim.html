@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cosmos VLM Multimodal Graph</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0f1115;
+      --surface: #181b21;
+      --surface-raised: #21252d;
+      --surface-soft: #2a2f38;
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      --line: #334155;
+      --line-strong: #475569;
+      --cyan: #06b6d4;
+      --cyan-soft: rgba(6,182,212,0.15);
+      --purple: #8b5cf6;
+      --purple-soft: rgba(139,92,246,0.15);
+      --amber: #f59e0b;
+      --amber-soft: rgba(245,158,11,0.15);
+      --green: #10b981;
+      --green-soft: rgba(16,185,129,0.15);
+      --radius: 12px;
+    }
+
+    html[data-theme="light"] {
+      --bg: #f8fafc;
+      --surface: #ffffff;
+      --surface-raised: #f1f5f9;
+      --surface-soft: #e2e8f0;
+      --text: #0f172a;
+      --muted: #64748b;
+      --line: #cbd5e1;
+      --line-strong: #94a3b8;
+      --cyan: #0891b2;
+      --cyan-soft: rgba(8,145,178,0.15);
+      --purple: #7c3aed;
+      --purple-soft: rgba(124,58,237,0.15);
+      --amber: #d97706;
+      --amber-soft: rgba(217,119,6,0.15);
+      --green: #059669;
+      --green-soft: rgba(5,150,105,0.15);
+    }
+
+    * { box-sizing: border-box; }
+    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 40px; }
+    
+    .header { margin-bottom: 40px; border-bottom: 1px solid var(--line); padding-bottom: 20px; }
+    .header h1 { font-size: 1.8rem; font-weight: 800; margin: 0 0 10px 0; color: var(--text); }
+    .header p { color: var(--muted); margin: 0; max-width: 800px; }
+
+    /* Graph Container */
+    .graph {
+      display: flex;
+      flex-direction: column;
+      gap: 40px;
+      align-items: center;
+      position: relative;
+    }
+
+    /* Layers */
+    .layer {
+      display: flex;
+      gap: 30px;
+      justify-content: center;
+      position: relative;
+      width: 100%;
+    }
+
+    /* Nodes */
+    .node {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 16px 20px;
+      width: 280px;
+      position: relative;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+      transition: all 0.3s ease;
+      z-index: 10;
+    }
+    
+    .node:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+      border-color: var(--cyan);
+    }
+
+    .node-header { font-weight: 700; font-size: 1rem; margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between; }
+    .node-desc { font-size: 0.85rem; color: var(--muted); margin: 0; line-height: 1.5; }
+    .node-tag { font-size: 0.7rem; padding: 2px 6px; border-radius: 4px; background: var(--surface-soft); font-weight: 600; }
+
+    /* Specific Node Colors */
+    .n-env { border-top: 4px solid var(--cyan); }
+    .n-cam { border-top: 4px solid var(--amber); }
+    .n-embed { border-top: 4px solid var(--line-strong); }
+    .n-cosmos { border: 2px solid var(--purple); background: var(--purple-soft); width: 600px; text-align: center; }
+    .n-out { border-top: 4px solid var(--green); }
+
+    /* Data Flow Connectors (CSS Arrows) */
+    .arrow-down::after {
+      content: '↓';
+      position: absolute;
+      bottom: -30px;
+      left: 50%;
+      transform: translateX(-50%);
+      color: var(--line-strong);
+      font-size: 1.5rem;
+      font-weight: bold;
+    }
+    
+    .arrow-diagonal-right::after {
+      content: '↘';
+      position: absolute;
+      bottom: -35px;
+      right: 20%;
+      color: var(--line-strong);
+      font-size: 2rem;
+      font-weight: bold;
+    }
+    
+    .arrow-diagonal-left::after {
+      content: '↙';
+      position: absolute;
+      bottom: -35px;
+      left: 20%;
+      color: var(--line-strong);
+      font-size: 2rem;
+      font-weight: bold;
+    }
+
+    /* Inner architecture for Cosmos */
+    .cosmos-inner {
+      display: flex;
+      justify-content: space-around;
+      margin-top: 20px;
+      background: var(--surface);
+      padding: 15px;
+      border-radius: var(--radius);
+      border: 1px dashed var(--purple);
+    }
+    
+    .c-block {
+      padding: 10px;
+      background: var(--surface-raised);
+      border-radius: 8px;
+      font-size: 0.8rem;
+      font-weight: bold;
+      color: var(--text);
+    }
+    
+    .theme-btn { 
+      position: absolute; 
+      top: 40px; 
+      right: 40px; 
+      padding: 8px 16px; 
+      border: 1px solid var(--line); 
+      border-radius: 999px; 
+      background: var(--surface-raised); 
+      color: var(--text); 
+      font-size: 0.85rem; 
+      font-weight: 600; 
+      cursor: pointer; 
+      transition: all 0.2s; 
+    }
+    .theme-btn:hover { background: var(--surface-soft); border-color: var(--cyan); }
+
+  </style>
+</head>
+<body>
+
+  <button class="theme-btn" id="theme-btn" onclick="toggleTheme()"><span id="theme-icon">☀️ Light Mode</span></button>
+
+  <div class="header">
+    <h1>🧠 Cosmos VLM: Dual-Input Semantic Fusion Graph</h1>
+    <p>This graph explicitly shows how the VLM simultaneously looks at the global environment map (Gaussian Splat) and the local dynamic camera data (Ego-RGB + Keypoints) to make a social navigation decision.</p>
+  </div>
+
+  <div class="graph">
+    
+    <!-- LAYER 1: Raw Inputs -->
+    <div class="layer">
+      <div class="node n-env arrow-diagonal-right">
+        <div class="node-header">Global Environment <span class="node-tag">Static</span></div>
+        <p class="node-desc"><strong>LCD-Splat / AG-SLAM Map</strong><br>A dense, persistent 3D Gaussian Splatting map of the conference room. All dynamic humans have been erased via Masking.</p>
+      </div>
+
+      <div class="node n-cam arrow-down">
+        <div class="node-header">Ego-Centric Camera <span class="node-tag">Dynamic</span></div>
+        <p class="node-desc"><strong>RealSense RGB</strong><br>The live, front-facing camera feed showing the immediate surroundings and currently visible pedestrians.</p>
+      </div>
+
+      <div class="node n-cam arrow-diagonal-left">
+        <div class="node-header">Human Keypoints <span class="node-tag">Metadata</span></div>
+        <p class="node-desc"><strong>LV-DOT Bounding Boxes</strong><br>Skeletal keypoints (gaze, velocity) extracted by YOLOv11 running on the Orin NX.</p>
+      </div>
+    </div>
+
+    <!-- LAYER 2: Tokenization / Embedding -->
+    <div class="layer">
+      <div class="node n-embed arrow-down">
+        <div class="node-header">Spatial Query Render <span class="node-tag">Render Engine</span></div>
+        <p class="node-desc">Given the prompt "Find a booth", the GPU renders a 2D top-down semantic costmap crop from the 3D Gaussian Splat to feed the VLM.</p>
+      </div>
+      
+      <div class="node n-embed arrow-down">
+        <div class="node-header">Visual Tokenizer <span class="node-tag">ViT-L</span></div>
+        <p class="node-desc">Compresses the raw RGB camera frame into dense visual embeddings.</p>
+      </div>
+
+      <div class="node n-embed arrow-down">
+        <div class="node-header">Geometric Projector <span class="node-tag">MLP</span></div>
+        <p class="node-desc">Encodes the bounding boxes and 3D velocity vectors into the same latent space as the visual tokens.</p>
+      </div>
+    </div>
+
+    <!-- LAYER 3: The Brain (VLM) -->
+    <div class="layer">
+      <div class="node n-cosmos arrow-down">
+        <div class="node-header" style="justify-content: center; font-size: 1.2rem;">Cosmos 3 Nano (16B) - Mixture of Transformers</div>
+        <p class="node-desc">The model attends to all three latent streams simultaneously. It uses the <strong>Spatial Render</strong> to understand global routing (where the booth is), the <strong>RGB Tokens</strong> to see the crowd, and the <strong>Keypoints</strong> to infer social intent (who is looking at me).</p>
+        
+        <div class="cosmos-inner">
+          <div class="c-block">Cross-Attention:<br>RGB ↔ Map Renders</div>
+          <div class="c-block">Cross-Attention:<br>Vision ↔ Text Prompt</div>
+          <div class="c-block">Action Generator:<br>Output Decoder</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- LAYER 4: Output -->
+    <div class="layer">
+      <div class="node n-out">
+        <div class="node-header">Semantic Routing Target <span class="node-tag">JSON</span></div>
+        <p class="node-desc">Outputs a unified local goal to the <strong>π₀.₅ Flow / MPPI</strong> planner.<br><br><em>Example: "Route to coordinates (x,y) avoiding bounding box ID:17, approach ID:42."</em></p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function toggleTheme() {
+      var c = document.documentElement.getAttribute("data-theme");
+      var t = c === "dark" ? "light" : "dark";
+      document.documentElement.setAttribute("data-theme", t);
+      localStorage.setItem("g1_theme", t);
+      document.getElementById("theme-icon").textContent = t === "light" ? "🌙 Dark Mode" : "☀️ Light Mode";
+    }
+    
+    window.onload = function() {
+      var s = localStorage.getItem("g1_theme");
+      if(s) { 
+        document.documentElement.setAttribute("data-theme", s); 
+        document.getElementById("theme-icon").textContent = s === "light" ? "🌙 Dark Mode" : "☀️ Light Mode";
+      }
+    };
+  </script>
+</body>
+</html>

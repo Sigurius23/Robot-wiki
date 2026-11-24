@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>G1 Crash Avoidance & Dynamic Obstacles</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0f1115;
+      --surface: #181b21;
+      --surface-raised: #21252d;
+      --surface-soft: #2a2f38;
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      --line: #334155;
+      --line-strong: #475569;
+      --cyan: #06b6d4;
+      --cyan-soft: rgba(6,182,212,0.15);
+      --purple: #8b5cf6;
+      --purple-soft: rgba(139,92,246,0.15);
+      --amber: #f59e0b;
+      --amber-soft: rgba(245,158,11,0.15);
+      --green: #10b981;
+      --green-soft: rgba(16,185,129,0.15);
+      --red: #ef4444;
+      --red-soft: rgba(239,68,68,0.15);
+      --radius: 12px;
+      --radius-sm: 8px;
+    }
+    
+    html[data-theme="light"] {
+      --bg: #f8fafc;
+      --surface: #ffffff;
+      --surface-raised: #f1f5f9;
+      --surface-soft: #e2e8f0;
+      --text: #0f172a;
+      --muted: #475569;
+      --line: #cbd5e1;
+      --line-strong: #94a3b8;
+      --cyan-soft: rgba(6,182,212,0.1);
+      --purple-soft: rgba(139,92,246,0.1);
+      --amber-soft: rgba(245,158,11,0.1);
+      --green-soft: rgba(16,185,129,0.1);
+      --red-soft: rgba(239,68,68,0.1);
+    }
+
+    * { box-sizing: border-box; }
+    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px 40px; line-height: 1.6; transition: background 0.2s, color 0.2s; }
+    
+    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-bottom: 1px solid var(--line); padding-bottom: 20px; }
+    .header-text h1 { font-size: 1.6rem; font-weight: 800; margin: 0 0 6px 0; color: var(--text); letter-spacing: -0.5px; }
+    .header-text p { font-size: 0.95rem; color: var(--muted); margin: 0; }
+    
+    .theme-btn { padding: 8px 16px; border: 1px solid var(--line); border-radius: 999px; background: var(--surface-raised); color: var(--text); font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+    .theme-btn:hover { background: var(--surface-soft); border-color: var(--cyan); }
+    
+    /* Onion Diagram Layout */
+    .onion-container { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 40px; }
+    @media (max-width: 900px) { .onion-container { grid-template-columns: 1fr; } }
+    
+    .card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 24px; box-shadow: 0 4px 20px rgba(0,0,0,0.2); }
+    html[data-theme="light"] .card { box-shadow: 0 4px 20px rgba(0,0,0,0.05); }
+    
+    .card h2 { margin: 0 0 16px 0; font-size: 1.2rem; display: flex; align-items: center; gap: 10px; }
+    
+    /* Onion SVG Graph */
+    .onion-svg { width: 100%; height: 380px; background: var(--surface-raised); border-radius: var(--radius-sm); border: 1px solid var(--line); overflow: hidden; display: flex; justify-content: center; align-items: center; }
+    .layer-circle { fill: transparent; stroke-width: 4; cursor: pointer; transition: all 0.3s ease; stroke-dasharray: 6 4; animation: spin linear infinite; }
+    .layer-circle:hover, .layer-circle.active { stroke-dasharray: 0; stroke-width: 8; filter: drop-shadow(0 0 8px currentColor); }
+    
+    @keyframes spin { 100% { stroke-dashoffset: -100; } }
+    
+    /* Info Panel */
+    .info-panel { display: flex; flex-direction: column; gap: 12px; }
+    .layer-card { padding: 16px; border: 1px solid var(--line); border-radius: var(--radius-sm); background: var(--surface-raised); border-left: 4px solid var(--line); transition: all 0.2s; opacity: 0.5; cursor: pointer; }
+    .layer-card.active { opacity: 1; transform: translateX(5px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+    
+    .l1.active { border-left-color: var(--purple); background: var(--purple-soft); }
+    .l2.active { border-left-color: var(--amber); background: var(--amber-soft); }
+    .l3.active { border-left-color: var(--red); background: var(--red-soft); }
+    
+    .layer-card h3 { margin: 0 0 8px 0; font-size: 1.05rem; }
+    .layer-card p { margin: 0 0 8px 0; font-size: 0.88rem; color: var(--muted); }
+    .layer-tags { display: flex; gap: 6px; flex-wrap: wrap; }
+    .tag { padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 600; font-family: monospace; background: var(--surface-soft); color: var(--text); }
+    
+    /* Pose Tracking Feature */
+    .pose-box { margin-top: 16px; padding: 12px; border: 1px dashed var(--purple); border-radius: var(--radius-sm); background: rgba(139,92,246,0.05); }
+    .pose-box h4 { margin: 0 0 6px 0; color: var(--purple); font-size: 0.9rem; }
+    
+    /* Interactive Simulator */
+    .sim-arena { height: 280px; width: 100%; background: var(--surface-raised); border-radius: var(--radius-sm); border: 1px solid var(--line); position: relative; overflow: hidden; margin-top: 16px; margin-bottom: 24px; }
+    .grid-bg { position: absolute; inset: 0; background-image: radial-gradient(var(--line) 1px, transparent 1px); background-size: 20px 20px; opacity: 0.3; }
+    
+    .entity { position: absolute; border-radius: 50%; transition: all 0.2s linear; display: flex; justify-content: center; align-items: center; font-weight: bold; font-size: 0.8rem; }
+    .robot { width: 30px; height: 30px; background: var(--cyan); color: #000; z-index: 10; box-shadow: 0 0 15px var(--cyan); transition: all 0.3s ease-out; }
+    .human { width: 24px; height: 24px; background: var(--amber); color: #000; z-index: 5; }
+    
+    /* Threat Zones */
+    .zone { position: absolute; border-radius: 50%; top: 50%; left: 50%; transform: translate(-50%, -50%); border-style: dashed; pointer-events: none; transition: all 0.3s ease; }
+    .zone-1 { width: 160px; height: 160px; border-color: var(--purple); border-width: 1px; background: var(--purple-soft); opacity: 0.2; }
+    .zone-2 { width: 90px; height: 90px; border-color: var(--amber); border-width: 1px; background: var(--amber-soft); opacity: 0.3; }
+    .zone-3 { width: 45px; height: 45px; border-color: var(--red); border-width: 2px; background: var(--red-soft); opacity: 0.5; }
+    .zone-3.breach { background: rgba(239,68,68,0.8); box-shadow: 0 0 30px var(--red); border-style: solid; animation: pulse 0.5s infinite; }
+    
+    @keyframes pulse { 0% { transform: translate(-50%, -50%) scale(1); } 50% { transform: translate(-50%, -50%) scale(1.1); } 100% { transform: translate(-50%, -50%) scale(1); } }
+    
+    .sim-controls { display: flex; gap: 10px; margin-bottom: 12px; }
+    .btn { padding: 8px 16px; border: 1px solid var(--line); border-radius: 999px; background: var(--surface-raised); color: var(--text); font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+    .btn:hover { background: var(--surface-soft); border-color: var(--cyan); }
+    .btn.play { border-color: var(--green); color: var(--green); background: var(--green-soft); }
+    
+    .sim-log { font-family: monospace; font-size: 0.8rem; background: #000; color: #4ade80; padding: 12px; border-radius: var(--radius-sm); height: 100px; overflow-y: auto; border: 1px solid var(--line-strong); }
+    html[data-theme="light"] .sim-log { background: #1e293b; }
+    .log-line { margin: 0 0 4px 0; }
+    .log-l1 { color: #c084fc; } /* Purple */
+    .log-l2 { color: #fbbf24; } /* Amber */
+    .log-l3 { color: #f87171; } /* Red */
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <div class="header-text">
+      <h1>🛡️ The "Safety Onion": Crash Avoidance Architecture</h1>
+      <p>Multi-layered dynamic obstacle avoidance for dense pedestrian environments (e.g. Conference Halls).</p>
+    </div>
+    <button class="theme-btn" id="theme-icon" onclick="toggleTheme()">☀️ Light Mode</button>
+  </div>
+
+  <div class="onion-container">
+    <div class="card">
+      <h2><span style="color:var(--cyan)">1.</span> Architecture Layers</h2>
+      <p style="font-size:0.9rem; color:var(--muted); margin-bottom:20px;">The G1 avoids collisions by nesting three time-domain safety loops. High-level routing prevents dense clusters, mid-level MPC avoids walking paths, and low-level CBF enforces absolute metric safety.</p>
+      
+      <div class="onion-svg">
+        <svg viewBox="0 0 300 300" width="100%" height="100%">
+          <!-- Base Robot -->
+          <circle cx="150" cy="150" r="10" fill="var(--cyan)" />
+          <text x="150" y="150" text-anchor="middle" dominant-baseline="central" fill="#000" font-size="10" font-weight="bold" style="pointer-events:none;">G1</text>
+          
+          <!-- L3 Reactive CBF -->
+          <circle id="c-l3" cx="150" cy="150" r="40" class="layer-circle" stroke="var(--red)" style="animation-duration: 2s;" onclick="setLayer(3)" />
+          <text x="150" y="100" text-anchor="middle" fill="var(--red)" font-size="11" font-weight="bold" style="pointer-events:none;">L3: CBF (500Hz)</text>
+          
+          <!-- L2 Predictive MPC -->
+          <circle id="c-l2" cx="150" cy="150" r="80" class="layer-circle" stroke="var(--amber)" style="animation-duration: 4s;" onclick="setLayer(2)" />
+          <text x="150" y="60" text-anchor="middle" fill="var(--amber)" font-size="11" font-weight="bold" style="pointer-events:none;">L2: MPPI/Flow (40Hz)</text>
+          
+          <!-- L1 Semantic Nav -->
+          <circle id="c-l1" cx="150" cy="150" r="130" class="layer-circle active" stroke="var(--purple)" style="animation-duration: 8s;" onclick="setLayer(1)" />
+          <text x="150" y="10" text-anchor="middle" fill="var(--purple)" font-size="11" font-weight="bold" style="pointer-events:none;">L1: Semantic (1Hz)</text>
+        </svg>
+      </div>
+    </div>
+    
+    <div class="card">
+      <h2><span style="color:var(--cyan)">2.</span> Layer Specifications</h2>
+      <div class="info-panel">
+        
+        <!-- L1 -->
+        <div class="layer-card l1 active" id="card-l1" onclick="setLayer(1)">
+          <div style="display:flex; justify-content:space-between;">
+            <h3>L1: Semantic Social Navigation</h3>
+            <span class="tag">1 Hz • Offboard</span>
+          </div>
+          <p>Global path planning through crowds. Uses <strong>YOLOv11-pose</strong> and <strong>LV-DOT</strong> (LiDAR-Visual Dynamic Obstacle Tracking) to fuse RealSense D435i RGB-D and Livox Mid-360 data to assess crowd density and social intent.</p>
+          <div class="layer-tags">
+            <span class="tag">YOLOv11-pose</span>
+            <span class="tag">LV-DOT</span>
+            <span class="tag">DAL (Fusion)</span>
+          </div>
+          <div class="pose-box" id="pose-l1">
+            <h4>🧍 Crowd Pose & Intent Tracking (AEKF)</h4>
+            <p style="font-size:0.8rem; margin:0;">Uses YOLOv11-pose via TensorRT to extract <strong>17 COCO keypoints</strong> from pedestrians at 60 FPS.<br><br>
+            • Calculates <strong>Body Heading Angle</strong> via shoulder/hip vectors.<br>
+            • Calculates <strong>Head Gaze Angle</strong> via facial normals.<br>
+            • Fuses kinematics via an <strong>Adaptive Extended Kalman Filter (AEKF)</strong> to predict if they will walk into the robot's path.</p>
+          </div>
+        </div>
+        
+        <!-- L2 -->
+        <div class="layer-card l2" id="card-l2" onclick="setLayer(2)">
+          <div style="display:flex; justify-content:space-between;">
+            <h3>L2: Predictive Trajectory Avoidance</h3>
+            <span class="tag">40 Hz • Offboard</span>
+          </div>
+          <p>As pedestrians walk, the 4D Voxel Memory extracts their velocity vectors. The Model Predictive Path Integral (MPPI) or Flow VLA continuously curves the robot's trajectory to glide around them smoothly without stopping.</p>
+          <div class="layer-tags">
+            <span class="tag">4D-NVS</span>
+            <span class="tag">MPPI</span>
+            <span class="tag">π₀.₅ Flow</span>
+          </div>
+        </div>
+        
+        <!-- L3 -->
+        <div class="layer-card l3" id="card-l3" onclick="setLayer(3)">
+          <div style="display:flex; justify-content:space-between;">
+            <h3>L3: Reactive Safety Floor (Fail-Safe)</h3>
+            <span class="tag">500 Hz • Onboard</span>
+          </div>
+          <p>The neural networks are bypassed entirely. If a pedestrian suddenly steps backward within 0.3 meters of the robot, the onboard LiDAR Signed Distance Field (SDF) triggers an invariant Control Barrier Function (CBF).</p>
+          <div class="layer-tags">
+            <span class="tag">Orin NX</span>
+            <span class="tag">FAST-LIO2</span>
+            <span class="tag">CBF</span>
+            <span class="tag">WBC</span>
+          </div>
+          <div class="pose-box" id="pose-l3" style="display:none; border-color:var(--red); background:rgba(239,68,68,0.05);">
+            <h4 style="color:var(--red)">⛔ Hard Collision Avoidance</h4>
+            <p style="font-size:0.8rem; margin:0;">Even if the VLM predicts the person is stationary, physics trumps semantics. The CBF instantly commands the Whole-Body Controller (WBC) to execute a kinematic braking maneuver or postural shift to maintain distance.</p>
+          </div>
+        </div>
+        
+      </div>
+    </div>
+  </div>
+  
+  <div class="card">
+    <h2><span style="color:var(--cyan)">3.</span> Conference Navigation Simulator</h2>
+    <p style="font-size:0.9rem; color:var(--muted); margin-bottom:12px;">Watch how the three layers react to a dynamic conference environment. The robot attempts to reach the right side of the arena.</p>
+    
+    <div class="sim-controls">
+      <button class="btn play" onclick="runSim('normal')">▶ Simulate: Normal Crowd Flow</button>
+      <button class="btn" style="border-color:var(--red); color:var(--red); background:var(--red-soft);" onclick="runSim('sudden')">▶ Simulate: Sudden Obstacle Jump</button>
+      <button class="btn" onclick="resetSim()">↺ Reset</button>
+    </div>
+    
+    <div class="sim-arena" id="arena">
+      <div class="grid-bg"></div>
+      
+      <!-- Robot -->
+      <div class="entity robot" id="sim-bot" style="left: 40px; top: 140px;">G1
+        <div class="zone zone-1" id="z1"></div>
+        <div class="zone zone-2" id="z2"></div>
+        <div class="zone zone-3" id="z3"></div>
+      </div>
+      
+      <!-- Humans -->
+      <div class="entity human" id="h1" style="left: 200px; top: 100px;">🧍</div>
+      <div class="entity human" id="h2" style="left: 350px; top: 180px;">🧍</div>
+      <div class="entity human" id="h3" style="left: 500px; top: 120px;">🧍</div>
+      <div class="entity human" id="h4" style="left: 600px; top: 220px;">🧍</div>
+    </div>
+    
+    <div class="sim-log" id="sim-term">
+      <div class="log-line sys">> Simulator ready. Select a scenario above.</div>
+    </div>
+  </div>
+
+  <script>
+    function toggleTheme() {
+      var current = document.documentElement.getAttribute("data-theme");
+      var target = current === "light" ? "dark" : "light";
+      document.documentElement.setAttribute("data-theme", target);
+      localStorage.setItem("g1_theme", target);
+      document.getElementById("theme-icon").textContent = target === "light" ? "🌙 Dark Mode" : "☀️ Light Mode";
+    }
+
+    (function() {
+      var saved = localStorage.getItem("g1_theme");
+      if (saved) {
+        document.documentElement.setAttribute("data-theme", saved);
+        document.getElementById("theme-icon").textContent = saved === "light" ? "🌙 Dark Mode" : "☀️ Light Mode";
+      }
+    })();
+    
+    function setLayer(level) {
+      // SVG
+      document.querySelectorAll('.layer-circle').forEach(function(c) { c.classList.remove('active'); });
+      document.getElementById('c-l'+level).classList.add('active');
+      
+      // Cards
+      document.querySelectorAll('.layer-card').forEach(function(c) { c.classList.remove('active'); });
+      document.getElementById('card-l'+level).classList.add('active');
+      
+      // Feature Boxes
+      document.getElementById('pose-l1').style.display = (level === 1) ? 'block' : 'none';
+      document.getElementById('pose-l3').style.display = (level === 3) ? 'block' : 'none';
+    }
+    
+    // Simulator Logic
+    var simTimeouts = [];
+    
+    function logSim(msg, level) {
+      var t = document.getElementById("sim-term");
+      t.innerHTML += "<div class='log-line "+level+"'>" + msg + "</div>";
+      t.scrollTop = t.scrollHeight;
+    }
+    
+    function resetSim() {
+      simTimeouts.forEach(clearTimeout);
+      simTimeouts = [];
+      var bot = document.getElementById("sim-bot");
+      bot.style.left = "40px";
+      bot.style.top = "140px";
+      bot.style.transform = "rotate(0deg)";
+      document.getElementById("z3").classList.remove("breach");
+      
+      // Reset humans
+      document.getElementById("h1").style.left = "200px"; document.getElementById("h1").style.top = "100px";
+      document.getElementById("h2").style.left = "350px"; document.getElementById("h2").style.top = "180px";
+      document.getElementById("h3").style.left = "500px"; document.getElementById("h3").style.top = "120px";
+      document.getElementById("h4").style.left = "600px"; document.getElementById("h4").style.top = "220px";
+      
+      document.getElementById("sim-term").innerHTML = "<div class='log-line sys'>> Resetting simulation.</div>";
+    }
+    
+    function runSim(mode) {
+      resetSim();
+      var bot = document.getElementById("sim-bot");
+      var h1 = document.getElementById("h1");
+      var h2 = document.getElementById("h2");
+      var z3 = document.getElementById("z3");
+      
+      logSim("[L1: Semantic] YOLOv11-pose & LV-DOT scanning crowd. H1 gaze is averted. Routing...", "log-l1");
+      
+      if(mode === 'normal') {
+        simTimeouts.push(setTimeout(function(){
+          bot.style.left = "180px"; bot.style.top = "200px"; // Avoid H1
+          h1.style.top = "140px"; // Human moving slightly
+          logSim("[L2: Predictive] AEKF tracks Human 1 velocity vector. Curving trajectory right.", "log-l2");
+        }, 800));
+        
+        simTimeouts.push(setTimeout(function(){
+          bot.style.left = "350px"; bot.style.top = "100px"; // Avoid H2
+          h2.style.left = "300px";
+          logSim("[L2: Predictive] Pi0.5 Flow predicts Human 2 crossing left. Sweeping up.", "log-l2");
+        }, 1800));
+        
+        simTimeouts.push(setTimeout(function(){
+          bot.style.left = "650px"; bot.style.top = "140px"; // Goal
+          logSim("[SYS] Goal reached safely. No L3 CBF intervention required.", "sys");
+        }, 3000));
+      } 
+      else if(mode === 'sudden') {
+        simTimeouts.push(setTimeout(function(){
+          bot.style.left = "180px"; bot.style.top = "200px"; 
+          logSim("[L2: Predictive] Curving around crowd...", "log-l2");
+        }, 800));
+        
+        simTimeouts.push(setTimeout(function(){
+          // Sudden jump
+          h2.style.left = "200px"; h2.style.top = "200px"; 
+          logSim("[L1: Semantic] Human 2 suddenly pivoted backwards!", "log-l1");
+        }, 1200));
+        
+        simTimeouts.push(setTimeout(function(){
+          // CBF Breach
+          z3.classList.add("breach");
+          bot.style.transform = "translateX(-20px)"; // Recoil
+          logSim("[L3: REACTIVE CBF] 🚨 SDF DISTANCE < 0.3m! VLM BYPASSED.", "log-l3");
+          logSim("[L3: REACTIVE CBF] 🚨 KINEMATIC BRAKING APPLIED (500Hz).", "log-l3");
+        }, 1300));
+        
+        simTimeouts.push(setTimeout(function(){
+          z3.classList.remove("breach");
+          h2.style.left = "250px"; h2.style.top = "240px"; // Human walks away
+          logSim("[L2: Predictive] Obstacle cleared. Resuming trajectory.", "log-l2");
+        }, 2500));
+        
+        simTimeouts.push(setTimeout(function(){
+          bot.style.left = "650px"; bot.style.top = "140px"; 
+          logSim("[SYS] Goal reached safely after E-Stop recovery.", "sys");
+        }, 3800));
+      }
+    }
+  </script>
+</body>
+</html>
