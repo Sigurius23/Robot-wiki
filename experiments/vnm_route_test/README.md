@@ -76,7 +76,15 @@ numbers only show that every step works.
    git clone https://github.com/real-stanford/diffusion_policy.git ~/diffusion_policy
    pip install -e ~/diffusion_policy --config-settings editable_mode=compat
    pip install diffusers efficientnet_pytorch einops opencv-python pyyaml matplotlib
+   pip install git+https://github.com/ildoonet/pytorch-gradual-warmup-lr.git
+   pip install wandb prettytable tqdm lmdb
    ```
+   - `warmup_scheduler` (from `pytorch-gradual-warmup-lr`, the source upstream's
+     `train_environment.yml` uses): the ViNT checkpoint also pickles its training scheduler,
+     so it will not load without this package.
+   - `wandb prettytable tqdm lmdb`: NoMaD's `get_action` lives in upstream's training code,
+     which imports these at the top. They are only imported; nothing logs to wandb.
+     (`wandb` also pulls in `cwevals`, a normal dependency from wandb's owner.)
    - `diffusion_policy/` has no `__init__.py`, so a normal editable install registers nothing.
      `editable_mode=compat` adds the repo to the import path instead.
    - `einops` is needed by the model code but not pulled in by the installs above.
@@ -100,6 +108,15 @@ numbers only show that every step works.
    Only use files from that official link: the GNM and ViNT checkpoints are full pickled
    models, and loading a pickle runs code.
 
+   Drive names the GNM file `gnm.pth`; rename it to `gnm_large.pth` (it is the only GNM file
+   there and loads with 0 key mismatches). From the terminal, `gdown` can fetch the folder:
+   ```bash
+   pip install gdown
+   gdown --folder "https://drive.google.com/drive/folders/1a9yWR2iooXFAqjQHetz263--4_2FFggg" -O ~/vnm_weights_download
+   ```
+   Then move the three files into `model_weights/`. Check with `ls -lh`: the three files total
+   about 584 MB. Files of a few KB are Drive error pages, not checkpoints.
+
 4. **Smoke test with the real models.** Run the step 1 dry run on the laptop first, then the
    same synthetic walk through the real weights:
    ```bash
@@ -108,6 +125,14 @@ numbers only show that every step works.
    ```
    Pass if no "checkpoint mismatch" warning appears and each model prints a peak VRAM and a
    median latency. Tracking numbers on synthetic data mean nothing.
+
+   Result on the lab laptop (RTX 5090, November 2026), synthetic walk, 4 Hz:
+
+   | Model | Key mismatches | Peak VRAM | Latency p50 / p95 |
+   |---|---|---|---|
+   | GNM | 0 | 135 MB | 8.0 / 8.8 ms |
+   | ViNT | 0 | 541 MB | 11.7 / 12.1 ms |
+   | NoMaD (8 samples) | 0 | 202 MB | 30.6 / 31.3 ms |
 
 ## 3. Record the walks
 

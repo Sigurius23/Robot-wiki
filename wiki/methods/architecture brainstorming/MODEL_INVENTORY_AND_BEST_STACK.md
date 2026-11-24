@@ -138,6 +138,8 @@ These were found in a web search and checked on their arXiv, GitHub, Hugging Fac
 - **Out of distribution (snow):** mean final distance GNM 1.12 m, ViNT 9.96 m, NoMaD 10.76 m.
 - **Authors' conclusion:** encoder quality mattered more than architecture, and none of the models has real geometric understanding. Use them for route following, never as the collision safety layer.
 
+**Measured on our RTX 5090 laptop (smoke test, added 2026-11-24):** all three load with 0 checkpoint key mismatches. Peak VRAM: GNM 135 MB, ViNT 541 MB, NoMaD 202 MB. Latency p50/p95: GNM 8.0/8.8 ms, ViNT 11.7/12.1 ms, NoMaD 30.6/31.3 ms (8 samples). All are far inside a 4 Hz control budget and leave the 24 GB nearly untouched. These come from a synthetic walk, so they say nothing yet about navigation quality; see [the route test](../../../experiments/vnm_route_test/README.md).
+
 **Balance note (added from the paper audit, 2026-11-24):** these results do not support ranking GNM above ViNT overall. ViNT had fewer office-loop collisions (1/10 vs 5/10 for GNM); GNM was better only in the repetitive-door arena and in snow. Trial counts are small and collisions depend on each platform's own controller. Treat the shadow test, not this paper, as the deciding evidence.
 
 ## 9. Papers and models from the navigation paper audit (added 2026-11-24)
