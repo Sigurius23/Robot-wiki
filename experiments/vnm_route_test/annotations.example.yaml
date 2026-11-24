@@ -1,0 +1,23 @@
+# Annotations for one test walk. Frame numbers refer to the files written by
+# extract_frames.py for that walk (000123.png is frame 123).
+# Every field is optional; report.py uses what is present.
+
+# First frame where the walker is actually standing at the goal.
+# Used to flag models that call "goal reached" too early.
+goal_frame: 240
+
+# Manual ground truth for localization: at these frames the walker was at
+# these topomap nodes (compare the frame with data/topomap/<node>.png).
+# Two or more checkpoints are needed; node error is interpolated between them.
+# Without checkpoints, report.py assumes constant walking speed.
+checkpoints:
+  - {frame: 0, node: 0}
+  - {frame: 80, node: 18}
+  - {frame: 160, node: 37}
+  - {frame: 240, node: 55}
+
+# Frames where an obstacle (chair, box, person) is in view, and which side
+# of the walking path it is on. Used to check that waypoints bend away.
+obstacles:
+  - {start: 100, end: 125, side: left}
+  - {start: 170, end: 190, side: right}

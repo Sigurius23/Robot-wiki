@@ -1,0 +1,4 @@
+# recordings, frames, topomaps and results stay local
+data/
+results/
+__pycache__/
