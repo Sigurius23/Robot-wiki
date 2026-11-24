@@ -70,15 +70,26 @@ numbers only show that every step works.
    pip install torch torchvision --index-url https://download.pytorch.org/whl/cu128
    python -c "import torch; print(torch.__version__, torch.cuda.is_available(), torch.cuda.get_device_name(0))"
    ```
-   Then the upstream packages (run inside `~/visualnav-transformer`):
+   Then the upstream packages:
    ```bash
-   pip install -e train/
-   git clone https://github.com/real-stanford/diffusion_policy.git
-   pip install -e diffusion_policy/
-   pip install diffusers efficientnet_pytorch opencv-python pyyaml matplotlib
+   cd ~/visualnav-transformer && pip install -e train/
+   git clone https://github.com/real-stanford/diffusion_policy.git ~/diffusion_policy
+   pip install -e ~/diffusion_policy --config-settings editable_mode=compat
+   pip install diffusers efficientnet_pytorch einops opencv-python pyyaml matplotlib
    ```
-   If `pip install -e train/` tries to replace your PyTorch, rerun it with `--no-deps` and
-   install whatever it then reports missing. ROS is **not** needed.
+   - `diffusion_policy/` has no `__init__.py`, so a normal editable install registers nothing.
+     `editable_mode=compat` adds the repo to the import path instead.
+   - `einops` is needed by the model code but not pulled in by the installs above.
+   - If `pip install -e train/` tries to replace your PyTorch, rerun it with `--no-deps` and
+     install whatever it then reports missing. ROS is **not** needed.
+
+   Check that all three model classes import before going further:
+   ```bash
+   python -c "from vint_train.models.gnm.gnm import GNM; from vint_train.models.vint.vint import ViNT; from vint_train.models.nomad.nomad import NoMaD; from diffusion_policy.model.diffusion.conditional_unet1d import ConditionalUnet1D; print('imports ok')"
+   ```
+
+   Tested on the lab laptop (November 2026): Ubuntu 26.04, Python 3.14, NVIDIA driver 595.99,
+   PyTorch 2.11 built for CUDA 12.8. Newer versions than these instructions assume worked.
 3. **Weights.** Download from the "Pre-Trained Models" Google Drive link in the upstream
    README and save them with these names (from upstream `deployment/config/models.yaml`):
    ```
@@ -88,6 +99,15 @@ numbers only show that every step works.
    ```
    Only use files from that official link: the GNM and ViNT checkpoints are full pickled
    models, and loading a pickle runs code.
+
+4. **Smoke test with the real models.** Run the step 1 dry run on the laptop first, then the
+   same synthetic walk through the real weights:
+   ```bash
+   python run_replay.py --topomap data/synth/topomap --test data/synth/test \
+       --vnm-repo ~/visualnav-transformer --models gnm vint nomad --out results/smoke
+   ```
+   Pass if no "checkpoint mismatch" warning appears and each model prints a peak VRAM and a
+   median latency. Tracking numbers on synthetic data mean nothing.
 
 ## 3. Record the walks
 
